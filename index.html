@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chords — guitar chord visualizer</title>
+<title>Chords 🎸</title>
 <style>
   :root {
     --bg: #faf9f5;
@@ -44,12 +44,7 @@
   h1 {
     font-size: 24px;
     font-weight: 500;
-    margin: 0 0 0.25rem;
-  }
-  .subtitle {
-    color: var(--muted);
-    font-size: 14px;
-    margin: 0 0 2rem;
+    margin: 0 0 1.5rem;
   }
   .filters {
     display: flex;
@@ -97,7 +92,7 @@
   }
   .viewer {
     display: flex;
-    gap: 2.5rem;
+    gap: 1.5rem;
     align-items: flex-start;
     flex-wrap: wrap;
     background: var(--surface);
@@ -105,7 +100,7 @@
     border-radius: var(--radius);
     padding: 2rem;
   }
-  .panel { flex: 1; min-width: 240px; }
+  .panel { flex: 1; min-width: 200px; }
   .chord-title {
     font-size: 32px;
     font-weight: 600;
@@ -221,13 +216,15 @@
     color: var(--ink);
   }
   .next-box {
+    display: none;
     background: var(--bg);
-    border: 1px solid var(--line);
+    border: 1px dashed var(--accent);
     border-radius: var(--radius);
-    padding: 12px 18px 8px;
+    padding: 10px 12px 6px;
     text-align: center;
-    min-width: 150px;
+    align-self: center;
   }
+  .next-box.visible { display: block; }
   .next-label {
     font-size: 12px;
     color: var(--muted);
@@ -251,14 +248,18 @@
 </head>
 <body>
 <main>
-  <h1>Chords</h1>
-  <p class="subtitle">A simple guitar chord visualizer. Click a chord to see the fingering and hear it.</p>
+  <h1>Chords 🎸</h1>
 
   <div class="filters" id="filters" role="group" aria-label="Filter chords by type"></div>
   <div class="chord-grid" id="chord-grid" role="group" aria-label="Chord selection"></div>
 
   <div class="viewer">
     <svg id="board" viewBox="0 0 280 380" width="280" height="380" role="img" aria-label="Chord fingering diagram"></svg>
+    <div class="next-box" id="next-box" aria-live="polite">
+      <p class="next-label">Next up</p>
+      <p class="next-name" id="next-name">–</p>
+      <div id="next-diagram"></div>
+    </div>
     <div class="panel">
       <p class="chord-title" id="chord-name"></p>
       <p class="chord-sub" id="chord-desc"></p>
@@ -285,17 +286,8 @@
         <output id="song-bpm-out">72 bpm</output>
       </div>
     </div>
-    <div style="display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap;">
-      <div style="flex:1;min-width:260px;">
-        <div class="bars" id="song-bars" aria-label="Chord progression, one chip per bar"></div>
-        <p class="song-hint">Each chip is one bar of 4 beats: a strum on beat 1, ticks on 2–4. The diagram above follows the current bar; the dashed chip and the next-up card show the change coming.</p>
-      </div>
-      <div class="next-box" aria-live="polite">
-        <p class="next-label">Next up</p>
-        <p class="next-name" id="next-name">–</p>
-        <div id="next-diagram"></div>
-      </div>
-    </div>
+    <div class="bars" id="song-bars" aria-label="Chord progression, one chip per bar"></div>
+    <p class="song-hint">Each chip is one bar of 4 beats: a strum on beat 1, ticks on 2–4. The diagram up top follows the current bar, with the next chord shown beside it.</p>
   </div>
 
   <footer>Sound is synthesized with the Web Audio API — an approximation, but pitch-accurate.</footer>
@@ -591,6 +583,7 @@ function showNext(chordName) {
   nextName.textContent = chordName || '–';
   nextDiagram.innerHTML = '';
   if (chordName) nextDiagram.appendChild(miniDiagram(CHORDS_BY_NAME[chordName]));
+  document.getElementById('next-box').classList.toggle('visible', !!chordName);
 }
 
 function renderSongBars() {
