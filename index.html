@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chords — guitar chord visualizer</title>
+<style>
+  :root {
+    --bg: #faf9f5;
+    --surface: #ffffff;
+    --ink: #1a1a18;
+    --muted: #6b6a64;
+    --faint: #a3a29a;
+    --line: #dedcd3;
+    --accent: #534ab7;
+    --accent-soft: #eeedfe;
+    --radius: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a;
+      --surface: #262624;
+      --ink: #f0efe9;
+      --muted: #a3a29a;
+      --faint: #6b6a64;
+      --line: #3d3c38;
+      --accent: #afa9ec;
+      --accent-soft: #34305c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+  }
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 {
+    font-size: 24px;
+    font-weight: 500;
+    margin: 0 0 0.25rem;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 2rem;
+  }
+  .filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .filters button {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .filters button.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .chord-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 2.5rem;
+  }
+  .chord-grid button {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-size: 15px;
+    min-width: 56px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .chord-grid button:hover { border-color: var(--accent); }
+  .chord-grid button.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .viewer {
+    display: flex;
+    gap: 2.5rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 2rem;
+  }
+  .panel { flex: 1; min-width: 240px; }
+  .chord-title {
+    font-size: 32px;
+    font-weight: 600;
+    margin: 0 0 2px;
+  }
+  .chord-sub {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 1.25rem;
+  }
+  .actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+  .actions button {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-size: 14px;
+    padding: 9px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .actions button:hover { border-color: var(--accent); color: var(--accent); }
+  .actions button:active { transform: scale(0.97); }
+  .help {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+  }
+  .help p { margin: 0 0 6px; }
+  kbd {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 12px;
+    font-family: ui-monospace, monospace;
+  }
+  footer {
+    margin-top: 2rem;
+    font-size: 13px;
+    color: var(--faint);
+  }
+  @media (max-width: 560px) {
+    .viewer { padding: 1.25rem; gap: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Chords</h1>
+  <p class="subtitle">A simple guitar chord visualizer. Click a chord to see the fingering and hear it.</p>
+
+  <div class="filters" id="filters" role="group" aria-label="Filter chords by type"></div>
+  <div class="chord-grid" id="chord-grid" role="group" aria-label="Chord selection"></div>
+
+  <div class="viewer">
+    <svg id="board" viewBox="0 0 280 380" width="280" height="380" role="img" aria-label="Chord fingering diagram"></svg>
+    <div class="panel">
+      <p class="chord-title" id="chord-name"></p>
+      <p class="chord-sub" id="chord-desc"></p>
+      <div class="actions">
+        <button id="strum-btn">&#9654;&#xFE0E; Strum</button>
+        <button id="arp-btn">&#9836;&#xFE0E; One by one</button>
+      </div>
+      <div class="help">
+        <p>Vertical lines are strings, low E on the left. Numbered dots show which finger to use: 1 index, 2 middle, 3 ring, 4 pinky.</p>
+        <p>An O above the nut means play the string open; an &#x2715; means don't play it. Note names appear under each string.</p>
+        <p>Keyboard: <kbd>&#x2190;</kbd> <kbd>&#x2192;</kbd> to change chord, <kbd>space</kbd> to strum, <kbd>a</kbd> for one by one.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>Sound is synthesized with the Web Audio API — an approximation, but pitch-accurate.</footer>
+</main>
+
+<script>
+const CHORDS = [
+  { name: 'C',  desc: 'C major', type: 'major', frets: [-1, 3, 2, 0, 1, 0], fingers: [0, 3, 2, 0, 1, 0] },
+  { name: 'A',  desc: 'A major', type: 'major', frets: [-1, 0, 2, 2, 2, 0], fingers: [0, 0, 1, 2, 3, 0] },
+  { name: 'G',  desc: 'G major', type: 'major', frets: [3, 2, 0, 0, 0, 3],  fingers: [2, 1, 0, 0, 0, 3] },
+  { name: 'E',  desc: 'E major', type: 'major', frets: [0, 2, 2, 1, 0, 0],  fingers: [0, 2, 3, 1, 0, 0] },
+  { name: 'D',  desc: 'D major', type: 'major', frets: [-1, -1, 0, 2, 3, 2], fingers: [0, 0, 0, 1, 3, 2] },
+  { name: 'F',  desc: 'F major (barre)', type: 'major', frets: [1, 3, 3, 2, 1, 1], fingers: [1, 3, 4, 2, 1, 1] },
+  { name: 'B',  desc: 'B major (barre)', type: 'major', frets: [-1, 2, 4, 4, 4, 2], fingers: [0, 1, 2, 3, 4, 1] },
+  { name: 'Am', desc: 'A minor', type: 'minor', frets: [-1, 0, 2, 2, 1, 0], fingers: [0, 0, 2, 3, 1, 0] },
+  { name: 'Em', desc: 'E minor', type: 'minor', frets: [0, 2, 2, 0, 0, 0],  fingers: [0, 2, 3, 0, 0, 0] },
+  { name: 'Dm', desc: 'D minor', type: 'minor', frets: [-1, -1, 0, 2, 3, 1], fingers: [0, 0, 0, 2, 3, 1] },
+  { name: 'Bm', desc: 'B minor (barre)', type: 'minor', frets: [-1, 2, 4, 4, 3, 2], fingers: [0, 1, 3, 4, 2, 1] },
+  { name: 'Fm', desc: 'F minor (barre)', type: 'minor', frets: [1, 3, 3, 1, 1, 1], fingers: [1, 3, 4, 1, 1, 1] },
+  { name: 'A7', desc: 'A dominant 7', type: 'seventh', frets: [-1, 0, 2, 0, 2, 0], fingers: [0, 0, 2, 0, 3, 0] },
+  { name: 'B7', desc: 'B dominant 7', type: 'seventh', frets: [-1, 2, 1, 2, 0, 2], fingers: [0, 2, 1, 3, 0, 4] },
+  { name: 'C7', desc: 'C dominant 7', type: 'seventh', frets: [-1, 3, 2, 3, 1, 0], fingers: [0, 3, 2, 4, 1, 0] },
+  { name: 'D7', desc: 'D dominant 7', type: 'seventh', frets: [-1, -1, 0, 2, 1, 2], fingers: [0, 0, 0, 2, 1, 3] },
+  { name: 'E7', desc: 'E dominant 7', type: 'seventh', frets: [0, 2, 0, 1, 0, 0], fingers: [0, 2, 0, 1, 0, 0] },
+  { name: 'G7', desc: 'G dominant 7', type: 'seventh', frets: [3, 2, 0, 0, 0, 1], fingers: [3, 2, 0, 0, 0, 1] },
+  { name: 'Am7', desc: 'A minor 7', type: 'seventh', frets: [-1, 0, 2, 0, 1, 0], fingers: [0, 0, 2, 0, 1, 0] },
+  { name: 'Em7', desc: 'E minor 7', type: 'seventh', frets: [0, 2, 2, 0, 3, 0], fingers: [0, 1, 2, 0, 3, 0] },
+  { name: 'Dm7', desc: 'D minor 7', type: 'seventh', frets: [-1, -1, 0, 2, 1, 1], fingers: [0, 0, 0, 2, 1, 1] },
+  { name: 'Cmaj7', desc: 'C major 7', type: 'seventh', frets: [-1, 3, 2, 0, 0, 0], fingers: [0, 3, 2, 0, 0, 0] },
+  { name: 'Fmaj7', desc: 'F major 7', type: 'seventh', frets: [-1, -1, 3, 2, 1, 0], fingers: [0, 0, 3, 2, 1, 0] },
+  { name: 'Gmaj7', desc: 'G major 7', type: 'seventh', frets: [3, 2, 0, 0, 0, 2], fingers: [3, 1, 0, 0, 0, 2] },
+  { name: 'Cadd9', desc: 'C add 9', type: 'other', frets: [-1, 3, 2, 0, 3, 3], fingers: [0, 2, 1, 0, 3, 4] },
+  { name: 'Dsus4', desc: 'D suspended 4', type: 'other', frets: [-1, -1, 0, 2, 3, 3], fingers: [0, 0, 0, 1, 2, 3] },
+  { name: 'Asus2', desc: 'A suspended 2', type: 'other', frets: [-1, 0, 2, 2, 0, 0], fingers: [0, 0, 1, 2, 0, 0] },
+  { name: 'Esus4', desc: 'E suspended 4', type: 'other', frets: [0, 2, 2, 2, 0, 0], fingers: [0, 1, 2, 3, 0, 0] },
+];
+
+const TYPES = [
+  { key: 'all', label: 'All' },
+  { key: 'major', label: 'Major' },
+  { key: 'minor', label: 'Minor' },
+  { key: 'seventh', label: '7ths' },
+  { key: 'other', label: 'Sus & add' },
+];
+
+const TUNING = [82.41, 110.00, 146.83, 196.00, 246.94, 329.63];
+const NOTE_NAMES = ['E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#'];
+const OPEN_SEMITONES = [0, 5, 10, 15, 19, 24];
+
+const NS = 'http://www.w3.org/2000/svg';
+const X0 = 50, STR_GAP = 36, NUT_Y = 56, FRET_GAP = 64, N_FRETS = 4;
+const board = document.getElementById('board');
+let visible = CHORDS;
+let current = CHORDS[0];
+
+function el(tag, attrs, text) {
+  const node = document.createElementNS(NS, tag);
+  for (const key in attrs) node.setAttribute(key, attrs[key]);
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function noteName(stringIndex, fret) {
+  return NOTE_NAMES[(OPEN_SEMITONES[stringIndex] + fret) % 12];
+}
+
+function draw(chord) {
+  board.innerHTML = '';
+  const ink = cssVar('--ink');
+  const line = cssVar('--line');
+  const muted = cssVar('--muted');
+  const faint = cssVar('--faint');
+  const surface = cssVar('--surface');
+  const accent = cssVar('--accent');
+
+  const maxFret = Math.max(...chord.frets);
+  const baseFret = maxFret > N_FRETS ? Math.min(...chord.frets.filter((fret) => fret > 0)) : 1;
+
+  if (baseFret === 1) {
+    board.appendChild(el('rect', { x: X0 - 2, y: NUT_Y - 5, width: STR_GAP * 5 + 4, height: 6, rx: 2, fill: ink }));
+  }
+  for (let s = 0; s < 6; s++) {
+    const x = X0 + s * STR_GAP;
+    board.appendChild(el('line', { x1: x, y1: NUT_Y, x2: x, y2: NUT_Y + N_FRETS * FRET_GAP, stroke: line, 'stroke-width': 1 + s * 0.25 }));
+  }
+  for (let f = 1; f <= N_FRETS; f++) {
+    const y = NUT_Y + f * FRET_GAP;
+    board.appendChild(el('line', { x1: X0, y1: y, x2: X0 + STR_GAP * 5, y2: y, stroke: line, 'stroke-width': 1 }));
+    board.appendChild(el('text', { x: X0 - 26, y: y - FRET_GAP / 2 + 4, 'font-size': 12, fill: faint }, String(baseFret + f - 1)));
+  }
+
+  const barres = {};
+  chord.fingers.forEach((finger, s) => {
+    if (finger > 0) {
+      const key = finger + ':' + chord.frets[s];
+      (barres[key] = barres[key] || []).push(s);
+    }
+  });
+  for (const key in barres) {
+    const strings = barres[key];
+    if (strings.length > 2) {
+      const fret = Number(key.split(':')[1]) - baseFret + 1;
+      const y = NUT_Y + (fret - 0.5) * FRET_GAP;
+      board.appendChild(el('rect', {
+        x: X0 + Math.min(...strings) * STR_GAP - 12, y: y - 12,
+        width: (Math.max(...strings) - Math.min(...strings)) * STR_GAP + 24, height: 24,
+        rx: 12, fill: accent, opacity: 0.3,
+      }));
+    }
+  }
+
+  chord.frets.forEach((fret, s) => {
+    const x = X0 + s * STR_GAP;
+    if (fret === -1) {
+      board.appendChild(el('text', { x: x, y: NUT_Y - 16, 'text-anchor': 'middle', 'font-size': 15, fill: faint }, '✕'));
+    } else if (fret === 0) {
+      board.appendChild(el('circle', { cx: x, cy: NUT_Y - 21, r: 6, fill: 'none', stroke: ink, 'stroke-width': 1.5 }));
+    } else {
+      const y = NUT_Y + (fret - baseFret + 0.5) * FRET_GAP;
+      board.appendChild(el('circle', { cx: x, cy: y, r: 13, fill: ink }));
+      const finger = chord.fingers[s];
+      if (finger > 0) {
+        board.appendChild(el('text', { x: x, y: y + 4.5, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 600, fill: surface }, String(finger)));
+      }
+    }
+    if (fret >= 0) {
+      board.appendChild(el('text', { x: x, y: NUT_Y + N_FRETS * FRET_GAP + 26, 'text-anchor': 'middle', 'font-size': 13, fill: muted }, noteName(s, fret)));
+    }
+  });
+
+  document.getElementById('chord-name').textContent = chord.name;
+  document.getElementById('chord-desc').textContent = chord.desc;
+}
+
+let audioCtx = null;
+function pluck(freq, when) {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+  osc.type = 'triangle';
+  osc.frequency.value = freq;
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(2800, when);
+  filter.frequency.exponentialRampToValueAtTime(700, when + 1.2);
+  gain.gain.setValueAtTime(0.0001, when);
+  gain.gain.exponentialRampToValueAtTime(0.18, when + 0.008);
+  gain.gain.exponentialRampToValueAtTime(0.0001, when + 1.6);
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(when);
+  osc.stop(when + 1.7);
+}
+
+function play(chord, stagger) {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const start = audioCtx.currentTime + 0.03;
+  let count = 0;
+  chord.frets.forEach((fret, s) => {
+    if (fret < 0) return;
+    pluck(TUNING[s] * Math.pow(2, fret / 12), start + count * stagger);
+    count++;
+  });
+}
+
+function select(chord, { silent = false } = {}) {
+  current = chord;
+  draw(chord);
+  document.querySelectorAll('#chord-grid button').forEach((btn) => {
+    btn.classList.toggle('active', btn.textContent === chord.name);
+  });
+  if (!silent) play(chord, 0.045);
+}
+
+function renderGrid() {
+  const grid = document.getElementById('chord-grid');
+  grid.innerHTML = '';
+  visible.forEach((chord) => {
+    const btn = document.createElement('button');
+    btn.textContent = chord.name;
+    btn.classList.toggle('active', chord === current);
+    btn.addEventListener('click', () => select(chord));
+    grid.appendChild(btn);
+  });
+}
+
+const filtersBox = document.getElementById('filters');
+TYPES.forEach((type, index) => {
+  const btn = document.createElement('button');
+  btn.textContent = type.label;
+  btn.classList.toggle('active', index === 0);
+  btn.addEventListener('click', () => {
+    filtersBox.querySelectorAll('button').forEach((other) => other.classList.remove('active'));
+    btn.classList.add('active');
+    visible = type.key === 'all' ? CHORDS : CHORDS.filter((chord) => chord.type === type.key);
+    renderGrid();
+  });
+  filtersBox.appendChild(btn);
+});
+
+document.getElementById('strum-btn').addEventListener('click', () => play(current, 0.045));
+document.getElementById('arp-btn').addEventListener('click', () => play(current, 0.35));
+
+document.addEventListener('keydown', (event) => {
+  if (event.target.tagName === 'INPUT') return;
+  const index = visible.indexOf(current);
+  if (event.key === 'ArrowRight') {
+    event.preventDefault();
+    select(visible[(index + 1) % visible.length]);
+  } else if (event.key === 'ArrowLeft') {
+    event.preventDefault();
+    select(visible[(index - 1 + visible.length) % visible.length]);
+  } else if (event.key === ' ') {
+    event.preventDefault();
+    play(current, 0.045);
+  } else if (event.key === 'a') {
+    play(current, 0.35);
+  }
+});
+
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => draw(current));
+
+renderGrid();
+select(current, { silent: true });
+</script>
+</body>
+</html>
