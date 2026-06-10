@@ -236,10 +236,10 @@
     margin: 2px 0 0;
     min-height: 30px;
   }
-  footer {
-    margin-top: 2rem;
-    font-size: 13px;
-    color: var(--faint);
+  .next-fr {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0 0 4px;
   }
   @media (max-width: 560px) {
     .viewer { padding: 1.25rem; gap: 1.5rem; }
@@ -258,6 +258,7 @@
     <div class="next-box" id="next-box" aria-live="polite">
       <p class="next-label">Next up</p>
       <p class="next-name" id="next-name">–</p>
+      <p class="next-fr" id="next-fr"></p>
       <div id="next-diagram"></div>
     </div>
     <div class="panel">
@@ -289,8 +290,6 @@
     <div class="bars" id="song-bars" aria-label="Chord progression, one chip per bar"></div>
     <p class="song-hint">Each chip is one bar of 4 beats: a strum on beat 1, ticks on 2–4. The diagram up top follows the current bar, with the next chord shown beside it.</p>
   </div>
-
-  <footer>Sound is synthesized with the Web Audio API — an approximation, but pitch-accurate.</footer>
 </main>
 
 <script>
@@ -358,6 +357,16 @@ function noteName(stringIndex, fret) {
   return NOTE_NAMES[(OPEN_SEMITONES[stringIndex] + fret) % 12];
 }
 
+const FRENCH_ROOTS = { C: 'Do', D: 'Ré', E: 'Mi', F: 'Fa', G: 'Sol', A: 'La', B: 'Si' };
+const FRENCH_SUFFIXES = { '': 'majeur', m: 'mineur', 7: '7', m7: 'mineur 7', maj7: 'majeur 7', add9: 'add 9', sus2: 'sus2', sus4: 'sus4' };
+
+function frenchName(chordName) {
+  const match = chordName.match(/^([A-G])(#?)(.*)$/);
+  const root = FRENCH_ROOTS[match[1]] + match[2];
+  const suffix = FRENCH_SUFFIXES[match[3]] ?? match[3];
+  return (root + ' ' + suffix).trim();
+}
+
 function draw(chord) {
   board.innerHTML = '';
   const ink = cssVar('--ink');
@@ -423,7 +432,7 @@ function draw(chord) {
   });
 
   document.getElementById('chord-name').textContent = chord.name;
-  document.getElementById('chord-desc').textContent = chord.desc;
+  document.getElementById('chord-desc').textContent = chord.desc + ' · ' + frenchName(chord.name);
 }
 
 let audioCtx = null;
@@ -581,6 +590,7 @@ function miniDiagram(chord) {
 
 function showNext(chordName) {
   nextName.textContent = chordName || '–';
+  document.getElementById('next-fr').textContent = chordName ? frenchName(chordName) : '';
   nextDiagram.innerHTML = '';
   if (chordName) nextDiagram.appendChild(miniDiagram(CHORDS_BY_NAME[chordName]));
   document.getElementById('next-box').classList.toggle('visible', !!chordName);
