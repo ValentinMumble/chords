@@ -146,6 +146,75 @@
     font-size: 12px;
     font-family: ui-monospace, monospace;
   }
+  h2 {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 2.5rem 0 1rem;
+  }
+  .song-bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+  }
+  .song-bar select {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .song-bar button {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-size: 14px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .song-bar button:hover { border-color: var(--accent); color: var(--accent); }
+  .tempo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .tempo input { accent-color: var(--accent); }
+  .tempo output {
+    min-width: 58px;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .bars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .bar-chip {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    min-width: 54px;
+    padding: 7px 0;
+    text-align: center;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .bar-chip.current {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .song-hint {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 1rem 0 0;
+  }
   footer {
     margin-top: 2rem;
     font-size: 13px;
@@ -179,6 +248,21 @@
         <p>Keyboard: <kbd>&#x2190;</kbd> <kbd>&#x2192;</kbd> to change chord, <kbd>space</kbd> to strum, <kbd>a</kbd> for one by one.</p>
       </div>
     </div>
+  </div>
+
+  <h2>Practice songs</h2>
+  <div class="viewer" style="display:block;">
+    <div class="song-bar">
+      <select id="song-select" aria-label="Choose a song"></select>
+      <button id="song-play">&#9654;&#xFE0E; Play</button>
+      <div class="tempo">
+        <label for="song-bpm">Tempo</label>
+        <input type="range" id="song-bpm" min="40" max="120" step="2" value="72">
+        <output id="song-bpm-out">72 bpm</output>
+      </div>
+    </div>
+    <div class="bars" id="song-bars" aria-label="Chord progression, one chip per bar"></div>
+    <p class="song-hint">Each chip is one bar of 4 beats: a strum on beat 1, ticks on 2–4. The diagram above follows along — watch the highlighted chip to see the next change coming.</p>
   </div>
 
   <footer>Sound is synthesized with the Web Audio API — an approximation, but pitch-accurate.</footer>
@@ -406,6 +490,104 @@ document.addEventListener('keydown', (event) => {
 
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => draw(current));
 
+const SONGS = [
+  { name: "Knockin' on Heaven's Door — Bob Dylan", bpm: 72, bars: ['G', 'D', 'Am7', 'Am7', 'G', 'D', 'C', 'C'] },
+  { name: 'Stand by Me — Ben E. King', bpm: 60, bars: ['G', 'G', 'Em', 'Em', 'C', 'D', 'G', 'G'] },
+  { name: 'Let It Be — The Beatles', bpm: 74, bars: ['C', 'G', 'Am', 'Fmaj7', 'C', 'G', 'Fmaj7', 'C'] },
+  { name: 'Wild Thing — The Troggs', bpm: 84, bars: ['A', 'D', 'E', 'D'] },
+];
+const CHORDS_BY_NAME = Object.fromEntries(CHORDS.map((chord) => [chord.name, chord]));
+
+const songSelect = document.getElementById('song-select');
+const songPlayBtn = document.getElementById('song-play');
+const songBarsBox = document.getElementById('song-bars');
+const bpmInput = document.getElementById('song-bpm');
+const bpmOut = document.getElementById('song-bpm-out');
+let currentSong = SONGS[0];
+let songPlaying = false;
+let songBar = 0;
+let songTimer = null;
+
+function tick(when) {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = 1100;
+  gain.gain.setValueAtTime(0.0001, when);
+  gain.gain.exponentialRampToValueAtTime(0.06, when + 0.004);
+  gain.gain.exponentialRampToValueAtTime(0.0001, when + 0.06);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(when);
+  osc.stop(when + 0.08);
+}
+
+function renderSongBars() {
+  songBarsBox.innerHTML = '';
+  currentSong.bars.forEach((chordName, index) => {
+    const chip = document.createElement('div');
+    chip.className = 'bar-chip';
+    chip.textContent = chordName;
+    chip.dataset.index = index;
+    songBarsBox.appendChild(chip);
+  });
+}
+
+function highlightBar(index) {
+  songBarsBox.querySelectorAll('.bar-chip').forEach((chip) => {
+    chip.classList.toggle('current', index !== null && Number(chip.dataset.index) === index);
+  });
+}
+
+function playBar() {
+  if (!songPlaying) return;
+  const index = songBar % currentSong.bars.length;
+  const chord = CHORDS_BY_NAME[currentSong.bars[index]];
+  highlightBar(index);
+  select(chord, { silent: true });
+  play(chord, 0.045);
+  const beat = 60 / Number(bpmInput.value);
+  for (let b = 1; b < 4; b++) tick(audioCtx.currentTime + 0.03 + b * beat);
+  songBar++;
+  songTimer = setTimeout(playBar, beat * 4 * 1000);
+}
+
+function stopSong() {
+  songPlaying = false;
+  clearTimeout(songTimer);
+  highlightBar(null);
+  songPlayBtn.innerHTML = '&#9654;&#xFE0E; Play';
+}
+
+songPlayBtn.addEventListener('click', () => {
+  if (songPlaying) {
+    stopSong();
+    return;
+  }
+  songPlaying = true;
+  songBar = 0;
+  songPlayBtn.innerHTML = '&#9632;&#xFE0E; Stop';
+  playBar();
+});
+
+SONGS.forEach((song, index) => {
+  const option = document.createElement('option');
+  option.value = index;
+  option.textContent = song.name;
+  songSelect.appendChild(option);
+});
+songSelect.addEventListener('change', () => {
+  stopSong();
+  currentSong = SONGS[Number(songSelect.value)];
+  bpmInput.value = currentSong.bpm;
+  bpmOut.textContent = currentSong.bpm + ' bpm';
+  renderSongBars();
+});
+bpmInput.addEventListener('input', () => {
+  bpmOut.textContent = bpmInput.value + ' bpm';
+});
+
+renderSongBars();
 renderGrid();
 select(current, { silent: true });
 </script>
