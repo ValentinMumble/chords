@@ -215,6 +215,30 @@
     color: var(--muted);
     margin: 1rem 0 0;
   }
+  .bar-chip.next {
+    border-style: dashed;
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+  .next-box {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 18px 8px;
+    text-align: center;
+    min-width: 150px;
+  }
+  .next-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0;
+  }
+  .next-name {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 2px 0 0;
+    min-height: 30px;
+  }
   footer {
     margin-top: 2rem;
     font-size: 13px;
@@ -261,8 +285,17 @@
         <output id="song-bpm-out">72 bpm</output>
       </div>
     </div>
-    <div class="bars" id="song-bars" aria-label="Chord progression, one chip per bar"></div>
-    <p class="song-hint">Each chip is one bar of 4 beats: a strum on beat 1, ticks on 2–4. The diagram above follows along — watch the highlighted chip to see the next change coming.</p>
+    <div style="display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap;">
+      <div style="flex:1;min-width:260px;">
+        <div class="bars" id="song-bars" aria-label="Chord progression, one chip per bar"></div>
+        <p class="song-hint">Each chip is one bar of 4 beats: a strum on beat 1, ticks on 2–4. The diagram above follows the current bar; the dashed chip and the next-up card show the change coming.</p>
+      </div>
+      <div class="next-box" aria-live="polite">
+        <p class="next-label">Next up</p>
+        <p class="next-name" id="next-name">–</p>
+        <div id="next-diagram"></div>
+      </div>
+    </div>
   </div>
 
   <footer>Sound is synthesized with the Web Audio API — an approximation, but pitch-accurate.</footer>
@@ -522,6 +555,44 @@ function tick(when) {
   osc.stop(when + 0.08);
 }
 
+const nextName = document.getElementById('next-name');
+const nextDiagram = document.getElementById('next-diagram');
+
+function miniDiagram(chord) {
+  const MX = 18, MGAP = 19, MNUT = 22, MFGAP = 26, MNF = 3;
+  const svg = el('svg', { viewBox: '0 0 131 116', width: 131, height: 116, role: 'img', 'aria-label': chord.name + ' fingering' });
+  svg.appendChild(el('rect', { x: MX - 1.5, y: MNUT - 3.5, width: MGAP * 5 + 3, height: 4, rx: 1.5, fill: 'var(--ink)' }));
+  for (let s = 0; s < 6; s++) {
+    const x = MX + s * MGAP;
+    svg.appendChild(el('line', { x1: x, y1: MNUT, x2: x, y2: MNUT + MNF * MFGAP, stroke: 'var(--line)', 'stroke-width': 1 }));
+  }
+  for (let f = 1; f <= MNF; f++) {
+    const y = MNUT + f * MFGAP;
+    svg.appendChild(el('line', { x1: MX, y1: y, x2: MX + MGAP * 5, y2: y, stroke: 'var(--line)', 'stroke-width': 1 }));
+  }
+  chord.frets.forEach((fret, s) => {
+    const x = MX + s * MGAP;
+    if (fret === -1) {
+      svg.appendChild(el('text', { x: x, y: MNUT - 9, 'text-anchor': 'middle', 'font-size': 10, fill: 'var(--faint)' }, '✕'));
+    } else if (fret === 0) {
+      svg.appendChild(el('circle', { cx: x, cy: MNUT - 12, r: 4, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 1.2 }));
+    } else {
+      const y = MNUT + (fret - 0.5) * MFGAP;
+      svg.appendChild(el('circle', { cx: x, cy: y, r: 8, fill: 'var(--ink)' }));
+      if (chord.fingers[s] > 0) {
+        svg.appendChild(el('text', { x: x, y: y + 3.5, 'text-anchor': 'middle', 'font-size': 9, 'font-weight': 500, fill: 'var(--surface)' }, String(chord.fingers[s])));
+      }
+    }
+  });
+  return svg;
+}
+
+function showNext(chordName) {
+  nextName.textContent = chordName || '–';
+  nextDiagram.innerHTML = '';
+  if (chordName) nextDiagram.appendChild(miniDiagram(CHORDS_BY_NAME[chordName]));
+}
+
 function renderSongBars() {
   songBarsBox.innerHTML = '';
   currentSong.bars.forEach((chordName, index) => {
@@ -533,17 +604,21 @@ function renderSongBars() {
   });
 }
 
-function highlightBar(index) {
+function highlightBar(index, nextIndex) {
   songBarsBox.querySelectorAll('.bar-chip').forEach((chip) => {
-    chip.classList.toggle('current', index !== null && Number(chip.dataset.index) === index);
+    const chipIndex = Number(chip.dataset.index);
+    chip.classList.toggle('current', index !== null && chipIndex === index);
+    chip.classList.toggle('next', nextIndex !== null && nextIndex !== undefined && chipIndex === nextIndex && chipIndex !== index);
   });
 }
 
 function playBar() {
   if (!songPlaying) return;
   const index = songBar % currentSong.bars.length;
+  const nextIndex = (index + 1) % currentSong.bars.length;
   const chord = CHORDS_BY_NAME[currentSong.bars[index]];
-  highlightBar(index);
+  highlightBar(index, nextIndex);
+  showNext(currentSong.bars[nextIndex]);
   select(chord, { silent: true });
   play(chord, 0.045);
   const beat = 60 / Number(bpmInput.value);
@@ -555,7 +630,8 @@ function playBar() {
 function stopSong() {
   songPlaying = false;
   clearTimeout(songTimer);
-  highlightBar(null);
+  highlightBar(null, null);
+  showNext(null);
   songPlayBtn.innerHTML = '&#9654;&#xFE0E; Play';
 }
 
