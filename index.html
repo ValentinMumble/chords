@@ -73,15 +73,24 @@
     margin-bottom: 2.5rem;
   }
   .chord-grid button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
     background: var(--surface);
     border: 1px solid var(--line);
     color: var(--ink);
     font-size: 15px;
     min-width: 56px;
-    padding: 8px 12px;
+    padding: 6px 12px;
     border-radius: 8px;
     cursor: pointer;
     transition: border-color 0.15s;
+  }
+  .chord-grid button .fr {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--muted);
   }
   .chord-grid button:hover { border-color: var(--accent); }
   .chord-grid button.active {
@@ -90,6 +99,7 @@
     color: var(--accent);
     font-weight: 600;
   }
+  .chord-grid button.active .fr { color: var(--accent); }
   .viewer {
     display: flex;
     gap: 1.5rem;
@@ -367,6 +377,11 @@ function frenchName(chordName) {
   return (root + ' ' + suffix).trim();
 }
 
+function frenchShort(chordName) {
+  const match = chordName.match(/^([A-G])(#?)(.*)$/);
+  return FRENCH_ROOTS[match[1]] + match[2] + (match[3] ? ' ' + match[3] : '');
+}
+
 function draw(chord) {
   board.innerHTML = '';
   const ink = cssVar('--ink');
@@ -471,7 +486,7 @@ function select(chord, { silent = false } = {}) {
   current = chord;
   draw(chord);
   document.querySelectorAll('#chord-grid button').forEach((btn) => {
-    btn.classList.toggle('active', btn.textContent === chord.name);
+    btn.classList.toggle('active', btn.dataset.name === chord.name);
   });
   if (!silent) play(chord, 0.045);
 }
@@ -481,7 +496,13 @@ function renderGrid() {
   grid.innerHTML = '';
   visible.forEach((chord) => {
     const btn = document.createElement('button');
-    btn.textContent = chord.name;
+    btn.dataset.name = chord.name;
+    const symbol = document.createElement('span');
+    symbol.textContent = chord.name;
+    const fr = document.createElement('span');
+    fr.className = 'fr';
+    fr.textContent = frenchShort(chord.name);
+    btn.append(symbol, fr);
     btn.classList.toggle('active', chord === current);
     btn.addEventListener('click', () => select(chord));
     grid.appendChild(btn);
