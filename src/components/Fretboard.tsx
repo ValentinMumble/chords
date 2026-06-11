@@ -1,6 +1,8 @@
 import {useEffect, useRef} from 'react';
-import {findBarres, noteName} from '../chords';
+import {FINGER_COLORS, findBarres, noteName} from '../chords';
 import type {Chord, Finger} from '../types';
+
+const fingerColor = (finger: number) => FINGER_COLORS[finger] ?? 'var(--ink)';
 
 type Variant = 'full' | 'mini';
 
@@ -80,6 +82,24 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
   const strings = [0, 1, 2, 3, 4, 5];
   const fretRows = Array.from({length: geo.fretCount}, (_, row) => row + 1);
 
+  // When several different fingers land on the same fret, nudge them a couple
+  // px off the straight line so they read like real (angled) fingers rather
+  // than a rigid row. Barre fingers (alone on their fret) stay aligned.
+  const fingersByFret = new Map<number, number[]>();
+  ([1, 2, 3, 4] as const).forEach(finger => {
+    const stringIndex = strings.find(index => chord.fingers[index] === finger);
+    if (stringIndex !== undefined) {
+      const fret = chord.frets[stringIndex];
+      fingersByFret.set(fret, [...(fingersByFret.get(fret) ?? []), finger]);
+    }
+  });
+  const stagger = geo.fretGap * 0.04;
+  const fingerShift = (finger: number, fret: number) => {
+    const group = fingersByFret.get(fret);
+    if (!group || group.length < 2) return 0;
+    return (group.indexOf(finger) - (group.length - 1) / 2) * stagger;
+  };
+
   // Dots are tracked per finger, not per string: a finger that keeps its
   // position between chords (a pivot) stays anchored, while moving fingers
   // glide to their new string/fret. Lifted fingers fade out where they were.
@@ -90,11 +110,12 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
       return {finger, visible: false, position: lastDotPositions.current.get(finger), extras: []};
     }
     const [primaryString, ...extraStrings] = fingerStrings;
+    const shift = fingerShift(finger, chord.frets[primaryString]);
     return {
       finger,
       visible: true,
-      position: {x: stringX(primaryString), y: dotY(chord.frets[primaryString])},
-      extras: extraStrings.map(stringIndex => ({x: stringX(stringIndex), y: dotY(chord.frets[stringIndex])})),
+      position: {x: stringX(primaryString), y: dotY(chord.frets[primaryString]) + shift},
+      extras: extraStrings.map(stringIndex => ({x: stringX(stringIndex), y: dotY(chord.frets[stringIndex]) + shift})),
     };
   });
 
@@ -153,8 +174,8 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
             width={(barre.toString - barre.fromString) * geo.stringGap + (geo.dotRadius - 1) * 2}
             height={(geo.dotRadius - 1) * 2}
             rx={geo.dotRadius - 1}
-            fill="var(--accent)"
-            opacity={0.3}
+            fill={fingerColor(barre.finger)}
+            opacity={0.28}
           />
         ))}
       {chord.frets.map((fret, stringIndex) => (
@@ -203,26 +224,26 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
                 opacity: dot.visible ? 1 : 0,
               }}
             >
-              <circle r={geo.dotRadius} fill="var(--ink)" />
+              <circle r={geo.dotRadius} fill={fingerColor(dot.finger)} />
               <text
                 y={geo.dotFontSize * 0.35}
                 textAnchor="middle"
                 fontSize={geo.dotFontSize}
                 fontWeight={600}
-                fill="var(--surface)"
+                fill="#fff"
               >
                 {dot.finger}
               </text>
             </g>
             {dot.extras.map((extra, extraIndex) => (
               <g key={extraIndex} className="fret-dot" style={{transform: `translate(${extra.x}px, ${extra.y}px)`}}>
-                <circle r={geo.dotRadius} fill="var(--ink)" />
+                <circle r={geo.dotRadius} fill={fingerColor(dot.finger)} />
                 <text
                   y={geo.dotFontSize * 0.35}
                   textAnchor="middle"
                   fontSize={geo.dotFontSize}
                   fontWeight={600}
-                  fill="var(--surface)"
+                  fill="#fff"
                 >
                   {dot.finger}
                 </text>

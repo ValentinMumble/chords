@@ -25,6 +25,14 @@ const BPM_MIN = 40;
 const BPM_MAX = 160;
 const BPM_STEP = 2;
 
+// Chord length as bars (4 beats per bar).
+function barLength(beats: number): string {
+  const bars = beats / 4;
+  if (bars === 1) return '1 bar';
+  if (bars === 0.5) return '½ bar';
+  return `${bars} bars`;
+}
+
 export function SongPlayer({
   songs,
   song,
@@ -71,6 +79,11 @@ export function SongPlayer({
           </select>
           {song.advanced && (
             <div className="level-toggle" role="group" aria-label="Difficulty">
+              <span
+                className="level-indicator"
+                style={{transform: level === 'advanced' ? 'translateX(100%)' : 'translateX(0)'}}
+                aria-hidden="true"
+              />
               <button className={level === 'easy' ? 'active' : ''} onClick={() => onLevelChange('easy')}>
                 Easy
               </button>
@@ -130,18 +143,20 @@ export function SongPlayer({
             <div
               key={index}
               className={`bar-chip${isCurrent ? ' current' : ''}${isNext ? ' next' : ''}`}
-              style={{minWidth: 38 + bar.beats * 7}}
+              style={{minWidth: 46 + bar.beats * 6}}
             >
-              {bar.name}
+              <span className="chip-name">{bar.name}</span>
+              <span className="chip-ticks" aria-label={barLength(bar.beats)}>
+                {Array.from({length: Math.floor(bar.beats / 4)}).map((_, tick) => (
+                  <span key={tick} className="tick" />
+                ))}
+                {bar.beats % 4 >= 2 && <span className="tick half" />}
+              </span>
             </div>
           );
         })}
       </div>
       <StrumPattern pattern={pattern} playing={playing} barSeconds={240 / bpm} />
-      <p className="song-hint">
-        Each chip is a chord — wider chips are held longer before the change. The diagram up top follows the current
-        chord, with the next one shown beside it. Easy strums steady downstrokes; advanced uses a down-up pattern.
-      </p>
     </div>
   );
 }

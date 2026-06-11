@@ -54,11 +54,16 @@ export function useSongPlayback(
     const phase = (beatsBefore * 2) % pat.length;
     const slots = bar.beats * 2;
     for (let slot = 0; slot < slots; slot++) {
-      const stroke = pat[(phase + slot) % pat.length];
+      const pos = (phase + slot) % pat.length;
+      const stroke = pat[pos];
       if (stroke === '-') continue;
-      const isDownbeatOne = (phase + slot) % pat.length === 0;
-      const gain = stroke === 'D' ? (isDownbeatOne ? 1 : 0.8) : 0.55;
-      strumStroke(chord, barStart + slot * eighth, stroke === 'D' ? 'down' : 'up', gain);
+      const down = stroke === 'D';
+      // Strong beats: 1 (loudest) and 3 (backbeat) carry a bass thump.
+      const strongBeat = pos === 0 || pos === 4;
+      const gain = down ? (pos === 0 ? 1 : pos === 4 ? 0.9 : 0.72) : 0.5;
+      // Lay the off-beat up-strokes slightly late for a relaxed swing feel.
+      const swing = pos % 2 === 1 ? eighth * 0.14 : 0;
+      strumStroke(chord, barStart + slot * eighth + swing, down ? 'down' : 'up', gain, down && strongBeat);
     }
     nextBarTimeRef.current = barStart + bar.beats * beat;
 

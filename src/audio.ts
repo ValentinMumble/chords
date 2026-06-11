@@ -112,7 +112,13 @@ function chordVoices(chord: Chord): number[] {
 // A single strum. Down-strokes sweep low-to-high across all strings; up-strokes
 // are lighter and snappier, catching mostly the top strings. Timing and volume
 // are humanized slightly so repeated strums don't sound mechanical.
-export function strumStroke(chord: Chord, when: number, direction: StrokeDirection, gain: number): void {
+export function strumStroke(
+  chord: Chord,
+  when: number,
+  direction: StrokeDirection,
+  gain: number,
+  withBass = false,
+): void {
   const context = ensureAudio();
   loadGuitar();
   const guitar = players.get(currentSound);
@@ -126,12 +132,14 @@ export function strumStroke(chord: Chord, when: number, direction: StrokeDirecti
   }
   // One velocity feel per strum (±10%), plus a hair of timing wobble per note.
   const strumGain = gain * (0.92 + Math.random() * 0.16);
-  const swing = (Math.random() - 0.5) * 0.012;
+  const wobble = (Math.random() - 0.5) * 0.012;
   notes.forEach((midi, index) => {
-    const at = when + swing + index * stagger + (Math.random() - 0.5) * 0.005;
-    const noteGain = Math.max(0.05, strumGain * (1 - index * 0.03));
+    const at = when + wobble + index * stagger + (Math.random() - 0.5) * 0.005;
+    let noteGain = strumGain * (1 - index * 0.03);
+    // On the beat, dig into the bass strings for a "boom-chick" thump.
+    if (withBass && direction === 'down') noteGain *= index === 0 ? 1.45 : index === 1 ? 1.18 : 1;
     if (guitar) {
-      guitar.play(midiToNote(midi), at, {gain: noteGain, duration});
+      guitar.play(midiToNote(midi), at, {gain: Math.max(0.05, noteGain), duration});
     } else {
       pluckFallback(context, midiToFrequency(midi), at);
     }

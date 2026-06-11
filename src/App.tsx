@@ -15,7 +15,7 @@ import {Fretboard} from './components/Fretboard';
 import {ChordActions} from './components/ChordActions';
 import {ChordFilters} from './components/ChordFilters';
 import {ChordGrid} from './components/ChordGrid';
-import {ChordDetails} from './components/ChordDetails';
+import {KeyboardHint} from './components/KeyboardHint';
 import {NextUpCard} from './components/NextUpCard';
 import {SongPlayer} from './components/SongPlayer';
 import {useSongPlayback} from './hooks/useSongPlayback';
@@ -105,17 +105,16 @@ export default function App() {
         playback={playback}
       />
       <div className="viewer chord-viewer">
-        <div className="chord-heading">
-          <div>
+        <div className="chord-header">
+          <div className="chord-name-block">
             <p className="chord-title">{chord.name}</p>
             <p className="chord-sub">{frenchName(chord.name)}</p>
           </div>
           <ChordActions chord={chord} />
         </div>
-        <div className="chord-row">
+        <div className="chord-diagrams">
           <Fretboard chord={chord} />
           {nextChordName && <NextUpCard chordName={nextChordName} />}
-          <ChordDetails />
         </div>
       </div>
       <h2>Chord library</h2>
@@ -125,6 +124,7 @@ export default function App() {
       ) : (
         <p className="empty-grid">No chords match these filters.</p>
       )}
+      <KeyboardHint />
     </main>
   );
 }

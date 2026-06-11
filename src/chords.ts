@@ -62,6 +62,15 @@ export const SHAPE_FILTERS: {key: Exclude<ShapeFilter, 'any'>; label: string}[] 
   {key: 'barre', label: 'Barre'},
 ];
 
+// Per-finger color code (1 index, 2 middle, 3 ring, 4 pinky). Coral-led palette
+// harmonious with the accent; all read with white numerals in both modes.
+export const FINGER_COLORS: Record<number, string> = {
+  1: '#d85a30',
+  2: '#ba7517',
+  3: '#0f6e56',
+  4: '#534ab7',
+};
+
 export interface Barre {
   finger: number;
   fret: number;
