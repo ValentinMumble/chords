@@ -48,6 +48,7 @@ export default function App() {
     playback.stop();
     setSongIndex(index);
     setBpm(SONGS[index].bpm);
+    setSound(SONGS[index].sound);
   }
 
   useKeyboardShortcuts({
