@@ -55,14 +55,6 @@ export default function App() {
   return (
     <main>
       <h1>Chords 🎸</h1>
-      <ChordFilters filter={activeFilter} onChange={setFilter} />
-      <ChordGrid chords={visible} selected={chord.name} onSelect={selectChord} />
-      <div className="viewer">
-        <Fretboard chord={chord} />
-        {nextChordName && <NextUpCard chordName={nextChordName} />}
-        <ChordDetails chord={chord} />
-      </div>
-      <h2>Practice songs</h2>
       <SongPlayer
         songs={SONGS}
         song={song}
@@ -72,6 +64,14 @@ export default function App() {
         onBpmChange={setBpm}
         playback={playback}
       />
+      <div className="viewer">
+        <Fretboard chord={chord} />
+        {nextChordName && <NextUpCard chordName={nextChordName} />}
+        <ChordDetails chord={chord} />
+      </div>
+      <h2>Chord library</h2>
+      <ChordFilters filter={activeFilter} onChange={setFilter} />
+      <ChordGrid chords={visible} selected={chord.name} onSelect={selectChord} />
     </main>
   );
 }

@@ -109,6 +109,9 @@ h1 {
   border-radius: var(--radius);
   padding: 2rem;
 }
+.viewer + .viewer {
+  margin-top: 1.5rem;
+}
 .panel {
   flex: 1;
   min-width: 200px;
