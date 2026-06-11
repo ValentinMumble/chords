@@ -5,8 +5,8 @@
   --muted: #6b6a64;
   --faint: #a3a29a;
   --line: #dedcd3;
-  --accent: #534ab7;
-  --accent-soft: #eeedfe;
+  --accent: #993c1d;
+  --accent-soft: #faece7;
   --radius: 12px;
 }
 @media (prefers-color-scheme: dark) {
@@ -17,8 +17,8 @@
     --muted: #a3a29a;
     --faint: #6b6a64;
     --line: #3d3c38;
-    --accent: #afa9ec;
-    --accent-soft: #34305c;
+    --accent: #f0997b;
+    --accent-soft: #46241a;
   }
 }
 * {
@@ -145,7 +145,7 @@ h1 {
   min-width: 200px;
 }
 .chord-title {
-  font-size: 32px;
+  font-size: 38px;
   font-weight: 600;
   margin: 0 0 2px;
 }
@@ -159,6 +159,8 @@ h1 {
   gap: 8px;
 }
 .actions button {
+  position: relative;
+  overflow: hidden;
   background: transparent;
   border: 1px solid var(--line);
   color: var(--ink);
@@ -173,6 +175,34 @@ h1 {
 }
 .actions button:active {
   transform: scale(0.97);
+}
+.action-label {
+  position: relative;
+  z-index: 1;
+}
+.arp-progress {
+  position: absolute;
+  inset: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: var(--accent-soft);
+  animation-name: arp-fill;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  pointer-events: none;
+}
+@keyframes arp-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .arp-progress {
+    animation: none;
+  }
 }
 .help {
   font-size: 13px;
@@ -195,14 +225,26 @@ h2 {
   font-weight: 500;
   margin: 2.5rem 0 1rem;
 }
-.song-bar {
+.song-controls {
   display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 16px;
   margin-bottom: 1.25rem;
 }
-.song-bar select {
+.song-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-right: 56px;
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.song-controls select {
   background: var(--surface);
   border: 1px solid var(--line);
   color: var(--ink);
@@ -211,18 +253,14 @@ h2 {
   border-radius: 8px;
   cursor: pointer;
 }
-.song-bar button {
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--ink);
-  font-size: 14px;
-  padding: 8px 18px;
-  border-radius: 8px;
-  cursor: pointer;
+.song-select {
+  flex: 1;
+  min-width: 240px;
 }
-.song-bar button:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+.tempo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 .song-player {
   display: block;
@@ -245,9 +283,6 @@ h2 {
   background: var(--accent-soft);
   border-color: var(--accent);
   color: var(--accent);
-}
-.song-player .song-bar {
-  padding-right: 60px;
 }
 .play-btn {
   position: absolute;
@@ -279,18 +314,76 @@ h2 {
   font-size: 13px;
   color: var(--muted);
 }
-.tempo input {
-  accent-color: var(--accent);
+.sound {
+  margin-left: auto;
 }
 .tempo output {
   min-width: 58px;
   font-variant-numeric: tabular-nums;
   color: var(--ink);
 }
+.reset-tempo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.reset-tempo:not(:disabled):hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.reset-tempo:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
 .bars {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+.metronome {
+  flex-shrink: 0;
+  cursor: ns-resize;
+  touch-action: none;
+  border-radius: 8px;
+}
+.metronome:focus {
+  outline: none;
+}
+.metronome:hover .metronome-arm.swinging,
+.metronome.dragging .metronome-arm.swinging {
+  animation: none;
+}
+.metronome-weight {
+  cursor: grab;
+}
+.metronome-arm {
+  transform-box: view-box;
+  transform-origin: 20px 50px;
+}
+.metronome-arm.swinging {
+  animation-name: tick-tock;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+@keyframes tick-tock {
+  from {
+    transform: rotate(-24deg);
+  }
+  to {
+    transform: rotate(24deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .metronome-arm.swinging {
+    animation: none;
+  }
 }
 .bar-chip {
   border: 1px solid var(--line);

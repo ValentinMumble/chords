@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {CHORDS_BY_NAME, type ChordName} from '../chords';
-import {ensureAudio, metronomeTick, strum} from '../audio';
+import {ensureAudio, strum} from '../audio';
 
 const RESYNC_THRESHOLD = 0.1;
 
@@ -45,9 +45,7 @@ export function useSongPlayback(
     const barStart = nextBarTimeRef.current;
     strum(chord, barStart);
     const beat = 60 / bpmRef.current;
-    const beats = beatsPerBarRef.current;
-    for (let tick = 1; tick < beats; tick++) metronomeTick(barStart + tick * beat);
-    nextBarTimeRef.current = barStart + beats * beat;
+    nextBarTimeRef.current = barStart + beatsPerBarRef.current * beat;
 
     const timer = setTimeout(
       () => {

@@ -12,6 +12,7 @@ import {
 import {SONGS, songVersion, type SongLevel} from './songs';
 import {arpeggio, GUITAR_SOUNDS, setGuitarSound, strum} from './audio';
 import {Fretboard} from './components/Fretboard';
+import {ChordActions} from './components/ChordActions';
 import {ChordFilters} from './components/ChordFilters';
 import {ChordGrid} from './components/ChordGrid';
 import {ChordDetails} from './components/ChordDetails';
@@ -96,6 +97,7 @@ export default function App() {
         onLevelChange={changeLevel}
         bars={version.bars}
         bpm={bpm}
+        recommendedBpm={version.bpm}
         onBpmChange={setBpm}
         sound={activeSound.id}
         onSoundChange={setSound}
@@ -107,10 +109,7 @@ export default function App() {
             <p className="chord-title">{chord.name}</p>
             <p className="chord-sub">{frenchName(chord.name)}</p>
           </div>
-          <div className="actions">
-            <button onClick={() => strum(chord)}>&#9654;&#xFE0E; Strum</button>
-            <button onClick={() => arpeggio(chord)}>&#9836;&#xFE0E; One by one</button>
-          </div>
+          <ChordActions chord={chord} />
         </div>
         <div className="chord-row">
           <Fretboard chord={chord} />

@@ -4,7 +4,7 @@ import type {Chord} from './types';
 const STRING_MIDI = [40, 45, 50, 55, 59, 64];
 const PITCH_CLASSES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const STRUM_STAGGER = 0.045;
-const ARPEGGIO_STAGGER = 0.35;
+export const ARPEGGIO_STAGGER = 0.35;
 const SCHEDULE_DELAY = 0.03;
 
 export const GUITAR_SOUNDS = [
@@ -106,17 +106,8 @@ export function arpeggio(chord: Chord): void {
   playChord(chord, ARPEGGIO_STAGGER);
 }
 
-export function metronomeTick(when: number): void {
-  const context = ensureAudio();
-  const osc = context.createOscillator();
-  const gain = context.createGain();
-  osc.type = 'sine';
-  osc.frequency.value = 1100;
-  gain.gain.setValueAtTime(0.0001, when);
-  gain.gain.exponentialRampToValueAtTime(0.06, when + 0.004);
-  gain.gain.exponentialRampToValueAtTime(0.0001, when + 0.06);
-  osc.connect(gain);
-  gain.connect(context.destination);
-  osc.start(when);
-  osc.stop(when + 0.08);
+// How long an arpeggio of this chord takes to ring out all its notes.
+export function arpeggioDuration(chord: Chord): number {
+  const played = chord.frets.filter(fret => fret >= 0).length;
+  return Math.max(0.2, (played - 1) * ARPEGGIO_STAGGER + 0.3);
 }

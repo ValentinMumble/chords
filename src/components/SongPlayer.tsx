@@ -2,6 +2,7 @@ import type {ChordName} from '../chords';
 import type {Song, SongLevel} from '../songs';
 import type {SongPlayback} from '../hooks/useSongPlayback';
 import {SoundPicker} from './SoundPicker';
+import {Metronome} from './Metronome';
 
 interface SongPlayerProps {
   songs: readonly Song[];
@@ -12,11 +13,16 @@ interface SongPlayerProps {
   onLevelChange: (level: SongLevel) => void;
   bars: readonly ChordName[];
   bpm: number;
+  recommendedBpm: number;
   onBpmChange: (bpm: number) => void;
   sound: string;
   onSoundChange: (sound: string) => void;
   playback: SongPlayback;
 }
+
+const BPM_MIN = 40;
+const BPM_MAX = 160;
+const BPM_STEP = 2;
 
 export function SongPlayer({
   songs,
@@ -27,6 +33,7 @@ export function SongPlayer({
   onLevelChange,
   bars,
   bpm,
+  recommendedBpm,
   onBpmChange,
   sound,
   onSoundChange,
@@ -46,42 +53,72 @@ export function SongPlayer({
           </svg>
         )}
       </button>
-      <div className="song-bar">
-        <select
-          aria-label="Choose a song"
-          value={songIndex}
-          onChange={event => onSongChange(Number(event.target.value))}
-        >
-          {songs.map((entry, index) => (
-            <option key={entry.name} value={index}>
-              {entry.name}
-            </option>
-          ))}
-        </select>
-        {song.advanced && (
-          <div className="level-toggle" role="group" aria-label="Difficulty">
-            <button className={level === 'easy' ? 'active' : ''} onClick={() => onLevelChange('easy')}>
-              Easy
-            </button>
-            <button className={level === 'advanced' ? 'active' : ''} onClick={() => onLevelChange('advanced')}>
-              Advanced
+      <div className="song-controls">
+        <div className="song-row">
+          <select
+            className="song-select"
+            aria-label="Choose a song"
+            value={songIndex}
+            onChange={event => onSongChange(Number(event.target.value))}
+          >
+            {songs.map((entry, index) => (
+              <option key={entry.name} value={index}>
+                {entry.name}
+              </option>
+            ))}
+          </select>
+          {song.advanced && (
+            <div className="level-toggle" role="group" aria-label="Difficulty">
+              <button className={level === 'easy' ? 'active' : ''} onClick={() => onLevelChange('easy')}>
+                Easy
+              </button>
+              <button className={level === 'advanced' ? 'active' : ''} onClick={() => onLevelChange('advanced')}>
+                Advanced
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="settings-row">
+          <div className="tempo">
+            <Metronome
+              key={playing ? 'play' : 'idle'}
+              playing={playing}
+              beatSeconds={60 / bpm}
+              bpm={bpm}
+              min={BPM_MIN}
+              max={BPM_MAX}
+              step={BPM_STEP}
+              onBpmChange={onBpmChange}
+            />
+            <div className="tempo-text">
+              <span className="tempo-label">Tempo</span>
+              <output>{bpm} bpm</output>
+            </div>
+            <button
+              className="reset-tempo"
+              aria-label="Reset to recommended tempo"
+              title="Reset to recommended tempo"
+              disabled={bpm === recommendedBpm}
+              onClick={() => onBpmChange(recommendedBpm)}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="1 4 1 10 7 10" />
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+              </svg>
             </button>
           </div>
-        )}
-        <div className="tempo">
-          <label htmlFor="song-bpm">Tempo</label>
-          <input
-            type="range"
-            id="song-bpm"
-            min={40}
-            max={160}
-            step={2}
-            value={bpm}
-            onChange={event => onBpmChange(Number(event.target.value))}
-          />
-          <output>{bpm} bpm</output>
+          <SoundPicker sound={sound} onChange={onSoundChange} />
         </div>
-        <SoundPicker sound={sound} onChange={onSoundChange} />
       </div>
       <div className="bars" aria-label="Chord progression, one chip per bar">
         {bars.map((name, index) => {
