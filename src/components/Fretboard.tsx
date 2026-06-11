@@ -75,6 +75,7 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
   const maxFret = Math.max(...chord.frets);
   const baseFret = maxFret > geo.fretCount ? Math.min(...chord.frets.filter(fret => fret > 0)) : 1;
   const dotY = (fret: number) => geo.nutY + (fret - baseFret + 0.5) * geo.fretGap;
+  const parkY = geo.nutY - geo.openOffset;
 
   const strings = [0, 1, 2, 3, 4, 5];
   const fretRows = Array.from({length: geo.fretCount}, (_, row) => row + 1);
@@ -122,6 +123,7 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
         findBarres(chord).map(barre => (
           <rect
             key={`${barre.finger}:${barre.fret}`}
+            className="barre"
             x={stringX(barre.fromString) - geo.dotRadius + 1}
             y={dotY(barre.fret) - geo.dotRadius + 1}
             width={(barre.toString - barre.fromString) * geo.stringGap + (geo.dotRadius - 1) * 2}
@@ -131,36 +133,42 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
             opacity={0.3}
           />
         ))}
-      {chord.frets.map((fret, stringIndex) => (
-        <g key={stringIndex}>
-          {fret === -1 && (
+      {chord.frets.map((fret, stringIndex) => {
+        const fretted = fret > 0;
+        return (
+          <g key={stringIndex}>
             <text
+              className="marker"
               x={stringX(stringIndex)}
               y={geo.nutY - geo.muteOffset}
               textAnchor="middle"
               fontSize={geo.muteFontSize}
               fill="var(--faint)"
+              style={{opacity: fret === -1 ? 1 : 0}}
             >
               ✕
             </text>
-          )}
-          {fret === 0 && (
             <circle
+              className="marker"
               cx={stringX(stringIndex)}
               cy={geo.nutY - geo.openOffset}
               r={geo.openRadius}
               fill="none"
               stroke="var(--ink)"
               strokeWidth={1.5}
+              style={{opacity: fret === 0 ? 1 : 0}}
             />
-          )}
-          {fret > 0 && (
-            <>
-              <circle cx={stringX(stringIndex)} cy={dotY(fret)} r={geo.dotRadius} fill="var(--ink)" />
+            <g
+              className="fret-dot"
+              style={{
+                transform: `translate(${stringX(stringIndex)}px, ${fretted ? dotY(fret) : parkY}px)`,
+                opacity: fretted ? 1 : 0,
+              }}
+            >
+              <circle r={geo.dotRadius} fill="var(--ink)" />
               {chord.fingers[stringIndex] > 0 && (
                 <text
-                  x={stringX(stringIndex)}
-                  y={dotY(fret) + geo.dotFontSize * 0.35}
+                  y={geo.dotFontSize * 0.35}
                   textAnchor="middle"
                   fontSize={geo.dotFontSize}
                   fontWeight={600}
@@ -169,21 +177,21 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
                   {chord.fingers[stringIndex]}
                 </text>
               )}
-            </>
-          )}
-          {geo.showNoteNames && fret >= 0 && (
-            <text
-              x={stringX(stringIndex)}
-              y={fretY(geo.fretCount) + 26}
-              textAnchor="middle"
-              fontSize={13}
-              fill="var(--muted)"
-            >
-              {noteName(stringIndex, fret)}
-            </text>
-          )}
-        </g>
-      ))}
+            </g>
+            {geo.showNoteNames && fret >= 0 && (
+              <text
+                x={stringX(stringIndex)}
+                y={fretY(geo.fretCount) + 26}
+                textAnchor="middle"
+                fontSize={13}
+                fill="var(--muted)"
+              >
+                {noteName(stringIndex, fret)}
+              </text>
+            )}
+          </g>
+        );
+      })}
     </svg>
   );
 }
