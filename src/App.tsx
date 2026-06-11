@@ -1,8 +1,6 @@
-import {useEffect, useState} from 'react';
 import {CHORDS, CHORDS_BY_NAME} from './chords';
 import {SONGS} from './songs';
 import {strumChord} from './audio';
-import {loadState, saveState} from './state';
 import {Board} from './components/Board';
 import {ChordFilters} from './components/ChordFilters';
 import {ChordGrid} from './components/ChordGrid';
@@ -11,27 +9,20 @@ import {NextUpCard} from './components/NextUpCard';
 import {SongPlayer} from './components/SongPlayer';
 import {useSongPlayback} from './hooks/useSongPlayback';
 import {useKeyboardShortcuts} from './hooks/useKeyboardShortcuts';
-
-const saved = loadState();
-const initialChord = saved.chord && CHORDS_BY_NAME[saved.chord] ? saved.chord : 'C';
-const initialSong = saved.songIndex !== undefined && SONGS[saved.songIndex] ? saved.songIndex : 0;
+import {usePersistedState} from './hooks/usePersistedState';
 
 export default function App() {
-  const [filter, setFilter] = useState(saved.filter ?? 'all');
-  const [chordName, setChordName] = useState(initialChord);
-  const [songIndex, setSongIndex] = useState(initialSong);
-  const [bpm, setBpm] = useState(saved.bpm ?? SONGS[initialSong].bpm);
+  const [filter, setFilter] = usePersistedState('chords:filter', 'all');
+  const [chordName, setChordName] = usePersistedState('chords:chord', 'C');
+  const [songIndex, setSongIndex] = usePersistedState('chords:song', 0);
+  const [bpm, setBpm] = usePersistedState('chords:bpm', SONGS[0].bpm);
 
-  const song = SONGS[songIndex];
-  const chord = CHORDS_BY_NAME[chordName];
+  const song = SONGS[songIndex] ?? SONGS[0];
+  const chord = CHORDS_BY_NAME[chordName] ?? CHORDS_BY_NAME.C;
   const visible = filter === 'all' ? CHORDS : CHORDS.filter(entry => entry.type === filter);
 
   const playback = useSongPlayback(song, bpm, setChordName);
   const nextChordName = playback.playing ? song.bars[playback.nextBarIndex] : null;
-
-  useEffect(() => {
-    saveState({chord: chordName, filter, songIndex, bpm});
-  }, [chordName, filter, songIndex, bpm]);
 
   function selectChord(name: string): void {
     setChordName(name);
@@ -49,7 +40,7 @@ export default function App() {
       if (playback.playing) {
         playback.stepBar(step);
       } else {
-        const index = visible.findIndex(entry => entry.name === chordName);
+        const index = visible.findIndex(entry => entry.name === chord.name);
         selectChord(visible[(index + step + visible.length) % visible.length].name);
       }
     },
@@ -61,7 +52,7 @@ export default function App() {
     <main>
       <h1>Chords 🎸</h1>
       <ChordFilters filter={filter} onChange={setFilter} />
-      <ChordGrid chords={visible} selected={chordName} onSelect={selectChord} />
+      <ChordGrid chords={visible} selected={chord.name} onSelect={selectChord} />
       <div className="viewer">
         <Board chord={chord} />
         {nextChordName && <NextUpCard chordName={nextChordName} />}
