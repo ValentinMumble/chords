@@ -1,5 +1,6 @@
 import type {Song} from '../songs';
 import type {SongPlayback} from '../hooks/useSongPlayback';
+import {SoundPicker} from './SoundPicker';
 
 interface SongPlayerProps {
   songs: readonly Song[];
@@ -8,10 +9,22 @@ interface SongPlayerProps {
   onSongChange: (index: number) => void;
   bpm: number;
   onBpmChange: (bpm: number) => void;
+  sound: string;
+  onSoundChange: (sound: string) => void;
   playback: SongPlayback;
 }
 
-export function SongPlayer({songs, song, songIndex, onSongChange, bpm, onBpmChange, playback}: SongPlayerProps) {
+export function SongPlayer({
+  songs,
+  song,
+  songIndex,
+  onSongChange,
+  bpm,
+  onBpmChange,
+  sound,
+  onSoundChange,
+  playback,
+}: SongPlayerProps) {
   const {playing, barIndex, nextBarIndex, togglePlay} = playback;
   return (
     <div className="viewer" style={{display: 'block'}}>
@@ -41,6 +54,7 @@ export function SongPlayer({songs, song, songIndex, onSongChange, bpm, onBpmChan
           />
           <output>{bpm} bpm</output>
         </div>
+        <SoundPicker sound={sound} onChange={onSoundChange} />
       </div>
       <div className="bars" aria-label="Chord progression, one chip per bar">
         {song.bars.map((name, index) => {

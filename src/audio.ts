@@ -7,9 +7,18 @@ const STRUM_STAGGER = 0.045;
 const ARPEGGIO_STAGGER = 0.35;
 const SCHEDULE_DELAY = 0.03;
 
+export const GUITAR_SOUNDS = [
+  {id: 'acoustic_guitar_steel', label: 'Steel acoustic'},
+  {id: 'acoustic_guitar_nylon', label: 'Nylon acoustic'},
+  {id: 'electric_guitar_clean', label: 'Clean electric'},
+  {id: 'electric_guitar_jazz', label: 'Jazz electric'},
+] as const;
+export type GuitarSoundId = (typeof GUITAR_SOUNDS)[number]['id'];
+
 let ctx: AudioContext | null = null;
-let guitar: Player | null = null;
-let guitarLoading = false;
+let currentSound: GuitarSoundId = GUITAR_SOUNDS[0].id;
+const players = new Map<GuitarSoundId, Player>();
+const loadingSounds = new Set<GuitarSoundId>();
 
 export function ensureAudio(): AudioContext {
   if (!ctx) ctx = new AudioContext();
@@ -17,15 +26,21 @@ export function ensureAudio(): AudioContext {
   return ctx;
 }
 
+export function setGuitarSound(sound: GuitarSoundId): void {
+  currentSound = sound;
+  if (ctx) loadGuitar();
+}
+
 export function loadGuitar(): void {
-  if (guitarLoading) return;
-  guitarLoading = true;
-  instrument(ensureAudio(), 'acoustic_guitar_steel')
+  const sound = currentSound;
+  if (players.has(sound) || loadingSounds.has(sound)) return;
+  loadingSounds.add(sound);
+  instrument(ensureAudio(), sound)
     .then(player => {
-      guitar = player;
+      players.set(sound, player);
     })
     .catch(() => {
-      guitarLoading = false;
+      loadingSounds.delete(sound);
     });
 }
 
@@ -64,6 +79,7 @@ function playChord(chord: Chord, stagger: number, startTime?: number): void {
   const context = ensureAudio();
   loadGuitar();
   const start = startTime ?? context.currentTime + SCHEDULE_DELAY;
+  const guitar = players.get(currentSound);
   let played = 0;
   chord.frets.forEach((fret, stringIndex) => {
     if (fret < 0) return;

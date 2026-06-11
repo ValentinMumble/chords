@@ -1,6 +1,7 @@
+import {useEffect} from 'react';
 import {CHORDS, CHORDS_BY_NAME, FILTER_TYPES, getChord} from './chords';
 import {SONGS} from './songs';
-import {arpeggio, strum} from './audio';
+import {arpeggio, GUITAR_SOUNDS, setGuitarSound, strum} from './audio';
 import {Fretboard} from './components/Fretboard';
 import {ChordFilters} from './components/ChordFilters';
 import {ChordGrid} from './components/ChordGrid';
@@ -16,11 +17,17 @@ export default function App() {
   const [chordName, setChordName] = usePersistedState('chords:chord', 'C');
   const [songIndex, setSongIndex] = usePersistedState('chords:song', 0);
   const [bpm, setBpm] = usePersistedState('chords:bpm', SONGS[0].bpm);
+  const [sound, setSound] = usePersistedState<string>('chords:sound', GUITAR_SOUNDS[0].id);
 
   const song = SONGS[songIndex] ?? SONGS[0];
   const chord = getChord(chordName) ?? CHORDS_BY_NAME.C;
   const activeFilter = FILTER_TYPES.some(type => type.key === filter) ? filter : 'all';
   const visible = activeFilter === 'all' ? CHORDS : CHORDS.filter(entry => entry.type === activeFilter);
+
+  const activeSound = GUITAR_SOUNDS.find(entry => entry.id === sound) ?? GUITAR_SOUNDS[0];
+  useEffect(() => {
+    setGuitarSound(activeSound.id);
+  }, [activeSound.id]);
 
   const playback = useSongPlayback(song, bpm, setChordName);
   const nextChordName = playback.playing ? song.bars[playback.nextBarIndex] : null;
@@ -62,6 +69,8 @@ export default function App() {
         onSongChange={changeSong}
         bpm={bpm}
         onBpmChange={setBpm}
+        sound={activeSound.id}
+        onSoundChange={setSound}
         playback={playback}
       />
       <div className="viewer">
