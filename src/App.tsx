@@ -28,6 +28,7 @@ export default function App() {
   function selectChord(name: string): void {
     const next = getChord(name);
     if (!next) return;
+    playback.stop();
     setChordName(name);
     strum(next);
   }
