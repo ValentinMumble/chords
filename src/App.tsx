@@ -48,8 +48,8 @@ export default function App() {
     setGuitarSound(activeSound.id);
   }, [activeSound.id]);
 
-  const playback = useSongPlayback(version.bars, bpm, version.beatsPerBar ?? 4, setChordName);
-  const nextChordName = playback.playing ? version.bars[playback.nextBarIndex] : null;
+  const playback = useSongPlayback(version.bars, bpm, version.pattern, setChordName);
+  const nextChordName = playback.playing ? version.bars[playback.nextBarIndex].name : null;
 
   function selectChord(name: string): void {
     const next = getChord(name);
@@ -96,6 +96,7 @@ export default function App() {
         level={activeLevel}
         onLevelChange={changeLevel}
         bars={version.bars}
+        pattern={version.pattern}
         bpm={bpm}
         recommendedBpm={version.bpm}
         onBpmChange={setBpm}

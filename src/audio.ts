@@ -3,7 +3,7 @@ import type {Chord} from './types';
 
 const STRING_MIDI = [40, 45, 50, 55, 59, 64];
 const PITCH_CLASSES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-const STRUM_STAGGER = 0.045;
+const STRUM_STAGGER = 0.014;
 export const ARPEGGIO_STAGGER = 0.35;
 const SCHEDULE_DELAY = 0.03;
 
@@ -98,8 +98,48 @@ function playChord(chord: Chord, stagger: number, startTime?: number): void {
   });
 }
 
+export type StrokeDirection = 'down' | 'up';
+
+// The midi notes of a chord's sounded strings, low to high.
+function chordVoices(chord: Chord): number[] {
+  const notes: number[] = [];
+  chord.frets.forEach((fret, stringIndex) => {
+    if (fret >= 0) notes.push(STRING_MIDI[stringIndex] + fret);
+  });
+  return notes;
+}
+
+// A single strum. Down-strokes sweep low-to-high across all strings; up-strokes
+// are lighter and snappier, catching mostly the top strings. Timing and volume
+// are humanized slightly so repeated strums don't sound mechanical.
+export function strumStroke(chord: Chord, when: number, direction: StrokeDirection, gain: number): void {
+  const context = ensureAudio();
+  loadGuitar();
+  const guitar = players.get(currentSound);
+  let notes = chordVoices(chord);
+  let stagger = STRUM_STAGGER;
+  let duration = 1.4;
+  if (direction === 'up') {
+    notes = notes.slice(-4).reverse();
+    stagger = STRUM_STAGGER * 0.6;
+    duration = 1.1;
+  }
+  // One velocity feel per strum (±10%), plus a hair of timing wobble per note.
+  const strumGain = gain * (0.92 + Math.random() * 0.16);
+  const swing = (Math.random() - 0.5) * 0.012;
+  notes.forEach((midi, index) => {
+    const at = when + swing + index * stagger + (Math.random() - 0.5) * 0.005;
+    const noteGain = Math.max(0.05, strumGain * (1 - index * 0.03));
+    if (guitar) {
+      guitar.play(midiToNote(midi), at, {gain: noteGain, duration});
+    } else {
+      pluckFallback(context, midiToFrequency(midi), at);
+    }
+  });
+}
+
 export function strum(chord: Chord, startTime?: number): void {
-  playChord(chord, STRUM_STAGGER, startTime);
+  strumStroke(chord, startTime ?? ensureAudio().currentTime + SCHEDULE_DELAY, 'down', 0.85);
 }
 
 export function arpeggio(chord: Chord): void {

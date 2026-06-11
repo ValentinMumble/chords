@@ -29,6 +29,8 @@ const CHORD_LIST = [
   {name: 'Dsus4', desc: 'D suspended 4', type: 'other', frets: [-1, -1, 0, 2, 3, 3], fingers: [0, 0, 0, 1, 2, 3]},
   {name: 'Asus2', desc: 'A suspended 2', type: 'other', frets: [-1, 0, 2, 2, 0, 0], fingers: [0, 0, 1, 2, 0, 0]},
   {name: 'Esus4', desc: 'E suspended 4', type: 'other', frets: [0, 2, 2, 2, 0, 0], fingers: [0, 1, 2, 3, 0, 0]},
+  {name: 'A7sus4', desc: 'A7 suspended 4', type: 'other', frets: [-1, 0, 2, 0, 3, 0], fingers: [0, 0, 1, 0, 3, 0]},
+  {name: 'D6/9', desc: 'D six-nine', type: 'other', frets: [2, 0, 0, 2, 0, 0], fingers: [2, 0, 0, 3, 0, 0]},
 ] as const satisfies readonly Chord[];
 
 export type ChordName = (typeof CHORD_LIST)[number]['name'];

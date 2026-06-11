@@ -12,7 +12,7 @@ export function ChordDetails() {
         </p>
         <p>
           Keyboard: <kbd>&#x2190;</kbd> <kbd>&#x2192;</kbd> to change chord (or jump bars while a song plays),{' '}
-          <kbd>space</kbd> to strum, <kbd>a</kbd> for one by one.
+          <kbd>space</kbd> to strum, <kbd>a</kbd> for arpeggio.
         </p>
       </div>
     </div>

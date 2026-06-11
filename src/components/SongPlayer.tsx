@@ -1,8 +1,8 @@
-import type {ChordName} from '../chords';
-import type {Song, SongLevel} from '../songs';
+import type {Bar, Song, SongLevel, StrumPattern as Pattern} from '../songs';
 import type {SongPlayback} from '../hooks/useSongPlayback';
 import {SoundPicker} from './SoundPicker';
 import {Metronome} from './Metronome';
+import {StrumPattern} from './StrumPattern';
 
 interface SongPlayerProps {
   songs: readonly Song[];
@@ -11,7 +11,8 @@ interface SongPlayerProps {
   onSongChange: (index: number) => void;
   level: SongLevel;
   onLevelChange: (level: SongLevel) => void;
-  bars: readonly ChordName[];
+  bars: readonly Bar[];
+  pattern: Pattern;
   bpm: number;
   recommendedBpm: number;
   onBpmChange: (bpm: number) => void;
@@ -32,6 +33,7 @@ export function SongPlayer({
   level,
   onLevelChange,
   bars,
+  pattern,
   bpm,
   recommendedBpm,
   onBpmChange,
@@ -120,20 +122,25 @@ export function SongPlayer({
           <SoundPicker sound={sound} onChange={onSoundChange} />
         </div>
       </div>
-      <div className="bars" aria-label="Chord progression, one chip per bar">
-        {bars.map((name, index) => {
+      <div className="bars" aria-label="Chord progression, one chip per chord">
+        {bars.map((bar, index) => {
           const isCurrent = playing && index === barIndex;
           const isNext = playing && index === nextBarIndex && nextBarIndex !== barIndex;
           return (
-            <div key={index} className={`bar-chip${isCurrent ? ' current' : ''}${isNext ? ' next' : ''}`}>
-              {name}
+            <div
+              key={index}
+              className={`bar-chip${isCurrent ? ' current' : ''}${isNext ? ' next' : ''}`}
+              style={{minWidth: 38 + bar.beats * 7}}
+            >
+              {bar.name}
             </div>
           );
         })}
       </div>
+      <StrumPattern pattern={pattern} playing={playing} barSeconds={240 / bpm} />
       <p className="song-hint">
-        Each chip is one strum, with metronome ticks filling the bar. The diagram up top follows the current chord, with
-        the next one shown beside it. Advanced strums twice per bar for a fuller rhythm.
+        Each chip is a chord — wider chips are held longer before the change. The diagram up top follows the current
+        chord, with the next one shown beside it. Easy strums steady downstrokes; advanced uses a down-up pattern.
       </p>
     </div>
   );

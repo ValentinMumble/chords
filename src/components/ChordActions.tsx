@@ -26,7 +26,7 @@ export function ChordActions({chord}: {chord: Chord}) {
             onAnimationEnd={() => setArpActive(false)}
           />
         )}
-        <span className="action-label">&#9836;&#xFE0E; One by one</span>
+        <span className="action-label">&#9836;&#xFE0E; Arpeggio</span>
       </button>
     </div>
   );
