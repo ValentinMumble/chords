@@ -7,12 +7,15 @@ interface SoundPickerProps {
 
 export function SoundPicker({sound, onChange}: SoundPickerProps) {
   return (
-    <select aria-label="Guitar sound" value={sound} onChange={event => onChange(event.target.value)}>
-      {GUITAR_SOUNDS.map(entry => (
-        <option key={entry.id} value={entry.id}>
-          {entry.label}
-        </option>
-      ))}
-    </select>
+    <div className="sound">
+      <label htmlFor="guitar-sound">🎸 Sound</label>
+      <select id="guitar-sound" value={sound} onChange={event => onChange(event.target.value)}>
+        {GUITAR_SOUNDS.map(entry => (
+          <option key={entry.id} value={entry.id}>
+            {entry.label}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }

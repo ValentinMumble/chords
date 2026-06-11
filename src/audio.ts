@@ -12,6 +12,10 @@ export const GUITAR_SOUNDS = [
   {id: 'acoustic_guitar_nylon', label: 'Nylon acoustic'},
   {id: 'electric_guitar_clean', label: 'Clean electric'},
   {id: 'electric_guitar_jazz', label: 'Jazz electric'},
+  {id: 'electric_guitar_muted', label: 'Muted electric'},
+  {id: 'overdriven_guitar', label: 'Overdriven'},
+  {id: 'distortion_guitar', label: 'Distortion'},
+  {id: 'guitar_harmonics', label: 'Harmonics'},
 ] as const;
 export type GuitarSoundId = (typeof GUITAR_SOUNDS)[number]['id'];
 
