@@ -1,6 +1,6 @@
 import type {Chord, ChordType} from './types';
 
-export const CHORDS: Chord[] = [
+const CHORD_LIST = [
   {name: 'C', desc: 'C major', type: 'major', frets: [-1, 3, 2, 0, 1, 0], fingers: [0, 3, 2, 0, 1, 0]},
   {name: 'A', desc: 'A major', type: 'major', frets: [-1, 0, 2, 2, 2, 0], fingers: [0, 0, 1, 2, 3, 0]},
   {name: 'G', desc: 'G major', type: 'major', frets: [3, 2, 0, 0, 0, 3], fingers: [2, 1, 0, 0, 0, 3]},
@@ -29,9 +29,20 @@ export const CHORDS: Chord[] = [
   {name: 'Dsus4', desc: 'D suspended 4', type: 'other', frets: [-1, -1, 0, 2, 3, 3], fingers: [0, 0, 0, 1, 2, 3]},
   {name: 'Asus2', desc: 'A suspended 2', type: 'other', frets: [-1, 0, 2, 2, 0, 0], fingers: [0, 0, 1, 2, 0, 0]},
   {name: 'Esus4', desc: 'E suspended 4', type: 'other', frets: [0, 2, 2, 2, 0, 0], fingers: [0, 1, 2, 3, 0, 0]},
-];
+] as const satisfies readonly Chord[];
 
-export const CHORDS_BY_NAME: Record<string, Chord> = Object.fromEntries(CHORDS.map(chord => [chord.name, chord]));
+export type ChordName = (typeof CHORD_LIST)[number]['name'];
+
+export const CHORDS: readonly Chord[] = CHORD_LIST;
+
+export const CHORDS_BY_NAME = Object.fromEntries(CHORD_LIST.map(chord => [chord.name, chord])) as Record<
+  ChordName,
+  Chord
+>;
+
+export function getChord(name: string): Chord | undefined {
+  return (CHORDS_BY_NAME as Record<string, Chord | undefined>)[name];
+}
 
 export const FILTER_TYPES: {key: ChordType | 'all'; label: string}[] = [
   {key: 'all', label: 'All'},
@@ -40,6 +51,29 @@ export const FILTER_TYPES: {key: ChordType | 'all'; label: string}[] = [
   {key: 'seventh', label: '7ths'},
   {key: 'other', label: 'Sus & add'},
 ];
+
+export interface Barre {
+  finger: number;
+  fret: number;
+  fromString: number;
+  toString: number;
+}
+
+export function findBarres(chord: Chord): Barre[] {
+  const groups = new Map<string, number[]>();
+  chord.fingers.forEach((finger, stringIndex) => {
+    if (finger > 0) {
+      const key = `${finger}:${chord.frets[stringIndex]}`;
+      groups.set(key, [...(groups.get(key) ?? []), stringIndex]);
+    }
+  });
+  return [...groups.entries()]
+    .filter(([, strings]) => strings.length > 2)
+    .map(([key, strings]) => {
+      const [finger, fret] = key.split(':').map(Number);
+      return {finger, fret, fromString: Math.min(...strings), toString: Math.max(...strings)};
+    });
+}
 
 const NOTE_NAMES = ['E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#'];
 const OPEN_SEMITONES = [0, 5, 10, 15, 19, 24];

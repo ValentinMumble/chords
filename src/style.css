@@ -240,16 +240,12 @@ h2 {
   color: var(--ink);
 }
 .next-box {
-  display: none;
   background: var(--bg);
   border: 1px dashed var(--accent);
   border-radius: var(--radius);
   padding: 10px 12px 6px;
   text-align: center;
   align-self: center;
-}
-.next-box.visible {
-  display: block;
 }
 .next-label {
   font-size: 12px;

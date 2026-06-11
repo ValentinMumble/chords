@@ -21,6 +21,7 @@ Built with Vite, React, and TypeScript.
 npm install
 npm run dev     # dev server on :5180
 npm run build   # type-check + production build to dist/
+npm test        # vitest (pure logic: chord names, barres, note math)
 ```
 
 ## Deployment

@@ -1,5 +1,5 @@
 import {frenchName} from '../chords';
-import {strumChord} from '../audio';
+import {arpeggio, strum} from '../audio';
 import type {Chord} from '../types';
 
 export function ChordDetails({chord}: {chord: Chord}) {
@@ -10,8 +10,8 @@ export function ChordDetails({chord}: {chord: Chord}) {
         {chord.desc} · {frenchName(chord.name)}
       </p>
       <div className="actions">
-        <button onClick={() => strumChord(chord, 0.045)}>&#9654;&#xFE0E; Strum</button>
-        <button onClick={() => strumChord(chord, 0.35)}>&#9836;&#xFE0E; One by one</button>
+        <button onClick={() => strum(chord)}>&#9654;&#xFE0E; Strum</button>
+        <button onClick={() => arpeggio(chord)}>&#9836;&#xFE0E; One by one</button>
       </div>
       <div className="help">
         <p>

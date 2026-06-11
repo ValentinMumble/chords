@@ -2,7 +2,7 @@ import {frenchShort} from '../chords';
 import type {Chord} from '../types';
 
 interface ChordGridProps {
-  chords: Chord[];
+  chords: readonly Chord[];
   selected: string;
   onSelect: (name: string) => void;
 }

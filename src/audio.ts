@@ -3,25 +3,34 @@ import type {Chord} from './types';
 
 const STRING_MIDI = [40, 45, 50, 55, 59, 64];
 const PITCH_CLASSES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const STRUM_STAGGER = 0.045;
+const ARPEGGIO_STAGGER = 0.35;
+const SCHEDULE_DELAY = 0.03;
 
 let ctx: AudioContext | null = null;
 let guitar: Player | null = null;
 let guitarLoading = false;
 
-export function audioContext(): AudioContext {
+export function ensureAudio(): AudioContext {
   if (!ctx) ctx = new AudioContext();
   if (ctx.state === 'suspended') void ctx.resume();
-  if (!guitarLoading) {
-    guitarLoading = true;
-    instrument(ctx, 'acoustic_guitar_steel')
-      .then(player => {
-        guitar = player;
-      })
-      .catch(() => {
-        guitarLoading = false;
-      });
-  }
   return ctx;
+}
+
+export function loadGuitar(): void {
+  if (guitarLoading) return;
+  guitarLoading = true;
+  instrument(ensureAudio(), 'acoustic_guitar_steel')
+    .then(player => {
+      guitar = player;
+    })
+    .catch(() => {
+      guitarLoading = false;
+    });
+}
+
+export function currentTime(): number {
+  return ensureAudio().currentTime;
 }
 
 function midiToNote(midi: number): string {
@@ -51,9 +60,10 @@ function pluckFallback(context: AudioContext, frequency: number, when: number): 
   osc.stop(when + 1.7);
 }
 
-export function strumChord(chord: Chord, stagger: number): void {
-  const context = audioContext();
-  const start = context.currentTime + 0.03;
+function playChord(chord: Chord, stagger: number, startTime?: number): void {
+  const context = ensureAudio();
+  loadGuitar();
+  const start = startTime ?? context.currentTime + SCHEDULE_DELAY;
   let played = 0;
   chord.frets.forEach((fret, stringIndex) => {
     if (fret < 0) return;
@@ -68,21 +78,25 @@ export function strumChord(chord: Chord, stagger: number): void {
   });
 }
 
+export function strum(chord: Chord, startTime?: number): void {
+  playChord(chord, STRUM_STAGGER, startTime);
+}
+
+export function arpeggio(chord: Chord): void {
+  playChord(chord, ARPEGGIO_STAGGER);
+}
+
 export function metronomeTick(when: number): void {
-  if (!ctx) return;
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
+  const context = ensureAudio();
+  const osc = context.createOscillator();
+  const gain = context.createGain();
   osc.type = 'sine';
   osc.frequency.value = 1100;
   gain.gain.setValueAtTime(0.0001, when);
   gain.gain.exponentialRampToValueAtTime(0.06, when + 0.004);
   gain.gain.exponentialRampToValueAtTime(0.0001, when + 0.06);
   osc.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(context.destination);
   osc.start(when);
   osc.stop(when + 0.08);
-}
-
-export function currentTime(): number {
-  return audioContext().currentTime;
 }

@@ -1,7 +1,7 @@
-import {CHORDS, CHORDS_BY_NAME} from './chords';
+import {CHORDS, CHORDS_BY_NAME, FILTER_TYPES, getChord} from './chords';
 import {SONGS} from './songs';
-import {strumChord} from './audio';
-import {Board} from './components/Board';
+import {arpeggio, strum} from './audio';
+import {Fretboard} from './components/Fretboard';
 import {ChordFilters} from './components/ChordFilters';
 import {ChordGrid} from './components/ChordGrid';
 import {ChordDetails} from './components/ChordDetails';
@@ -18,15 +18,18 @@ export default function App() {
   const [bpm, setBpm] = usePersistedState('chords:bpm', SONGS[0].bpm);
 
   const song = SONGS[songIndex] ?? SONGS[0];
-  const chord = CHORDS_BY_NAME[chordName] ?? CHORDS_BY_NAME.C;
-  const visible = filter === 'all' ? CHORDS : CHORDS.filter(entry => entry.type === filter);
+  const chord = getChord(chordName) ?? CHORDS_BY_NAME.C;
+  const activeFilter = FILTER_TYPES.some(type => type.key === filter) ? filter : 'all';
+  const visible = activeFilter === 'all' ? CHORDS : CHORDS.filter(entry => entry.type === activeFilter);
 
   const playback = useSongPlayback(song, bpm, setChordName);
   const nextChordName = playback.playing ? song.bars[playback.nextBarIndex] : null;
 
   function selectChord(name: string): void {
+    const next = getChord(name);
+    if (!next) return;
     setChordName(name);
-    strumChord(CHORDS_BY_NAME[name], 0.045);
+    strum(next);
   }
 
   function changeSong(index: number): void {
@@ -44,22 +47,23 @@ export default function App() {
         selectChord(visible[(index + step + visible.length) % visible.length].name);
       }
     },
-    onStrum: () => strumChord(chord, 0.045),
-    onArpeggio: () => strumChord(chord, 0.35),
+    onStrum: () => strum(chord),
+    onArpeggio: () => arpeggio(chord),
   });
 
   return (
     <main>
       <h1>Chords 🎸</h1>
-      <ChordFilters filter={filter} onChange={setFilter} />
+      <ChordFilters filter={activeFilter} onChange={setFilter} />
       <ChordGrid chords={visible} selected={chord.name} onSelect={selectChord} />
       <div className="viewer">
-        <Board chord={chord} />
+        <Fretboard chord={chord} />
         {nextChordName && <NextUpCard chordName={nextChordName} />}
         <ChordDetails chord={chord} />
       </div>
       <h2>Practice songs</h2>
       <SongPlayer
+        songs={SONGS}
         song={song}
         songIndex={songIndex}
         onSongChange={changeSong}
