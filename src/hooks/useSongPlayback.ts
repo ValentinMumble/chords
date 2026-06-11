@@ -1,9 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
-import {CHORDS_BY_NAME} from '../chords';
+import {CHORDS_BY_NAME, type ChordName} from '../chords';
 import {ensureAudio, metronomeTick, strum} from '../audio';
-import type {Song} from '../songs';
 
-const BEATS_PER_BAR = 4;
 const RESYNC_THRESHOLD = 0.1;
 
 export interface SongPlayback {
@@ -15,19 +13,26 @@ export interface SongPlayback {
   stepBar: (step: number) => void;
 }
 
-export function useSongPlayback(song: Song, bpm: number, onBarChord: (chordName: string) => void): SongPlayback {
+export function useSongPlayback(
+  bars: readonly ChordName[],
+  bpm: number,
+  beatsPerBar: number,
+  onBarChord: (chordName: string) => void,
+): SongPlayback {
   const [playing, setPlaying] = useState(false);
   const [barIndex, setBarIndex] = useState(0);
 
   const bpmRef = useRef(bpm);
   bpmRef.current = bpm;
+  const beatsPerBarRef = useRef(beatsPerBar);
+  beatsPerBarRef.current = beatsPerBar;
   const onBarChordRef = useRef(onBarChord);
   onBarChordRef.current = onBarChord;
   const nextBarTimeRef = useRef(0);
 
   useEffect(() => {
     if (!playing) return;
-    const chord = CHORDS_BY_NAME[song.bars[barIndex]];
+    const chord = CHORDS_BY_NAME[bars[barIndex]];
     onBarChordRef.current(chord.name);
 
     // Schedule against the audio clock so bar timing doesn't drift: each bar
@@ -40,17 +45,18 @@ export function useSongPlayback(song: Song, bpm: number, onBarChord: (chordName:
     const barStart = nextBarTimeRef.current;
     strum(chord, barStart);
     const beat = 60 / bpmRef.current;
-    for (let tick = 1; tick < BEATS_PER_BAR; tick++) metronomeTick(barStart + tick * beat);
-    nextBarTimeRef.current = barStart + BEATS_PER_BAR * beat;
+    const beats = beatsPerBarRef.current;
+    for (let tick = 1; tick < beats; tick++) metronomeTick(barStart + tick * beat);
+    nextBarTimeRef.current = barStart + beats * beat;
 
     const timer = setTimeout(
       () => {
-        setBarIndex(index => (index + 1) % song.bars.length);
+        setBarIndex(index => (index + 1) % bars.length);
       },
       (nextBarTimeRef.current - context.currentTime) * 1000,
     );
     return () => clearTimeout(timer);
-  }, [playing, barIndex, song]);
+  }, [playing, barIndex, bars]);
 
   function stop(): void {
     setPlaying(false);
@@ -70,13 +76,13 @@ export function useSongPlayback(song: Song, bpm: number, onBarChord: (chordName:
 
   function stepBar(step: number): void {
     nextBarTimeRef.current = 0;
-    setBarIndex(index => (index + step + song.bars.length) % song.bars.length);
+    setBarIndex(index => (index + step + bars.length) % bars.length);
   }
 
   return {
     playing,
     barIndex,
-    nextBarIndex: (barIndex + 1) % song.bars.length,
+    nextBarIndex: (barIndex + 1) % bars.length,
     togglePlay,
     stop,
     stepBar,

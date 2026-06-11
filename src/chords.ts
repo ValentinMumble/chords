@@ -44,7 +44,8 @@ export function getChord(name: string): Chord | undefined {
   return (CHORDS_BY_NAME as Record<string, Chord | undefined>)[name];
 }
 
-export type ChordFilter = ChordType | 'all' | 'barre';
+export type ChordFilter = ChordType | 'all';
+export type ShapeFilter = 'any' | 'open' | 'barre';
 
 export const FILTER_TYPES: {key: ChordFilter; label: string}[] = [
   {key: 'all', label: 'All'},
@@ -52,6 +53,10 @@ export const FILTER_TYPES: {key: ChordFilter; label: string}[] = [
   {key: 'minor', label: 'Minor'},
   {key: 'seventh', label: '7ths'},
   {key: 'other', label: 'Sus & add'},
+];
+
+export const SHAPE_FILTERS: {key: Exclude<ShapeFilter, 'any'>; label: string}[] = [
+  {key: 'open', label: 'Open'},
   {key: 'barre', label: 'Barre'},
 ];
 

@@ -1,18 +1,6 @@
-import {frenchName} from '../chords';
-import {arpeggio, strum} from '../audio';
-import type {Chord} from '../types';
-
-export function ChordDetails({chord}: {chord: Chord}) {
+export function ChordDetails() {
   return (
     <div className="panel">
-      <p className="chord-title">{chord.name}</p>
-      <p className="chord-sub">
-        {chord.desc} · {frenchName(chord.name)}
-      </p>
-      <div className="actions">
-        <button onClick={() => strum(chord)}>&#9654;&#xFE0E; Strum</button>
-        <button onClick={() => arpeggio(chord)}>&#9836;&#xFE0E; One by one</button>
-      </div>
       <div className="help">
         <p>
           Vertical lines are strings, low E on the left. Numbered dots show which finger to use: 1 index, 2 middle, 3
