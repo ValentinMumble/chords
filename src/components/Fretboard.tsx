@@ -1,5 +1,6 @@
+import {useEffect, useRef} from 'react';
 import {findBarres, noteName} from '../chords';
-import type {Chord} from '../types';
+import type {Chord, Finger} from '../types';
 
 type Variant = 'full' | 'mini';
 
@@ -75,10 +76,33 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
   const maxFret = Math.max(...chord.frets);
   const baseFret = maxFret > geo.fretCount ? Math.min(...chord.frets.filter(fret => fret > 0)) : 1;
   const dotY = (fret: number) => geo.nutY + (fret - baseFret + 0.5) * geo.fretGap;
-  const parkY = geo.nutY - geo.openOffset;
 
   const strings = [0, 1, 2, 3, 4, 5];
   const fretRows = Array.from({length: geo.fretCount}, (_, row) => row + 1);
+
+  // Dots are tracked per finger, not per string: a finger that keeps its
+  // position between chords (a pivot) stays anchored, while moving fingers
+  // glide to their new string/fret. Lifted fingers fade out where they were.
+  const lastDotPositions = useRef(new Map<Finger, {x: number; y: number}>());
+  const fingerDots = ([1, 2, 3, 4] as const).map(finger => {
+    const fingerStrings = strings.filter(stringIndex => chord.fingers[stringIndex] === finger);
+    if (fingerStrings.length === 0) {
+      return {finger, visible: false, position: lastDotPositions.current.get(finger), extras: []};
+    }
+    const [primaryString, ...extraStrings] = fingerStrings;
+    return {
+      finger,
+      visible: true,
+      position: {x: stringX(primaryString), y: dotY(chord.frets[primaryString])},
+      extras: extraStrings.map(stringIndex => ({x: stringX(stringIndex), y: dotY(chord.frets[stringIndex])})),
+    };
+  });
+
+  useEffect(() => {
+    fingerDots.forEach(dot => {
+      if (dot.visible && dot.position) lastDotPositions.current.set(dot.finger, dot.position);
+    });
+  });
 
   return (
     <svg
@@ -133,40 +157,66 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
             opacity={0.3}
           />
         ))}
-      {chord.frets.map((fret, stringIndex) => {
-        const fretted = fret > 0;
-        return (
-          <g key={stringIndex}>
+      {chord.frets.map((fret, stringIndex) => (
+        <g key={stringIndex}>
+          <text
+            className="marker"
+            x={stringX(stringIndex)}
+            y={geo.nutY - geo.muteOffset}
+            textAnchor="middle"
+            fontSize={geo.muteFontSize}
+            fill="var(--faint)"
+            style={{opacity: fret === -1 ? 1 : 0}}
+          >
+            ✕
+          </text>
+          <circle
+            className="marker"
+            cx={stringX(stringIndex)}
+            cy={geo.nutY - geo.openOffset}
+            r={geo.openRadius}
+            fill="none"
+            stroke="var(--ink)"
+            strokeWidth={1.5}
+            style={{opacity: fret === 0 ? 1 : 0}}
+          />
+          {geo.showNoteNames && fret >= 0 && (
             <text
-              className="marker"
               x={stringX(stringIndex)}
-              y={geo.nutY - geo.muteOffset}
+              y={fretY(geo.fretCount) + 26}
               textAnchor="middle"
-              fontSize={geo.muteFontSize}
-              fill="var(--faint)"
-              style={{opacity: fret === -1 ? 1 : 0}}
+              fontSize={13}
+              fill="var(--muted)"
             >
-              ✕
+              {noteName(stringIndex, fret)}
             </text>
-            <circle
-              className="marker"
-              cx={stringX(stringIndex)}
-              cy={geo.nutY - geo.openOffset}
-              r={geo.openRadius}
-              fill="none"
-              stroke="var(--ink)"
-              strokeWidth={1.5}
-              style={{opacity: fret === 0 ? 1 : 0}}
-            />
+          )}
+        </g>
+      ))}
+      {fingerDots.map(dot =>
+        dot.position ? (
+          <g key={`finger-${dot.finger}`}>
             <g
               className="fret-dot"
               style={{
-                transform: `translate(${stringX(stringIndex)}px, ${fretted ? dotY(fret) : parkY}px)`,
-                opacity: fretted ? 1 : 0,
+                transform: `translate(${dot.position.x}px, ${dot.position.y}px)`,
+                opacity: dot.visible ? 1 : 0,
               }}
             >
               <circle r={geo.dotRadius} fill="var(--ink)" />
-              {chord.fingers[stringIndex] > 0 && (
+              <text
+                y={geo.dotFontSize * 0.35}
+                textAnchor="middle"
+                fontSize={geo.dotFontSize}
+                fontWeight={600}
+                fill="var(--surface)"
+              >
+                {dot.finger}
+              </text>
+            </g>
+            {dot.extras.map((extra, extraIndex) => (
+              <g key={extraIndex} className="fret-dot" style={{transform: `translate(${extra.x}px, ${extra.y}px)`}}>
+                <circle r={geo.dotRadius} fill="var(--ink)" />
                 <text
                   y={geo.dotFontSize * 0.35}
                   textAnchor="middle"
@@ -174,24 +224,13 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
                   fontWeight={600}
                   fill="var(--surface)"
                 >
-                  {chord.fingers[stringIndex]}
+                  {dot.finger}
                 </text>
-              )}
-            </g>
-            {geo.showNoteNames && fret >= 0 && (
-              <text
-                x={stringX(stringIndex)}
-                y={fretY(geo.fretCount) + 26}
-                textAnchor="middle"
-                fontSize={13}
-                fill="var(--muted)"
-              >
-                {noteName(stringIndex, fret)}
-              </text>
-            )}
+              </g>
+            ))}
           </g>
-        );
-      })}
+        ) : null,
+      )}
     </svg>
   );
 }
