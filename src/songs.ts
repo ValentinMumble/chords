@@ -106,6 +106,32 @@ const horseAdvanced = bars([
   ['Em', 4],
   ['D6/9', 4],
 ]);
+const threeLittleBirds = bars([
+  ['A', 4],
+  ['A', 4],
+  ['D', 4],
+  ['A', 4],
+  ['E', 4],
+  ['D', 4],
+  ['A', 4],
+  ['A', 4],
+]);
+const zombie = bars([
+  ['Em', 4],
+  ['C', 4],
+  ['G', 4],
+  ['D', 4],
+]);
+const countryRoads = bars([
+  ['G', 4],
+  ['D', 4],
+  ['Em', 4],
+  ['C', 4],
+  ['G', 4],
+  ['D', 4],
+  ['C', 4],
+  ['G', 4],
+]);
 
 export const SONGS: readonly Song[] = [
   {
@@ -143,5 +169,23 @@ export const SONGS: readonly Song[] = [
     sound: 'acoustic_guitar_steel',
     easy: {bpm: 122, pattern: EASY_PATTERN, bars: horseEasy},
     advanced: {bpm: 122, pattern: ADVANCED_PATTERN, bars: horseAdvanced},
+  },
+  {
+    name: 'Three Little Birds — Bob Marley',
+    sound: 'electric_guitar_clean',
+    easy: {bpm: 76, pattern: EASY_PATTERN, bars: threeLittleBirds},
+    advanced: {bpm: 76, pattern: ADVANCED_PATTERN, bars: threeLittleBirds},
+  },
+  {
+    name: 'Zombie — The Cranberries',
+    sound: 'overdriven_guitar',
+    easy: {bpm: 84, pattern: EASY_PATTERN, bars: zombie},
+    advanced: {bpm: 84, pattern: ADVANCED_PATTERN, bars: zombie},
+  },
+  {
+    name: 'Take Me Home, Country Roads — John Denver',
+    sound: 'acoustic_guitar_steel',
+    easy: {bpm: 82, pattern: EASY_PATTERN, bars: countryRoads},
+    advanced: {bpm: 82, pattern: ADVANCED_PATTERN, bars: countryRoads},
   },
 ];
