@@ -1,5 +1,5 @@
-import { frenchShort } from '../chords';
-import type { Chord } from '../types';
+import {frenchShort} from '../chords';
+import type {Chord} from '../types';
 
 interface ChordGridProps {
   chords: Chord[];
@@ -7,10 +7,10 @@ interface ChordGridProps {
   onSelect: (name: string) => void;
 }
 
-export function ChordGrid({ chords, selected, onSelect }: ChordGridProps) {
+export function ChordGrid({chords, selected, onSelect}: ChordGridProps) {
   return (
     <div className="chord-grid" role="group" aria-label="Chord selection">
-      {chords.map((chord) => (
+      {chords.map(chord => (
         <button
           key={chord.name}
           className={chord.name === selected ? 'active' : ''}

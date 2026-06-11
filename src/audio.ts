@@ -1,5 +1,5 @@
-import { instrument, type Player } from 'soundfont-player';
-import type { Chord } from './types';
+import {instrument, type Player} from 'soundfont-player';
+import type {Chord} from './types';
 
 const STRING_MIDI = [40, 45, 50, 55, 59, 64];
 const PITCH_CLASSES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -14,7 +14,7 @@ export function audioContext(): AudioContext {
   if (!guitarLoading) {
     guitarLoading = true;
     instrument(ctx, 'acoustic_guitar_steel')
-      .then((player) => {
+      .then(player => {
         guitar = player;
       })
       .catch(() => {
@@ -60,7 +60,7 @@ export function strumChord(chord: Chord, stagger: number): void {
     const midi = STRING_MIDI[stringIndex] + fret;
     const when = start + played * stagger;
     if (guitar) {
-      guitar.play(midiToNote(midi), when, { gain: 0.7, duration: 2.5 });
+      guitar.play(midiToNote(midi), when, {gain: 0.7, duration: 2.5});
     } else {
       pluckFallback(context, midiToFrequency(midi), when);
     }

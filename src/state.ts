@@ -18,7 +18,7 @@ export function loadState(): Partial<PersistedState> {
 
 export function saveState(patch: Partial<PersistedState>): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...loadState(), ...patch }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({...loadState(), ...patch}));
   } catch {
     // storage unavailable (private mode, quota) — state just won't persist
   }

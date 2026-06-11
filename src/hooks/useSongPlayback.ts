@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
-import { CHORDS_BY_NAME } from '../chords';
-import { strumChord, metronomeTick, currentTime } from '../audio';
-import type { Song } from '../types';
+import {useEffect, useRef, useState} from 'react';
+import {CHORDS_BY_NAME} from '../chords';
+import {strumChord, metronomeTick, currentTime} from '../audio';
+import type {Song} from '../types';
 
 export interface SongPlayback {
   playing: boolean;
@@ -28,9 +28,12 @@ export function useSongPlayback(song: Song, bpm: number, onBarChord: (chordName:
     strumChord(chord, 0.045);
     const beat = 60 / bpmRef.current;
     for (let tick = 1; tick < 4; tick++) metronomeTick(currentTime() + 0.03 + tick * beat);
-    const timer = setTimeout(() => {
-      setBarIndex((index) => (index + 1) % song.bars.length);
-    }, beat * 4 * 1000);
+    const timer = setTimeout(
+      () => {
+        setBarIndex(index => (index + 1) % song.bars.length);
+      },
+      beat * 4 * 1000,
+    );
     return () => clearTimeout(timer);
   }, [playing, barIndex, song]);
 
@@ -49,7 +52,7 @@ export function useSongPlayback(song: Song, bpm: number, onBarChord: (chordName:
   }
 
   function stepBar(step: number): void {
-    setBarIndex((index) => (index + step + song.bars.length) % song.bars.length);
+    setBarIndex(index => (index + step + song.bars.length) % song.bars.length);
   }
 
   return {

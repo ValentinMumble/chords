@@ -1,6 +1,6 @@
-import { SONGS } from '../songs';
-import type { Song } from '../types';
-import type { SongPlayback } from '../hooks/useSongPlayback';
+import {SONGS} from '../songs';
+import type {Song} from '../types';
+import type {SongPlayback} from '../hooks/useSongPlayback';
 
 interface SongPlayerProps {
   song: Song;
@@ -11,29 +11,33 @@ interface SongPlayerProps {
   playback: SongPlayback;
 }
 
-export function SongPlayer({ song, songIndex, onSongChange, bpm, onBpmChange, playback }: SongPlayerProps) {
-  const { playing, barIndex, nextBarIndex, togglePlay } = playback;
+export function SongPlayer({song, songIndex, onSongChange, bpm, onBpmChange, playback}: SongPlayerProps) {
+  const {playing, barIndex, nextBarIndex, togglePlay} = playback;
   return (
-    <div className="viewer" style={{ display: 'block' }}>
+    <div className="viewer" style={{display: 'block'}}>
       <div className="song-bar">
         <select
           aria-label="Choose a song"
           value={songIndex}
-          onChange={(event) => onSongChange(Number(event.target.value))}
+          onChange={event => onSongChange(Number(event.target.value))}
         >
           {SONGS.map((entry, index) => (
-            <option key={entry.name} value={index}>{entry.name}</option>
+            <option key={entry.name} value={index}>
+              {entry.name}
+            </option>
           ))}
         </select>
-        <button onClick={togglePlay}>
-          {playing ? <>&#9632;&#xFE0E; Stop</> : <>&#9654;&#xFE0E; Play</>}
-        </button>
+        <button onClick={togglePlay}>{playing ? <>&#9632;&#xFE0E; Stop</> : <>&#9654;&#xFE0E; Play</>}</button>
         <div className="tempo">
           <label htmlFor="song-bpm">Tempo</label>
           <input
-            type="range" id="song-bpm" min={40} max={120} step={2}
+            type="range"
+            id="song-bpm"
+            min={40}
+            max={120}
+            step={2}
             value={bpm}
-            onChange={(event) => onBpmChange(Number(event.target.value))}
+            onChange={event => onBpmChange(Number(event.target.value))}
           />
           <output>{bpm} bpm</output>
         </div>
@@ -50,8 +54,8 @@ export function SongPlayer({ song, songIndex, onSongChange, bpm, onBpmChange, pl
         })}
       </div>
       <p className="song-hint">
-        Each chip is one bar of 4 beats: a strum on beat 1, ticks on 2–4. The diagram up top follows
-        the current bar, with the next chord shown beside it.
+        Each chip is one bar of 4 beats: a strum on beat 1, ticks on 2–4. The diagram up top follows the current bar,
+        with the next chord shown beside it.
       </p>
     </div>
   );

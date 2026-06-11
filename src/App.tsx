@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
-import { CHORDS, CHORDS_BY_NAME } from './chords';
-import { SONGS } from './songs';
-import { strumChord } from './audio';
-import { loadState, saveState } from './state';
-import { Board } from './components/Board';
-import { ChordFilters } from './components/ChordFilters';
-import { ChordGrid } from './components/ChordGrid';
-import { ChordDetails } from './components/ChordDetails';
-import { NextUpCard } from './components/NextUpCard';
-import { SongPlayer } from './components/SongPlayer';
-import { useSongPlayback } from './hooks/useSongPlayback';
-import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import {useEffect, useState} from 'react';
+import {CHORDS, CHORDS_BY_NAME} from './chords';
+import {SONGS} from './songs';
+import {strumChord} from './audio';
+import {loadState, saveState} from './state';
+import {Board} from './components/Board';
+import {ChordFilters} from './components/ChordFilters';
+import {ChordGrid} from './components/ChordGrid';
+import {ChordDetails} from './components/ChordDetails';
+import {NextUpCard} from './components/NextUpCard';
+import {SongPlayer} from './components/SongPlayer';
+import {useSongPlayback} from './hooks/useSongPlayback';
+import {useKeyboardShortcuts} from './hooks/useKeyboardShortcuts';
 
 const saved = loadState();
 const initialChord = saved.chord && CHORDS_BY_NAME[saved.chord] ? saved.chord : 'C';
@@ -24,13 +24,13 @@ export default function App() {
 
   const song = SONGS[songIndex];
   const chord = CHORDS_BY_NAME[chordName];
-  const visible = filter === 'all' ? CHORDS : CHORDS.filter((entry) => entry.type === filter);
+  const visible = filter === 'all' ? CHORDS : CHORDS.filter(entry => entry.type === filter);
 
   const playback = useSongPlayback(song, bpm, setChordName);
   const nextChordName = playback.playing ? song.bars[playback.nextBarIndex] : null;
 
   useEffect(() => {
-    saveState({ chord: chordName, filter, songIndex, bpm });
+    saveState({chord: chordName, filter, songIndex, bpm});
   }, [chordName, filter, songIndex, bpm]);
 
   function selectChord(name: string): void {
@@ -45,11 +45,11 @@ export default function App() {
   }
 
   useKeyboardShortcuts({
-    onArrow: (step) => {
+    onArrow: step => {
       if (playback.playing) {
         playback.stepBar(step);
       } else {
-        const index = visible.findIndex((entry) => entry.name === chordName);
+        const index = visible.findIndex(entry => entry.name === chordName);
         selectChord(visible[(index + step + visible.length) % visible.length].name);
       }
     },
