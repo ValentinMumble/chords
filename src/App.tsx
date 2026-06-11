@@ -1,5 +1,5 @@
 import {useEffect} from 'react';
-import {CHORDS, CHORDS_BY_NAME, FILTER_TYPES, getChord} from './chords';
+import {CHORDS, CHORDS_BY_NAME, FILTER_TYPES, getChord, isBarreChord} from './chords';
 import {SONGS} from './songs';
 import {arpeggio, GUITAR_SOUNDS, setGuitarSound, strum} from './audio';
 import {Fretboard} from './components/Fretboard';
@@ -22,7 +22,11 @@ export default function App() {
   const song = SONGS[songIndex] ?? SONGS[0];
   const chord = getChord(chordName) ?? CHORDS_BY_NAME.C;
   const activeFilter = FILTER_TYPES.some(type => type.key === filter) ? filter : 'all';
-  const visible = activeFilter === 'all' ? CHORDS : CHORDS.filter(entry => entry.type === activeFilter);
+  const visible = CHORDS.filter(entry => {
+    if (activeFilter === 'all') return true;
+    if (activeFilter === 'barre') return isBarreChord(entry);
+    return entry.type === activeFilter;
+  });
 
   const activeSound = GUITAR_SOUNDS.find(entry => entry.id === sound) ?? GUITAR_SOUNDS[0];
   useEffect(() => {

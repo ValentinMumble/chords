@@ -44,12 +44,15 @@ export function getChord(name: string): Chord | undefined {
   return (CHORDS_BY_NAME as Record<string, Chord | undefined>)[name];
 }
 
-export const FILTER_TYPES: {key: ChordType | 'all'; label: string}[] = [
+export type ChordFilter = ChordType | 'all' | 'barre';
+
+export const FILTER_TYPES: {key: ChordFilter; label: string}[] = [
   {key: 'all', label: 'All'},
   {key: 'major', label: 'Major'},
   {key: 'minor', label: 'Minor'},
   {key: 'seventh', label: '7ths'},
   {key: 'other', label: 'Sus & add'},
+  {key: 'barre', label: 'Barre'},
 ];
 
 export interface Barre {
@@ -67,12 +70,18 @@ export function findBarres(chord: Chord): Barre[] {
       groups.set(key, [...(groups.get(key) ?? []), stringIndex]);
     }
   });
+  // One finger fretting two or more strings at the same fret is physically a
+  // barre, even when other fingers fret higher notes on the strings between.
   return [...groups.entries()]
-    .filter(([, strings]) => strings.length > 2)
+    .filter(([, strings]) => strings.length >= 2)
     .map(([key, strings]) => {
       const [finger, fret] = key.split(':').map(Number);
       return {finger, fret, fromString: Math.min(...strings), toString: Math.max(...strings)};
     });
+}
+
+export function isBarreChord(chord: Chord): boolean {
+  return findBarres(chord).some(barre => barre.toString - barre.fromString >= 2);
 }
 
 const NOTE_NAMES = ['E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#'];

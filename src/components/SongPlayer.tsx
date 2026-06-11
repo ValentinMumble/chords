@@ -40,7 +40,9 @@ export function SongPlayer({
             </option>
           ))}
         </select>
-        <button onClick={togglePlay}>{playing ? <>&#9632;&#xFE0E; Stop</> : <>&#9654;&#xFE0E; Play</>}</button>
+        <button className="play-btn" aria-label={playing ? 'Stop' : 'Play'} onClick={togglePlay}>
+          {playing ? <>&#9632;&#xFE0E;</> : <>&#9654;&#xFE0E;</>}
+        </button>
         <div className="tempo">
           <label htmlFor="song-bpm">Tempo</label>
           <input

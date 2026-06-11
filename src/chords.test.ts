@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {CHORDS, CHORDS_BY_NAME, findBarres, frenchName, frenchShort, getChord, noteName} from './chords';
+import {CHORDS, CHORDS_BY_NAME, findBarres, frenchName, frenchShort, getChord, isBarreChord, noteName} from './chords';
 
 describe('frenchName', () => {
   it.each([
@@ -47,13 +47,28 @@ describe('findBarres', () => {
     expect(findBarres(CHORDS_BY_NAME.Fm)).toEqual([{finger: 1, fret: 1, fromString: 0, toString: 5}]);
   });
 
-  it('ignores a finger covering only two strings (Bm)', () => {
-    expect(findBarres(CHORDS_BY_NAME.Bm)).toEqual([]);
+  it('finds the barre on B and Bm even with other fingers between', () => {
+    expect(findBarres(CHORDS_BY_NAME.B)).toEqual([{finger: 1, fret: 2, fromString: 1, toString: 5}]);
+    expect(findBarres(CHORDS_BY_NAME.Bm)).toEqual([{finger: 1, fret: 2, fromString: 1, toString: 5}]);
+  });
+
+  it('finds the two-string mini-barre on Dm7', () => {
+    expect(findBarres(CHORDS_BY_NAME.Dm7)).toEqual([{finger: 1, fret: 1, fromString: 4, toString: 5}]);
   });
 
   it('finds no barre on open chords', () => {
     expect(findBarres(CHORDS_BY_NAME.C)).toEqual([]);
     expect(findBarres(CHORDS_BY_NAME.Em)).toEqual([]);
+  });
+});
+
+describe('isBarreChord', () => {
+  it('flags the four barre shapes', () => {
+    expect(CHORDS.filter(isBarreChord).map(chord => chord.name)).toEqual(['F', 'B', 'Bm', 'Fm']);
+  });
+
+  it('does not flag the Dm7 mini-barre', () => {
+    expect(isBarreChord(CHORDS_BY_NAME.Dm7)).toBe(false);
   });
 });
 
