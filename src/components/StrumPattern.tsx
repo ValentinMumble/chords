@@ -1,7 +1,8 @@
-import type {StrumPattern as Pattern} from '../songs';
+import type {PickPattern, StrumPattern as Pattern} from '../songs';
 
 interface StrumPatternProps {
   pattern: Pattern;
+  pick?: PickPattern;
   playing: boolean;
   subdivision: number;
   barSeconds: number;
@@ -14,15 +15,29 @@ function slotLabel(index: number, subdivision: number): string {
   return String(index + 1);
 }
 
-export function StrumPattern({pattern, playing, subdivision, barSeconds}: StrumPatternProps) {
+export function StrumPattern({pattern, pick, playing, subdivision, barSeconds}: StrumPatternProps) {
+  const picking = pick !== undefined;
+  const slots = pick ?? pattern;
   return (
     <div className="strum">
-      <span className="strum-label">Strum</span>
+      <span className="strum-label">{picking ? 'Pick' : 'Strum'}</span>
       <div className="strum-grid">
         {playing && (
           <span className="strum-playhead" style={{animationDuration: `${barSeconds}s`}} aria-hidden="true" />
         )}
-        {pattern.map((stroke, index) => {
+        {slots.map((slot, index) => {
+          if (picking) {
+            const voice = slot as number | null;
+            const active = voice !== null;
+            const bass = voice === 0;
+            return (
+              <div key={index} className={`strum-slot ${active ? 'pluck' : 'rest'}${bass ? ' accent' : ''}`}>
+                <span className="pluck-dot">{active ? <span /> : null}</span>
+                <span className="strum-beat">{slotLabel(index, subdivision)}</span>
+              </div>
+            );
+          }
+          const stroke = slot as Pattern[number];
           const kind = stroke === 'D' ? 'down' : stroke === 'U' ? 'up' : 'rest';
           const accent = stroke === 'D' && index === 0;
           return (

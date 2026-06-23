@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {CHORDS_BY_NAME} from '../chords';
-import {ensureAudio, strumStroke} from '../audio';
-import type {Bar, StrumPattern} from '../songs';
+import {ensureAudio, pluckVoice, strumStroke} from '../audio';
+import type {Bar, PickPattern, StrumPattern} from '../songs';
 
 const RESYNC_THRESHOLD = 0.1;
 
@@ -19,6 +19,7 @@ export function useSongPlayback(
   bars: readonly Bar[],
   bpm: number,
   pattern: StrumPattern,
+  pick: PickPattern | undefined,
   subdivision: number,
   onBarChord: (chordName: string) => void,
 ): SongPlayback {
@@ -29,6 +30,8 @@ export function useSongPlayback(
   bpmRef.current = bpm;
   const patternRef = useRef(pattern);
   patternRef.current = pattern;
+  const pickRef = useRef(pick);
+  pickRef.current = pick;
   const subdivisionRef = useRef(subdivision);
   subdivisionRef.current = subdivision;
   const onBarChordRef = useRef(onBarChord);
@@ -53,24 +56,30 @@ export function useSongPlayback(
     const beat = 60 / bpmRef.current;
     const sub = subdivisionRef.current;
     const slotDur = beat / sub;
-    const pat = patternRef.current;
+    const pick = pickRef.current;
+    const seqLength = pick ? pick.length : patternRef.current.length;
     let beatsBefore = 0;
     for (let index = 0; index < barIndex; index++) beatsBefore += bars[index].beats;
-    const phase = (beatsBefore * sub) % pat.length;
+    const phase = (beatsBefore * sub) % seqLength;
     const slots = bar.beats * sub;
     for (let slot = 0; slot < slots; slot++) {
-      const pos = (phase + slot) % pat.length;
-      const stroke = pat[pos];
-      if (stroke === '-') continue;
-      const down = stroke === 'D';
+      const pos = (phase + slot) % seqLength;
       const onBeat = pos % sub === 0;
-      const beatIndex = pos / sub;
-      // Downbeat loudest; alternating strong beats (1 & 3 in 4/4) get a bass thump.
-      const strongBeat = onBeat && beatIndex % 2 === 0;
-      const gain = !down ? 0.5 : !onBeat ? 0.7 : beatIndex === 0 ? 1 : strongBeat ? 0.9 : 0.78;
-      // Lay the off-beat strokes slightly late for a relaxed swing feel.
-      const swing = onBeat ? 0 : slotDur * 0.14;
-      strumStroke(chord, barStart + slot * slotDur + swing, down ? 'down' : 'up', gain, down && strongBeat);
+      const at = barStart + slot * slotDur + (onBeat ? 0 : slotDur * 0.14);
+      if (pick) {
+        const voice = pick[pos];
+        if (voice === null) continue;
+        pluckVoice(chord, voice, at, onBeat ? 0.92 : 0.62);
+      } else {
+        const stroke = patternRef.current[pos];
+        if (stroke === '-') continue;
+        const down = stroke === 'D';
+        const beatIndex = pos / sub;
+        // Downbeat loudest; alternating strong beats (1 & 3 in 4/4) get a bass thump.
+        const strongBeat = onBeat && beatIndex % 2 === 0;
+        const gain = !down ? 0.5 : !onBeat ? 0.7 : beatIndex === 0 ? 1 : strongBeat ? 0.9 : 0.78;
+        strumStroke(chord, at, down ? 'down' : 'up', gain, down && strongBeat);
+      }
     }
     nextBarTimeRef.current = barStart + bar.beats * beat;
 

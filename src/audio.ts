@@ -20,14 +20,47 @@ export const GUITAR_SOUNDS = [
 export type GuitarSoundId = (typeof GUITAR_SOUNDS)[number]['id'];
 
 let ctx: AudioContext | null = null;
+let busInput: GainNode | null = null;
 let currentSound: GuitarSoundId = GUITAR_SOUNDS[0].id;
 const players = new Map<GuitarSoundId, Player>();
 const loadingSounds = new Set<GuitarSoundId>();
 
+// A short decaying-noise impulse response — a small room, so the dry samples
+// don't sound bone-dry/MIDI.
+function roomImpulse(context: AudioContext): AudioBuffer {
+  const length = Math.floor(context.sampleRate * 1.6);
+  const buffer = context.createBuffer(2, length, context.sampleRate);
+  for (let channel = 0; channel < 2; channel++) {
+    const data = buffer.getChannelData(channel);
+    for (let i = 0; i < length; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2.6);
+    }
+  }
+  return buffer;
+}
+
 export function ensureAudio(): AudioContext {
-  if (!ctx) ctx = new AudioContext();
+  if (!ctx) {
+    ctx = new AudioContext();
+    // Everything plays into busInput, which splits to a dry path and a wet
+    // (reverb) path before the output.
+    busInput = ctx.createGain();
+    const dry = ctx.createGain();
+    dry.gain.value = 0.9;
+    const wet = ctx.createGain();
+    wet.gain.value = 0.22;
+    const reverb = ctx.createConvolver();
+    reverb.buffer = roomImpulse(ctx);
+    busInput.connect(dry).connect(ctx.destination);
+    busInput.connect(reverb).connect(wet).connect(ctx.destination);
+  }
   if (ctx.state === 'suspended') void ctx.resume();
   return ctx;
+}
+
+function output(): AudioNode {
+  ensureAudio();
+  return busInput ?? ctx!.destination;
 }
 
 export function setGuitarSound(sound: GuitarSoundId): void {
@@ -39,7 +72,9 @@ export function loadGuitar(): void {
   const sound = currentSound;
   if (players.has(sound) || loadingSounds.has(sound)) return;
   loadingSounds.add(sound);
-  instrument(ensureAudio(), sound)
+  const ac = ensureAudio();
+  // Route the instrument through the reverb bus instead of straight to output.
+  instrument(ac, sound, {destination: output()})
     .then(player => {
       players.set(sound, player);
     })
@@ -94,7 +129,7 @@ function pluckFallback(context: AudioContext, frequency: number, when: number): 
   gain.gain.exponentialRampToValueAtTime(0.0001, when + 1.6);
   osc.connect(filter);
   filter.connect(gain);
-  gain.connect(context.destination);
+  gain.connect(output());
   osc.start(when);
   osc.stop(when + 1.7);
 }
@@ -168,6 +203,22 @@ export function strumStroke(
 
 export function strum(chord: Chord, startTime?: number): void {
   strumStroke(chord, startTime ?? ensureAudio().currentTime + SCHEDULE_DELAY, 'down', 0.85);
+}
+
+// Pluck a single string of the chord — voice 0 is the lowest sounded string,
+// counting up. Used for fingerpicking patterns.
+export function pluckVoice(chord: Chord, voiceIndex: number, when: number, gain: number): void {
+  const context = ensureAudio();
+  loadGuitar();
+  const guitar = players.get(currentSound);
+  const voices = chordVoices(chord);
+  if (voices.length === 0) return;
+  const midi = voices[Math.min(voiceIndex, voices.length - 1)];
+  if (guitar) {
+    guitar.play(midiToNote(midi), when, {gain, duration: 1.9});
+  } else {
+    pluckFallback(context, midiToFrequency(midi), when);
+  }
 }
 
 export function arpeggio(chord: Chord): void {

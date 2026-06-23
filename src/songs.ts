@@ -21,13 +21,25 @@ export interface Meter {
 export const FOUR_FOUR: Meter = {beats: 4, subdivision: 2};
 export const SIX_EIGHT: Meter = {beats: 2, subdivision: 3};
 
-// 4/4 patterns (8 slots). Down on every beat — simple and steady.
-export const EASY_PATTERN: StrumPattern = ['D', '-', 'D', '-', 'D', '-', 'D', '-'];
-// The classic folk/pop pattern: D · D-U · U-D-U (accent on the 1).
-export const ADVANCED_PATTERN: StrumPattern = ['D', '-', 'D', 'U', '-', 'U', 'D', 'U'];
+// 4/4 patterns (8 slots), each a distinct feel so songs don't blur together.
+export const EASY_PATTERN: StrumPattern = ['D', '-', 'D', '-', 'D', '-', 'D', '-']; // steady downs
+export const ADVANCED_PATTERN: StrumPattern = ['D', '-', 'D', 'U', '-', 'U', 'D', 'U']; // folk/pop D-DU-UDU
+export const DRIVING_PATTERN: StrumPattern = ['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']; // eighth-note rock chug
+export const BALLAD_PATTERN: StrumPattern = ['D', '-', '-', '-', 'D', '-', 'U', '-']; // sparse and gentle
+export const ANTHEM_PATTERN: StrumPattern = ['D', '-', 'D', 'U', 'D', '-', 'D', 'U']; // strong, with up-strokes
 // 6/8 patterns (6 slots): strum the two dotted-quarter pulses, with a lilt.
 export const EASY_PATTERN_68: StrumPattern = ['D', '-', '-', 'D', '-', '-'];
 export const ADVANCED_PATTERN_68: StrumPattern = ['D', '-', 'U', 'D', '-', 'U'];
+
+// A fingerpicking pattern: which voice (0 = lowest sounded string, upward) to
+// pluck on each subdivision slot; null is a rest.
+export type PickPattern = readonly (number | null)[];
+// 6/8 roll: bass, then up and back across the chord.
+export const PICK_68: PickPattern = [0, 2, 3, 4, 3, 2];
+// 4/4 Travis-ish: alternating bass with upper voices.
+export const PICK_44: PickPattern = [0, 3, 1, 3, 0, 4, 1, 3];
+// 4/4 flowing arpeggio: bass then roll up the chord, alternating the bass note.
+export const PICK_FLOW: PickPattern = [0, 2, 3, 4, 1, 2, 3, 4];
 
 export interface SongVersion {
   readonly bpm: number;
@@ -35,12 +47,18 @@ export interface SongVersion {
   // Strummed across the bar on the subdivision grid; tiled over each held chord
   // so long chords keep ringing instead of decaying to silence.
   readonly pattern: StrumPattern;
+  // If set, the chord is fingerpicked with this voice pattern instead of strummed.
+  readonly pick?: PickPattern;
   readonly bars: readonly Bar[];
 }
+
+export type Difficulty = 1 | 2 | 3;
+export const DIFFICULTY_LABELS: Record<Difficulty, string> = {1: 'Easy', 2: 'Intermediate', 3: 'Advanced'};
 
 export interface Song {
   readonly name: string;
   readonly sound: GuitarSoundId;
+  readonly difficulty: Difficulty;
   readonly capo?: number;
   readonly easy: SongVersion;
   readonly advanced?: SongVersion;
@@ -71,22 +89,6 @@ const standByMe = bars([
   ['C', 4],
   ['D', 4],
   ['G', 8],
-]);
-const letItBe = bars([
-  ['C', 4],
-  ['G', 4],
-  ['Am', 4],
-  ['Fmaj7', 4],
-  ['C', 4],
-  ['G', 4],
-  ['Fmaj7', 2],
-  ['C', 2],
-]);
-const wildThing = bars([
-  ['A', 4],
-  ['D', 4],
-  ['E', 4],
-  ['D', 4],
 ]);
 // Easy: basic open chords. Advanced: the song's real, richer voicings.
 const wonderwallEasy = bars([
@@ -121,38 +123,51 @@ const horseAdvanced = bars([
   ['Em', 4],
   ['D6/9', 4],
 ]);
-const threeLittleBirds = bars([
-  ['A', 4],
-  ['A', 4],
-  ['D', 4],
-  ['A', 4],
-  ['E', 4],
-  ['D', 4],
-  ['A', 4],
-  ['A', 4],
-]);
 const zombie = bars([
   ['Em', 4],
   ['C', 4],
   ['G', 4],
   ['D', 4],
 ]);
-const countryRoads = bars([
-  ['G', 4],
-  ['D', 4],
-  ['Em', 4],
-  ['C', 4],
-  ['G', 4],
+// In Dm (i–iv–V): the song is Dm·Gm·Asus4. With a capo on 5 those become the
+// open shapes Am·Dm·Esus4 — what's drawn here.
+const commeToi = bars([
+  ['Am', 4],
+  ['Dm', 4],
+  ['Esus4', 4],
+  ['Am', 4],
+]);
+// 6/8, fingerpicked — each chord one bar (two dotted-quarter beats).
+const houseOfRisingSun = bars([
+  ['Am', 2],
+  ['C', 2],
+  ['D', 2],
+  ['F', 2],
+  ['Am', 2],
+  ['E', 2],
+  ['Am', 2],
+  ['E', 2],
+]);
+const sweetHomeAlabama = bars([
   ['D', 4],
   ['C', 4],
   ['G', 4],
 ]);
-// Verse in 6/8 — each chord is one bar (two dotted-quarter beats).
-const fakePlasticTrees = bars([
-  ['A', 2],
-  ['E', 2],
-  ['G', 2],
-  ['D', 2],
+// Three open chords, bouncy I–IV–I–V.
+const anyoneElseButYou = bars([
+  ['G', 4],
+  ['C', 4],
+  ['G', 4],
+  ['D', 4],
+]);
+// Fingerpicked, capo 2 — the verse phrase (I–V–vi–IV–V–I).
+const jeLAimeAMourir = bars([
+  ['D', 4],
+  ['A', 4],
+  ['Bm', 4],
+  ['G', 4],
+  ['A', 4],
+  ['D', 4],
 ]);
 
 // Named progressions for the trainer to walk in order (all use library chords).
@@ -164,66 +179,79 @@ export const TRAINER_PROGRESSIONS: {readonly name: string; readonly chords: read
   {name: 'Canon in D', chords: ['D', 'A', 'Bm', 'F#m', 'G', 'D', 'G', 'A']},
 ];
 
+// Ordered easiest → hardest. Each song has its own feel (pattern/pick/tempo)
+// so the set doesn't all sound alike.
 export const SONGS: readonly Song[] = [
-  {
-    name: "Knockin' on Heaven's Door — Bob Dylan",
-    sound: 'acoustic_guitar_steel',
-    easy: {bpm: 72, pattern: EASY_PATTERN, bars: knockin},
-    advanced: {bpm: 72, pattern: ADVANCED_PATTERN, bars: knockin},
-  },
-  {
-    name: 'Stand by Me — Ben E. King',
-    sound: 'electric_guitar_clean',
-    easy: {bpm: 118, pattern: EASY_PATTERN, bars: standByMe},
-    advanced: {bpm: 118, pattern: ADVANCED_PATTERN, bars: standByMe},
-  },
-  {
-    name: 'Let It Be — The Beatles',
-    sound: 'acoustic_guitar_nylon',
-    easy: {bpm: 74, pattern: EASY_PATTERN, bars: letItBe},
-    advanced: {bpm: 74, pattern: ADVANCED_PATTERN, bars: letItBe},
-  },
-  {
-    name: 'Wild Thing — The Troggs',
-    sound: 'overdriven_guitar',
-    easy: {bpm: 104, pattern: EASY_PATTERN, bars: wildThing},
-    advanced: {bpm: 104, pattern: ADVANCED_PATTERN, bars: wildThing},
-  },
-  {
-    name: 'Wonderwall — Oasis',
-    sound: 'acoustic_guitar_steel',
-    capo: 2,
-    easy: {bpm: 87, pattern: EASY_PATTERN, bars: wonderwallEasy},
-    advanced: {bpm: 87, pattern: ADVANCED_PATTERN, bars: wonderwallAdvanced},
-  },
   {
     name: 'A Horse with No Name — America',
     sound: 'acoustic_guitar_steel',
+    difficulty: 1,
     easy: {bpm: 122, pattern: EASY_PATTERN, bars: horseEasy},
     advanced: {bpm: 122, pattern: ADVANCED_PATTERN, bars: horseAdvanced},
   },
   {
-    name: 'Three Little Birds — Bob Marley',
+    name: 'Sweet Home Alabama — Lynyrd Skynyrd',
     sound: 'electric_guitar_clean',
-    easy: {bpm: 76, pattern: EASY_PATTERN, bars: threeLittleBirds},
-    advanced: {bpm: 76, pattern: ADVANCED_PATTERN, bars: threeLittleBirds},
+    difficulty: 1,
+    easy: {bpm: 98, pattern: EASY_PATTERN, bars: sweetHomeAlabama},
+    advanced: {bpm: 98, pattern: DRIVING_PATTERN, bars: sweetHomeAlabama},
+  },
+  {
+    name: "Knockin' on Heaven's Door — Bob Dylan",
+    sound: 'acoustic_guitar_steel',
+    difficulty: 1,
+    easy: {bpm: 72, pattern: EASY_PATTERN, bars: knockin},
+    advanced: {bpm: 72, pattern: ADVANCED_PATTERN, bars: knockin},
   },
   {
     name: 'Zombie — The Cranberries',
     sound: 'overdriven_guitar',
+    difficulty: 1,
     easy: {bpm: 84, pattern: EASY_PATTERN, bars: zombie},
-    advanced: {bpm: 84, pattern: ADVANCED_PATTERN, bars: zombie},
+    advanced: {bpm: 84, pattern: DRIVING_PATTERN, bars: zombie},
   },
   {
-    name: 'Take Me Home, Country Roads — John Denver',
+    name: 'Anyone Else But You — The Moldy Peaches',
     sound: 'acoustic_guitar_steel',
-    easy: {bpm: 82, pattern: EASY_PATTERN, bars: countryRoads},
-    advanced: {bpm: 82, pattern: ADVANCED_PATTERN, bars: countryRoads},
+    difficulty: 1,
+    easy: {bpm: 120, pattern: EASY_PATTERN, bars: anyoneElseButYou},
+    advanced: {bpm: 120, pattern: ADVANCED_PATTERN, bars: anyoneElseButYou},
   },
   {
-    name: 'Fake Plastic Trees — Radiohead',
+    name: 'Stand by Me — Ben E. King',
+    sound: 'electric_guitar_clean',
+    difficulty: 2,
+    easy: {bpm: 118, pattern: EASY_PATTERN, bars: standByMe},
+    advanced: {bpm: 118, pattern: BALLAD_PATTERN, bars: standByMe},
+  },
+  {
+    name: 'Wonderwall — Oasis',
     sound: 'acoustic_guitar_steel',
-    easy: {bpm: 52, meter: SIX_EIGHT, pattern: EASY_PATTERN_68, bars: fakePlasticTrees},
-    advanced: {bpm: 52, meter: SIX_EIGHT, pattern: ADVANCED_PATTERN_68, bars: fakePlasticTrees},
+    difficulty: 2,
+    capo: 2,
+    easy: {bpm: 87, pattern: EASY_PATTERN, bars: wonderwallEasy},
+    advanced: {bpm: 87, pattern: ANTHEM_PATTERN, bars: wonderwallAdvanced},
+  },
+  {
+    name: 'Comme toi — Jean-Jacques Goldman',
+    sound: 'acoustic_guitar_nylon',
+    difficulty: 2,
+    capo: 5,
+    easy: {bpm: 96, pattern: EASY_PATTERN, bars: commeToi},
+    advanced: {bpm: 96, pattern: EASY_PATTERN, pick: PICK_44, bars: commeToi},
+  },
+  {
+    name: 'House of the Rising Sun — The Animals',
+    sound: 'acoustic_guitar_steel',
+    difficulty: 3,
+    easy: {bpm: 56, meter: SIX_EIGHT, pattern: EASY_PATTERN_68, pick: PICK_68, bars: houseOfRisingSun},
+  },
+  {
+    name: "Je l'aime à mourir — Francis Cabrel",
+    sound: 'acoustic_guitar_nylon',
+    difficulty: 3,
+    capo: 2,
+    easy: {bpm: 100, pattern: EASY_PATTERN, bars: jeLAimeAMourir},
+    advanced: {bpm: 100, pattern: EASY_PATTERN, pick: PICK_FLOW, bars: jeLAimeAMourir},
   },
 ];

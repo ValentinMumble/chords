@@ -17,6 +17,7 @@ import {ChordFilters} from './components/ChordFilters';
 import {ChordGrid} from './components/ChordGrid';
 import {ChordNotes} from './components/ChordNotes';
 import {ChordTrainer} from './components/ChordTrainer';
+import {CapoBadge} from './components/CapoBadge';
 import {KeyboardHint} from './components/KeyboardHint';
 import {NextUpCard} from './components/NextUpCard';
 import {SongPlayer} from './components/SongPlayer';
@@ -52,7 +53,7 @@ export default function App() {
     setGuitarSound(activeSound.id);
   }, [activeSound.id]);
 
-  const playback = useSongPlayback(version.bars, bpm, version.pattern, meter.subdivision, setChordName);
+  const playback = useSongPlayback(version.bars, bpm, version.pattern, version.pick, meter.subdivision, setChordName);
   const nextChordName = playback.playing ? version.bars[playback.nextBarIndex].name : null;
 
   // Brief pulse on the diagram whenever the chord changes (a struck-chord cue).
@@ -155,6 +156,7 @@ export default function App() {
           onLevelChange={changeLevel}
           bars={version.bars}
           pattern={version.pattern}
+          pick={version.pick}
           meter={meter}
           onBarSelect={selectBar}
           bpm={bpm}
@@ -173,7 +175,7 @@ export default function App() {
             <p className="chord-title">{chord.name}</p>
             <p className="chord-sub">{frenchName(chord.name)}</p>
           </div>
-          {mode === 'songs' && song.capo ? <span className="capo-badge">Capo {song.capo}</span> : null}
+          {mode === 'songs' && song.capo ? <CapoBadge fret={song.capo} /> : null}
           <ChordActions chord={chord} />
         </div>
         <div className="chord-diagrams">

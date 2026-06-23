@@ -478,12 +478,18 @@ h2 {
   margin-left: auto;
 }
 .capo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   font-size: 12px;
   font-weight: 500;
   color: var(--accent);
   background: var(--accent-soft);
-  padding: 3px 10px;
+  padding: 4px 12px 4px 8px;
   border-radius: 999px;
+}
+.capo-icon {
+  flex-shrink: 0;
 }
 .tuning-hint {
   font-size: 12px;
@@ -552,6 +558,23 @@ h2 {
   line-height: 1;
   min-height: 19px;
   color: var(--ink);
+}
+.pluck-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 19px;
+}
+.pluck-dot span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+.strum-slot.accent .pluck-dot span {
+  background: var(--accent);
+  width: 10px;
+  height: 10px;
 }
 .strum-slot.up .strum-arrow {
   color: var(--muted);

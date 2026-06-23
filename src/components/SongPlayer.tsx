@@ -1,5 +1,13 @@
 import {useState} from 'react';
-import type {Bar, Meter, Song, SongLevel, StrumPattern as Pattern} from '../songs';
+import {
+  DIFFICULTY_LABELS,
+  type Bar,
+  type Meter,
+  type PickPattern,
+  type Song,
+  type SongLevel,
+  type StrumPattern as Pattern,
+} from '../songs';
 import type {SongPlayback} from '../hooks/useSongPlayback';
 import {isSoundLoaded, preloadSound, whenSoundReady} from '../audio';
 import {SoundPicker} from './SoundPicker';
@@ -15,6 +23,7 @@ interface SongPlayerProps {
   onLevelChange: (level: SongLevel) => void;
   bars: readonly Bar[];
   pattern: Pattern;
+  pick?: PickPattern;
   meter: Meter;
   onBarSelect: (index: number) => void;
   bpm: number;
@@ -46,6 +55,7 @@ export function SongPlayer({
   onLevelChange,
   bars,
   pattern,
+  pick,
   meter,
   onBarSelect,
   bpm,
@@ -93,11 +103,19 @@ export function SongPlayer({
             value={songIndex}
             onChange={event => onSongChange(Number(event.target.value))}
           >
-            {songs.map((entry, index) => (
-              <option key={entry.name} value={index}>
-                {entry.name}
-              </option>
-            ))}
+            {([1, 2, 3] as const)
+              .filter(level => songs.some(entry => entry.difficulty === level))
+              .map(level => (
+                <optgroup key={level} label={DIFFICULTY_LABELS[level]}>
+                  {songs.map((entry, index) =>
+                    entry.difficulty === level ? (
+                      <option key={entry.name} value={index}>
+                        {entry.name}
+                      </option>
+                    ) : null,
+                  )}
+                </optgroup>
+              ))}
           </select>
           {song.advanced && (
             <div className="level-toggle" role="group" aria-label="Difficulty">
@@ -184,6 +202,7 @@ export function SongPlayer({
       </div>
       <StrumPattern
         pattern={pattern}
+        pick={pick}
         playing={playing}
         subdivision={meter.subdivision}
         barSeconds={(meter.beats * 60) / bpm}
