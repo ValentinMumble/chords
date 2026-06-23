@@ -165,31 +165,77 @@ h1 {
   justify-content: center;
 }
 .note {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.note-name {
   font-size: 16px;
   color: var(--ink);
+}
+.note-degree {
+  font-size: 11px;
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
-.note.root {
+.note.root .note-name {
   color: var(--accent);
   font-weight: 500;
+}
+.trainer {
+  display: block;
 }
 .trainer-controls {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 20px;
   flex-wrap: wrap;
+}
+.trainer select {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 120px;
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  cursor: pointer;
+}
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+input[type='range']::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
 }
 .trainer-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 18px;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
   background: transparent;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 50%;
   color: var(--ink);
-  font-size: 14px;
-  font-family: inherit;
   cursor: pointer;
 }
 .trainer-toggle:hover {
@@ -197,13 +243,27 @@ h1 {
   color: var(--accent);
 }
 .trainer-countdown {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 1.25rem;
+}
+.countdown-num {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--accent);
+  min-width: 1.5ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.countdown-track {
+  flex: 1;
   height: 4px;
-  margin-top: 1rem;
   background: var(--line);
   border-radius: 2px;
   overflow: hidden;
 }
-.trainer-countdown span {
+.countdown-track span {
   display: block;
   height: 100%;
   background: var(--accent);
@@ -214,10 +274,10 @@ h1 {
 }
 @keyframes countdown {
   from {
-    transform: scaleX(1);
+    transform: scaleX(0);
   }
   to {
-    transform: scaleX(0);
+    transform: scaleX(1);
   }
 }
 .chord-title {

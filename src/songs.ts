@@ -155,6 +155,15 @@ const fakePlasticTrees = bars([
   ['D', 2],
 ]);
 
+// Named progressions for the trainer to walk in order (all use library chords).
+export const TRAINER_PROGRESSIONS: {readonly name: string; readonly chords: readonly ChordName[]}[] = [
+  {name: 'Pop (I–V–vi–IV)', chords: ['C', 'G', 'Am', 'F']},
+  {name: 'Doo-wop (I–vi–IV–V)', chords: ['C', 'Am', 'F', 'G']},
+  {name: 'Three-chord (I–IV–V)', chords: ['G', 'C', 'D']},
+  {name: '12-bar blues in A', chords: ['A7', 'A7', 'A7', 'A7', 'D7', 'D7', 'A7', 'A7', 'E7', 'D7', 'A7', 'E7']},
+  {name: 'Canon in D', chords: ['D', 'A', 'Bm', 'F#m', 'G', 'D', 'G', 'A']},
+];
+
 export const SONGS: readonly Song[] = [
   {
     name: "Knockin' on Heaven's Door — Bob Dylan",

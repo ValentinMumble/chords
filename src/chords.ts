@@ -124,6 +124,21 @@ export function chordNotes(chord: Chord): string[] {
   return notes;
 }
 
+const CHROMATIC = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const DEGREES = ['R', '♭2', '2', '♭3', '3', '4', '♭5', '5', '♭6', '6', '♭7', '7'];
+
+// Each distinct note plus its scale degree relative to the chord's root
+// (parsed from the name), e.g. C major → C:R, E:3, G:5.
+export function chordTones(chord: Chord): {note: string; degree: string}[] {
+  const root = chord.name.match(/^([A-G]#?)/)?.[1];
+  const rootIndex = root ? CHROMATIC.indexOf(root) : -1;
+  return chordNotes(chord).map(note => {
+    const index = CHROMATIC.indexOf(note);
+    const degree = rootIndex >= 0 && index >= 0 ? DEGREES[(index - rootIndex + 12) % 12] : '';
+    return {note, degree};
+  });
+}
+
 const FRENCH_ROOTS: Record<string, string> = {C: 'Do', D: 'Ré', E: 'Mi', F: 'Fa', G: 'Sol', A: 'La', B: 'Si'};
 const FRENCH_SUFFIXES: Record<string, string> = {
   '': 'majeur',
