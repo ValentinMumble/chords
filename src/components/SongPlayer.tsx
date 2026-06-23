@@ -1,5 +1,7 @@
-import type {Bar, Song, SongLevel, StrumPattern as Pattern} from '../songs';
+import {useState} from 'react';
+import type {Bar, Meter, Song, SongLevel, StrumPattern as Pattern} from '../songs';
 import type {SongPlayback} from '../hooks/useSongPlayback';
+import {isSoundLoaded, preloadSound, whenSoundReady} from '../audio';
 import {SoundPicker} from './SoundPicker';
 import {Metronome} from './Metronome';
 import {StrumPattern} from './StrumPattern';
@@ -13,6 +15,8 @@ interface SongPlayerProps {
   onLevelChange: (level: SongLevel) => void;
   bars: readonly Bar[];
   pattern: Pattern;
+  meter: Meter;
+  onBarSelect: (index: number) => void;
   bpm: number;
   recommendedBpm: number;
   onBpmChange: (bpm: number) => void;
@@ -25,9 +29,9 @@ const BPM_MIN = 40;
 const BPM_MAX = 160;
 const BPM_STEP = 2;
 
-// Chord length as bars (4 beats per bar).
-function barLength(beats: number): string {
-  const bars = beats / 4;
+// Chord length as bars, given the meter's beats per bar.
+function barLength(beats: number, beatsPerBar: number): string {
+  const bars = beats / beatsPerBar;
   if (bars === 1) return '1 bar';
   if (bars === 0.5) return '½ bar';
   return `${bars} bars`;
@@ -42,6 +46,8 @@ export function SongPlayer({
   onLevelChange,
   bars,
   pattern,
+  meter,
+  onBarSelect,
   bpm,
   recommendedBpm,
   onBpmChange,
@@ -50,9 +56,25 @@ export function SongPlayer({
   playback,
 }: SongPlayerProps) {
   const {playing, barIndex, nextBarIndex, togglePlay} = playback;
+  const [tuning, setTuning] = useState(false);
+
+  function handlePlay(): void {
+    const starting = !playing;
+    togglePlay();
+    if (starting && !isSoundLoaded()) {
+      setTuning(true);
+      whenSoundReady().then(() => setTuning(false));
+    }
+  }
+
   return (
     <div className="viewer song-player">
-      <button className="play-btn" aria-label={playing ? 'Stop' : 'Play'} onClick={togglePlay}>
+      <button
+        className="play-btn"
+        aria-label={playing ? 'Stop' : 'Play'}
+        onPointerEnter={preloadSound}
+        onClick={handlePlay}
+      >
         {playing ? (
           <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
             <rect x="2" y="2" width="12" height="12" rx="1.5" fill="currentColor" />
@@ -92,6 +114,7 @@ export function SongPlayer({
               </button>
             </div>
           )}
+          {tuning && <span className="tuning-hint">tuning up…</span>}
         </div>
         <div className="settings-row">
           <div className="tempo">
@@ -140,23 +163,31 @@ export function SongPlayer({
           const isCurrent = playing && index === barIndex;
           const isNext = playing && index === nextBarIndex && nextBarIndex !== barIndex;
           return (
-            <div
+            <button
               key={index}
+              type="button"
               className={`bar-chip${isCurrent ? ' current' : ''}${isNext ? ' next' : ''}`}
-              style={{minWidth: 46 + bar.beats * 6}}
+              style={{minWidth: 46 + (bar.beats / meter.beats) * 24}}
+              onClick={() => onBarSelect(index)}
+              aria-label={`Play ${bar.name}`}
             >
               <span className="chip-name">{bar.name}</span>
-              <span className="chip-ticks" aria-label={barLength(bar.beats)}>
-                {Array.from({length: Math.floor(bar.beats / 4)}).map((_, tick) => (
+              <span className="chip-ticks" aria-label={barLength(bar.beats, meter.beats)}>
+                {Array.from({length: Math.floor(bar.beats / meter.beats)}).map((_, tick) => (
                   <span key={tick} className="tick" />
                 ))}
-                {bar.beats % 4 >= 2 && <span className="tick half" />}
+                {bar.beats % meter.beats >= meter.beats / 2 && <span className="tick half" />}
               </span>
-            </div>
+            </button>
           );
         })}
       </div>
-      <StrumPattern pattern={pattern} playing={playing} barSeconds={240 / bpm} />
+      <StrumPattern
+        pattern={pattern}
+        playing={playing}
+        subdivision={meter.subdivision}
+        barSeconds={(meter.beats * 60) / bpm}
+      />
     </div>
   );
 }

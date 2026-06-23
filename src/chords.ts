@@ -13,6 +13,8 @@ const CHORD_LIST = [
   {name: 'Dm', desc: 'D minor', type: 'minor', frets: [-1, -1, 0, 2, 3, 1], fingers: [0, 0, 0, 2, 3, 1]},
   {name: 'Bm', desc: 'B minor (barre)', type: 'minor', frets: [-1, 2, 4, 4, 3, 2], fingers: [0, 1, 3, 4, 2, 1]},
   {name: 'Fm', desc: 'F minor (barre)', type: 'minor', frets: [1, 3, 3, 1, 1, 1], fingers: [1, 3, 4, 1, 1, 1]},
+  {name: 'F#m', desc: 'F# minor (barre)', type: 'minor', frets: [2, 4, 4, 2, 2, 2], fingers: [1, 3, 4, 1, 1, 1]},
+  {name: 'C#m', desc: 'C# minor (barre)', type: 'minor', frets: [-1, 4, 6, 6, 5, 4], fingers: [0, 1, 3, 4, 2, 1]},
   {name: 'A7', desc: 'A dominant 7', type: 'seventh', frets: [-1, 0, 2, 0, 2, 0], fingers: [0, 0, 2, 0, 3, 0]},
   {name: 'B7', desc: 'B dominant 7', type: 'seventh', frets: [-1, 2, 1, 2, 0, 2], fingers: [0, 2, 1, 3, 0, 4]},
   {name: 'C7', desc: 'C dominant 7', type: 'seventh', frets: [-1, 3, 2, 3, 1, 0], fingers: [0, 3, 2, 4, 1, 0]},
@@ -105,6 +107,21 @@ const OPEN_SEMITONES = [0, 5, 10, 15, 19, 24];
 
 export function noteName(stringIndex: number, fret: number): string {
   return NOTE_NAMES[(OPEN_SEMITONES[stringIndex] + fret) % 12];
+}
+
+// The distinct notes a chord sounds, lowest string first (root usually first).
+export function chordNotes(chord: Chord): string[] {
+  const seen = new Set<string>();
+  const notes: string[] = [];
+  chord.frets.forEach((fret, stringIndex) => {
+    if (fret < 0) return;
+    const note = noteName(stringIndex, fret);
+    if (!seen.has(note)) {
+      seen.add(note);
+      notes.push(note);
+    }
+  });
+  return notes;
 }
 
 const FRENCH_ROOTS: Record<string, string> = {C: 'Do', D: 'Ré', E: 'Mi', F: 'Fa', G: 'Sol', A: 'La', B: 'Si'};

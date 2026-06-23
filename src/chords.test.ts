@@ -63,8 +63,8 @@ describe('findBarres', () => {
 });
 
 describe('isBarreChord', () => {
-  it('flags the four barre shapes', () => {
-    expect(CHORDS.filter(isBarreChord).map(chord => chord.name)).toEqual(['F', 'B', 'Bm', 'Fm']);
+  it('flags the barre shapes', () => {
+    expect(CHORDS.filter(isBarreChord).map(chord => chord.name)).toEqual(['F', 'B', 'Bm', 'Fm', 'F#m', 'C#m']);
   });
 
   it('does not flag the Dm7 mini-barre', () => {

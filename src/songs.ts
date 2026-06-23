@@ -7,18 +7,32 @@ export interface Bar {
   readonly beats: number;
 }
 
-// One eighth-note slot in a 4/4 bar: down-strum, up-strum, or rest.
+// One subdivision slot in a bar: down-strum, up-strum, or rest.
 export type Stroke = 'D' | 'U' | '-';
 export type StrumPattern = readonly Stroke[];
 
-// Down on every beat — simple and steady.
+// A time signature, expressed as the felt beats per bar and how many strum
+// slots each beat is divided into. 4/4 = 4 beats of 2 (eighths); 6/8 = 2
+// dotted-quarter beats of 3. `bpm` is always the felt beat.
+export interface Meter {
+  readonly beats: number;
+  readonly subdivision: number;
+}
+export const FOUR_FOUR: Meter = {beats: 4, subdivision: 2};
+export const SIX_EIGHT: Meter = {beats: 2, subdivision: 3};
+
+// 4/4 patterns (8 slots). Down on every beat — simple and steady.
 export const EASY_PATTERN: StrumPattern = ['D', '-', 'D', '-', 'D', '-', 'D', '-'];
 // The classic folk/pop pattern: D · D-U · U-D-U (accent on the 1).
 export const ADVANCED_PATTERN: StrumPattern = ['D', '-', 'D', 'U', '-', 'U', 'D', 'U'];
+// 6/8 patterns (6 slots): strum the two dotted-quarter pulses, with a lilt.
+export const EASY_PATTERN_68: StrumPattern = ['D', '-', '-', 'D', '-', '-'];
+export const ADVANCED_PATTERN_68: StrumPattern = ['D', '-', 'U', 'D', '-', 'U'];
 
 export interface SongVersion {
   readonly bpm: number;
-  // Strummed across the bar on an eighth-note grid; tiled over each held chord
+  readonly meter?: Meter;
+  // Strummed across the bar on the subdivision grid; tiled over each held chord
   // so long chords keep ringing instead of decaying to silence.
   readonly pattern: StrumPattern;
   readonly bars: readonly Bar[];
@@ -27,6 +41,7 @@ export interface SongVersion {
 export interface Song {
   readonly name: string;
   readonly sound: GuitarSoundId;
+  readonly capo?: number;
   readonly easy: SongVersion;
   readonly advanced?: SongVersion;
 }
@@ -132,6 +147,13 @@ const countryRoads = bars([
   ['C', 4],
   ['G', 4],
 ]);
+// Verse in 6/8 — each chord is one bar (two dotted-quarter beats).
+const fakePlasticTrees = bars([
+  ['A', 2],
+  ['E', 2],
+  ['G', 2],
+  ['D', 2],
+]);
 
 export const SONGS: readonly Song[] = [
   {
@@ -161,6 +183,7 @@ export const SONGS: readonly Song[] = [
   {
     name: 'Wonderwall — Oasis',
     sound: 'acoustic_guitar_steel',
+    capo: 2,
     easy: {bpm: 87, pattern: EASY_PATTERN, bars: wonderwallEasy},
     advanced: {bpm: 87, pattern: ADVANCED_PATTERN, bars: wonderwallAdvanced},
   },
@@ -187,5 +210,11 @@ export const SONGS: readonly Song[] = [
     sound: 'acoustic_guitar_steel',
     easy: {bpm: 82, pattern: EASY_PATTERN, bars: countryRoads},
     advanced: {bpm: 82, pattern: ADVANCED_PATTERN, bars: countryRoads},
+  },
+  {
+    name: 'Fake Plastic Trees — Radiohead',
+    sound: 'acoustic_guitar_steel',
+    easy: {bpm: 52, meter: SIX_EIGHT, pattern: EASY_PATTERN_68, bars: fakePlasticTrees},
+    advanced: {bpm: 52, meter: SIX_EIGHT, pattern: ADVANCED_PATTERN_68, bars: fakePlasticTrees},
   },
 ];

@@ -48,6 +48,26 @@ export function loadGuitar(): void {
     });
 }
 
+export function isSoundLoaded(): boolean {
+  return players.has(currentSound);
+}
+
+// Kick off loading the current instrument early (e.g. on hover) so the first
+// strum uses real samples instead of the synth fallback.
+export function preloadSound(): void {
+  ensureAudio();
+  loadGuitar();
+}
+
+export function whenSoundReady(): Promise<void> {
+  if (players.has(currentSound)) return Promise.resolve();
+  loadGuitar();
+  return new Promise(resolve => {
+    const check = () => (players.has(currentSound) ? resolve() : window.setTimeout(check, 80));
+    check();
+  });
+}
+
 export function currentTime(): number {
   return ensureAudio().currentTime;
 }

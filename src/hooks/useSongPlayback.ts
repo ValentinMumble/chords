@@ -12,12 +12,14 @@ export interface SongPlayback {
   togglePlay: () => void;
   stop: () => void;
   stepBar: (step: number) => void;
+  goToBar: (index: number) => void;
 }
 
 export function useSongPlayback(
   bars: readonly Bar[],
   bpm: number,
   pattern: StrumPattern,
+  subdivision: number,
   onBarChord: (chordName: string) => void,
 ): SongPlayback {
   const [playing, setPlaying] = useState(false);
@@ -27,6 +29,8 @@ export function useSongPlayback(
   bpmRef.current = bpm;
   const patternRef = useRef(pattern);
   patternRef.current = pattern;
+  const subdivisionRef = useRef(subdivision);
+  subdivisionRef.current = subdivision;
   const onBarChordRef = useRef(onBarChord);
   onBarChordRef.current = onBarChord;
   const nextBarTimeRef = useRef(0);
@@ -47,23 +51,26 @@ export function useSongPlayback(
     }
     const barStart = nextBarTimeRef.current;
     const beat = 60 / bpmRef.current;
-    const eighth = beat / 2;
+    const sub = subdivisionRef.current;
+    const slotDur = beat / sub;
     const pat = patternRef.current;
     let beatsBefore = 0;
     for (let index = 0; index < barIndex; index++) beatsBefore += bars[index].beats;
-    const phase = (beatsBefore * 2) % pat.length;
-    const slots = bar.beats * 2;
+    const phase = (beatsBefore * sub) % pat.length;
+    const slots = bar.beats * sub;
     for (let slot = 0; slot < slots; slot++) {
       const pos = (phase + slot) % pat.length;
       const stroke = pat[pos];
       if (stroke === '-') continue;
       const down = stroke === 'D';
-      // Strong beats: 1 (loudest) and 3 (backbeat) carry a bass thump.
-      const strongBeat = pos === 0 || pos === 4;
-      const gain = down ? (pos === 0 ? 1 : pos === 4 ? 0.9 : 0.72) : 0.5;
-      // Lay the off-beat up-strokes slightly late for a relaxed swing feel.
-      const swing = pos % 2 === 1 ? eighth * 0.14 : 0;
-      strumStroke(chord, barStart + slot * eighth + swing, down ? 'down' : 'up', gain, down && strongBeat);
+      const onBeat = pos % sub === 0;
+      const beatIndex = pos / sub;
+      // Downbeat loudest; alternating strong beats (1 & 3 in 4/4) get a bass thump.
+      const strongBeat = onBeat && beatIndex % 2 === 0;
+      const gain = !down ? 0.5 : !onBeat ? 0.7 : beatIndex === 0 ? 1 : strongBeat ? 0.9 : 0.78;
+      // Lay the off-beat strokes slightly late for a relaxed swing feel.
+      const swing = onBeat ? 0 : slotDur * 0.14;
+      strumStroke(chord, barStart + slot * slotDur + swing, down ? 'down' : 'up', gain, down && strongBeat);
     }
     nextBarTimeRef.current = barStart + bar.beats * beat;
 
@@ -97,6 +104,11 @@ export function useSongPlayback(
     setBarIndex(index => (index + step + bars.length) % bars.length);
   }
 
+  function goToBar(index: number): void {
+    nextBarTimeRef.current = 0;
+    setBarIndex(((index % bars.length) + bars.length) % bars.length);
+  }
+
   return {
     playing,
     barIndex,
@@ -104,5 +116,6 @@ export function useSongPlayback(
     togglePlay,
     stop,
     stepBar,
+    goToBar,
   };
 }
