@@ -39,7 +39,22 @@ main {
 h1 {
   font-size: 24px;
   font-weight: 500;
-  margin: 0 0 1.5rem;
+  margin: 0;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.song-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
 }
 .filters {
   display: flex;
@@ -123,11 +138,6 @@ h1 {
 .viewer + .viewer {
   margin-top: 1.5rem;
 }
-.chord-viewer {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
 .chord-header {
   display: flex;
   justify-content: flex-start;
@@ -137,15 +147,43 @@ h1 {
 }
 .chord-diagrams {
   display: flex;
-  gap: 1.5rem;
+  gap: 3rem;
   align-items: center;
+  justify-content: center;
   flex-wrap: wrap;
 }
 .diagram-wrap {
   display: inline-block;
 }
+.diagram-wrap svg {
+  width: 330px;
+  height: auto;
+  max-width: 100%;
+}
 .mode-toggle {
-  margin-bottom: 1.5rem;
+  margin: 0;
+}
+.stage {
+  margin-top: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.transport {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.5rem 2rem;
+}
+.transport-row {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
 }
 .notes-box {
   background: var(--bg);
@@ -360,26 +398,8 @@ h2 {
   font-weight: 500;
   margin: 2.5rem 0 1rem;
 }
-.song-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 1.25rem;
-}
-.song-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding-right: 56px;
-}
-.settings-row {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  flex-wrap: wrap;
-}
-.song-controls select {
+.song-bar select,
+.sound select {
   background: var(--surface);
   border: 1px solid var(--line);
   color: var(--ink);
@@ -396,10 +416,6 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: 2px;
-}
-.song-player {
-  display: block;
-  position: relative;
 }
 .level-toggle {
   position: relative;
@@ -445,9 +461,7 @@ h2 {
   }
 }
 .play-btn {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
+  flex-shrink: 0;
   width: 46px;
   height: 46px;
   padding: 0;
@@ -528,6 +542,7 @@ h2 {
 .bars {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 6px;
 }
 .strum {
@@ -707,29 +722,52 @@ h2 {
   background: var(--bg);
   border: 1px dashed var(--accent);
   border-radius: var(--radius);
-  padding: 10px 12px 6px;
+  padding: 16px 22px 12px;
   text-align: center;
 }
+.next-box svg {
+  width: 152px;
+  height: auto;
+}
 .next-label {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
   margin: 0;
 }
 .next-name {
-  font-size: 24px;
+  font-size: 30px;
   font-weight: 600;
-  margin: 2px 0 0;
-  min-height: 30px;
+  margin: 3px 0 0;
+  min-height: 38px;
 }
 .next-fr {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
-  margin: 0 0 4px;
+  margin: 0 0 6px;
+}
+/* Both companion boxes share one footprint so the diagram doesn't jump when
+   play/stop swaps the notes box for the next-up card. */
+.notes-box,
+.next-box {
+  box-sizing: border-box;
+  width: 198px;
+  min-height: 270px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 @media (max-width: 560px) {
-  .viewer {
+  .viewer,
+  .stage {
     padding: 1.25rem;
     gap: 1.5rem;
+  }
+  .transport {
+    padding: 1.25rem;
+  }
+  .transport-row {
+    gap: 16px;
   }
 }
 
