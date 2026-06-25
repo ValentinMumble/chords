@@ -539,11 +539,44 @@ h2 {
   opacity: 0.35;
   cursor: default;
 }
+.progression {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 .bars {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 6px;
+}
+.loop-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 22px;
+  font-size: 12px;
+}
+.loop-hint {
+  color: var(--faint);
+}
+.loop-info {
+  color: var(--accent);
+}
+.loop-clear {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.loop-clear:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 .strum {
   display: flex;
@@ -666,7 +699,11 @@ h2 {
     animation: none;
   }
 }
+.bars {
+  user-select: none;
+}
 .bar-chip {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -681,10 +718,36 @@ h2 {
   color: var(--muted);
   background: transparent;
   cursor: pointer;
+  touch-action: none;
   transition: border-color 0.15s;
 }
 .bar-chip:hover {
   border-color: var(--accent);
+}
+.bar-chip.in-loop {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.loop-marker {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 7px;
+  background: var(--accent);
+  border-radius: 999px;
+  cursor: ew-resize;
+  touch-action: none;
+}
+.loop-marker.left {
+  left: -5px;
+}
+.loop-marker.right {
+  right: -5px;
+}
+body.looping-drag {
+  cursor: ew-resize;
+  user-select: none;
 }
 .chip-ticks {
   display: flex;

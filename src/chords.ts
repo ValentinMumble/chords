@@ -3,7 +3,7 @@ import type {Chord, ChordType} from './types';
 const CHORD_LIST = [
   {name: 'C', desc: 'C major', type: 'major', frets: [-1, 3, 2, 0, 1, 0], fingers: [0, 3, 2, 0, 1, 0]},
   {name: 'A', desc: 'A major', type: 'major', frets: [-1, 0, 2, 2, 2, 0], fingers: [0, 0, 1, 2, 3, 0]},
-  {name: 'G', desc: 'G major', type: 'major', frets: [3, 2, 0, 0, 0, 3], fingers: [2, 1, 0, 0, 0, 3]},
+  {name: 'G', desc: 'G major', type: 'major', frets: [3, 2, 0, 0, 3, 3], fingers: [2, 1, 0, 0, 3, 4]},
   {name: 'E', desc: 'E major', type: 'major', frets: [0, 2, 2, 1, 0, 0], fingers: [0, 2, 3, 1, 0, 0]},
   {name: 'D', desc: 'D major', type: 'major', frets: [-1, -1, 0, 2, 3, 2], fingers: [0, 0, 0, 1, 3, 2]},
   {name: 'F', desc: 'F major (barre)', type: 'major', frets: [1, 3, 3, 2, 1, 1], fingers: [1, 3, 4, 2, 1, 1]},

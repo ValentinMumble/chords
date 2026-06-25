@@ -2,6 +2,7 @@ import {useEffect, useRef} from 'react';
 
 export interface KeyboardHandlers {
   onArrow: (step: number) => void;
+  onPlayPause: () => void;
   onStrum: () => void;
   onArpeggio: () => void;
 }
@@ -18,6 +19,8 @@ export function useKeyboardShortcuts(handlers: KeyboardHandlers): void {
         handlersRef.current.onArrow(event.key === 'ArrowRight' ? 1 : -1);
       } else if (event.key === ' ') {
         event.preventDefault();
+        handlersRef.current.onPlayPause();
+      } else if (event.key === 's') {
         handlersRef.current.onStrum();
       } else if (event.key === 'a') {
         handlersRef.current.onArpeggio();

@@ -56,7 +56,10 @@ export default function App() {
   }, [activeSound.id]);
 
   const playback = useSongPlayback(version.bars, bpm, version.pattern, version.pick, meter.subdivision, setChordName);
-  const nextChordName = playback.playing ? version.bars[playback.nextBarIndex].name : null;
+  // The next chord in the song progression — shown whenever we're in songs
+  // mode, playing or not, so you can see what's coming. Trainer mode has no
+  // progression, so it falls back to the chord notes.
+  const nextChordName = mode === 'songs' ? version.bars[playback.nextBarIndex].name : null;
 
   // Brief pulse on the diagram whenever the chord changes (a struck-chord cue).
   const diagramRef = useRef<HTMLDivElement>(null);
@@ -95,11 +98,17 @@ export default function App() {
     setMode(next);
   }
 
-  function selectBar(index: number): void {
-    if (playback.playing) {
-      playback.goToBar(index);
+  function selectBar(index: number, extend: boolean): void {
+    // Shift/cmd-click sets a practice loop from the current position to here.
+    if (extend) {
+      playback.setLoop(playback.barIndex, index);
       return;
     }
+    // A plain click clears any loop and moves the progression position either
+    // way, so the next-up card tracks the selected chord even while stopped.
+    playback.clearLoop();
+    playback.goToBar(index);
+    if (playback.playing) return;
     const next = getChord(version.bars[index].name);
     if (!next) return;
     setChordName(next.name);
@@ -109,14 +118,19 @@ export default function App() {
   function changeSong(index: number): void {
     playback.stop();
     setSongIndex(index);
-    setBpm(songVersion(SONGS[index], activeLevel).bpm);
+    const nextVersion = songVersion(SONGS[index], activeLevel);
+    setBpm(nextVersion.bpm);
     setSound(SONGS[index].sound);
+    // Show the new song's first chord right away, not only once playback starts.
+    setChordName(nextVersion.bars[0].name);
   }
 
   function changeLevel(next: SongLevel): void {
     playback.stop();
     setLevel(next);
-    setBpm(songVersion(song, next).bpm);
+    const nextVersion = songVersion(song, next);
+    setBpm(nextVersion.bpm);
+    setChordName(nextVersion.bars[0].name);
   }
 
   useKeyboardShortcuts({
@@ -128,6 +142,7 @@ export default function App() {
         selectChord(visible[(index + step + visible.length) % visible.length].name);
       }
     },
+    onPlayPause: () => (mode === 'songs' ? playback.togglePlay() : strum(chord)),
     onStrum: () => strum(chord),
     onArpeggio: () => arpeggio(chord),
   });
