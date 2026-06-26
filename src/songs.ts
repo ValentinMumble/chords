@@ -78,7 +78,7 @@ function bars(steps: readonly [ChordName, number][]): readonly Bar[] {
 const knockin = bars([
   ['G', 4],
   ['D', 4],
-  ['Am7', 8],
+  ['Am', 8],
   ['G', 4],
   ['D', 4],
   ['C', 8],

@@ -1,8 +1,19 @@
 import {useEffect, useRef} from 'react';
-import {FINGER_COLORS, findBarres, noteName} from '../chords';
+import {FINGER_COLORS, findBarres} from '../chords';
 import type {Chord, Finger} from '../types';
 
 const fingerColor = (finger: number) => FINGER_COLORS[finger] ?? 'var(--ink)';
+
+// Standard tuning, low to high — shown under each string in English and French
+// so the open-string names are easy to memorise.
+const OPEN_STRINGS = [
+  {en: 'E', fr: 'Mi'},
+  {en: 'A', fr: 'La'},
+  {en: 'D', fr: 'Ré'},
+  {en: 'G', fr: 'Sol'},
+  {en: 'B', fr: 'Si'},
+  {en: 'E', fr: 'Mi'},
+] as const;
 
 type Variant = 'full' | 'mini';
 
@@ -24,7 +35,7 @@ interface Geometry {
   muteOffset: number;
   showBarre: boolean;
   showFretNumbers: boolean;
-  showNoteNames: boolean;
+  showStringNames: boolean;
 }
 
 const GEOMETRIES: Record<Variant, Geometry> = {
@@ -46,7 +57,7 @@ const GEOMETRIES: Record<Variant, Geometry> = {
     muteOffset: 16,
     showBarre: true,
     showFretNumbers: true,
-    showNoteNames: true,
+    showStringNames: true,
   },
   mini: {
     width: 131,
@@ -66,7 +77,7 @@ const GEOMETRIES: Record<Variant, Geometry> = {
     muteOffset: 9,
     showBarre: false,
     showFretNumbers: false,
-    showNoteNames: false,
+    showStringNames: false,
   },
 };
 
@@ -201,16 +212,28 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
             strokeWidth={1.5}
             style={{opacity: fret === 0 ? 1 : 0}}
           />
-          {geo.showNoteNames && fret >= 0 && (
-            <text
-              x={stringX(stringIndex)}
-              y={fretY(geo.fretCount) + 26}
-              textAnchor="middle"
-              fontSize={13}
-              fill="var(--muted)"
-            >
-              {noteName(stringIndex, fret)}
-            </text>
+          {geo.showStringNames && (
+            <>
+              <text
+                x={stringX(stringIndex)}
+                y={fretY(geo.fretCount) + 28}
+                textAnchor="middle"
+                fontSize={14}
+                fontWeight={500}
+                fill="var(--muted)"
+              >
+                {OPEN_STRINGS[stringIndex].en}
+              </text>
+              <text
+                x={stringX(stringIndex)}
+                y={fretY(geo.fretCount) + 44}
+                textAnchor="middle"
+                fontSize={11}
+                fill="var(--faint)"
+              >
+                {OPEN_STRINGS[stringIndex].fr}
+              </text>
+            </>
           )}
         </g>
       ))}

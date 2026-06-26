@@ -87,11 +87,22 @@ h1 {
   color: var(--muted);
   margin: 0 0 2.5rem;
 }
+.chord-sections {
+  margin-bottom: 2.5rem;
+}
+.chord-section + .chord-section {
+  margin-top: 1.5rem;
+}
+.chord-section-label {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
 .chord-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 2.5rem;
 }
 .chord-grid button {
   display: flex;
