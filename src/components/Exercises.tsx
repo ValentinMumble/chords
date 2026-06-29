@@ -1,9 +1,9 @@
 import {FINGER_COLORS} from '../chords';
 
-// A note on the tab: the fret, plus the finger (1-4) that plays it, used to
-// colour the number the same way the chord diagram colours its dots. Open
-// strings carry no finger.
-type Cell = {fret: number; finger?: number} | null;
+// A note on the tab: the fret, the finger (1-4) that plays it (for colour
+// coding, like the chord diagram), and `slur` = it connects to the next note on
+// the same string (hammer-on / pull-off / slide).
+type Cell = {fret: number; finger?: number; slur?: boolean} | null;
 // A column is one time-slot across the six strings, high E first (index 0) to
 // low E (index 5); null means that string isn't played on that slot.
 type Col = Cell[];
@@ -20,15 +20,27 @@ function parseTab(lines: string[]): Col[][] {
   const bars: Col[][] = [];
   for (let bar = 0; bar < barCount; bar++) {
     const width = perString[0][bar].length;
-    const columns: Col[] = [];
-    for (let slot = 0; slot < width; slot++) {
-      columns.push(
-        perString.map(segments => {
-          const char = segments[bar]?.[slot];
-          return char !== undefined && char >= '0' && char <= '9' ? {fret: Number(char)} : null;
-        }),
-      );
-    }
+    const columns: Col[] = Array.from({length: width}, () => [null, null, null, null, null, null]);
+    // Walk each string left to right, placing notes. An articulation char
+    // (p/h/b/r/s or a slide /\) before a note flags the previous note as
+    // slurred to it.
+    perString.forEach((stringBars, row) => {
+      const text = stringBars[bar] ?? '';
+      let lastNote = -1;
+      let pendingSlur = false;
+      for (let slot = 0; slot < width; slot++) {
+        const char = text[slot];
+        if (char !== undefined && char >= '0' && char <= '9') {
+          columns[slot][row] = {fret: Number(char)};
+          const prev = lastNote >= 0 ? columns[lastNote][row] : null;
+          if (pendingSlur && prev) prev.slur = true;
+          pendingSlur = false;
+          lastNote = slot;
+        } else if (char !== undefined && 'phbrs/\\'.includes(char)) {
+          pendingSlur = true;
+        }
+      }
+    });
     bars.push(columns);
   }
   return bars;
@@ -88,7 +100,7 @@ const STRING_WIDTHS = [0.8, 1, 1.2, 1.5, 1.9, 2.3];
 // A graphical tab staff drawn in the chord diagram's visual language (themed
 // SVG): tuning letters, tapered string lines, fret numbers sitting on them,
 // and weighted bar lines. Columns are distributed evenly across the line.
-function TabStaff({bars}: {bars: Col[][]}) {
+function TabStaff({bars, chords, firstBar}: {bars: Col[][]; chords?: (string | null)[]; firstBar?: number}) {
   const totalCols = bars.reduce((sum, bar) => sum + bar.length, 0);
   const available = VIEW_W - PAD_LEFT - PAD_RIGHT;
   const colW = (available - bars.length * BAR_GAP) / Math.max(totalCols, 1);
@@ -106,11 +118,29 @@ function TabStaff({bars}: {bars: Col[][]}) {
   const endX = cursor;
   const lineStart = barLines[0];
   const allBars = [...barLines, endX];
-  const stringY = (row: number) => PAD_TOP + row * ROW_H;
+  // A header band above the staff holds bar numbers + chord names when present.
+  const hasHeader = firstBar !== undefined || !!chords?.some(Boolean);
+  const headerH = hasHeader ? 26 : 0;
+  const stringY = (row: number) => PAD_TOP + headerH + row * ROW_H;
   const height = stringY(5) + PAD_BOTTOM;
 
   return (
     <svg className="tab-staff" viewBox={`0 0 ${VIEW_W} ${height}`} role="img" aria-label="Guitar tab">
+      {hasHeader &&
+        bars.map((_, index) => (
+          <g key={`hdr${index}`}>
+            {firstBar !== undefined && (
+              <text x={barLines[index] + 3} y={10} fontSize={9} fill="var(--faint)">
+                {firstBar + index}
+              </text>
+            )}
+            {chords?.[index] && (
+              <text x={barLines[index] + 3} y={26} fontSize={12} fontWeight={500} fill="var(--muted)">
+                {chords[index]}
+              </text>
+            )}
+          </g>
+        ))}
       {STRING_LABELS.map((label, row) => (
         <g key={label + row}>
           <text x={5} y={stringY(row)} dominantBaseline="central" fontSize={12} fill="var(--muted)">
@@ -163,20 +193,56 @@ function TabStaff({bars}: {bars: Col[][]}) {
           ),
         ),
       )}
+      {columns.map(({col, x}, colIndex) =>
+        col.map((cell, row) => {
+          if (!cell?.slur) return null;
+          const next = columns.findIndex((entry, index) => index > colIndex && entry.col[row] !== null);
+          if (next < 0) return null;
+          const x2 = columns[next].x;
+          const arcY = stringY(row) - 11;
+          return (
+            <path
+              key={`slur-${colIndex}-${row}`}
+              d={`M ${x} ${arcY} Q ${(x + x2) / 2} ${arcY - 5} ${x2} ${arcY}`}
+              fill="none"
+              stroke="var(--muted)"
+              strokeWidth={1}
+            />
+          );
+        }),
+      )}
     </svg>
   );
 }
 
-function TabBlock({bars, caption, barsPerRow}: {bars: Col[][]; caption?: string; barsPerRow?: number}) {
+function TabBlock({
+  bars,
+  caption,
+  barsPerRow,
+  chords,
+  firstBar,
+}: {
+  bars: Col[][];
+  caption?: string;
+  barsPerRow?: number;
+  chords?: (string | null)[];
+  firstBar?: number;
+}) {
   const perRow = barsPerRow ?? bars.length;
-  const rows: Col[][][] = [];
-  for (let index = 0; index < bars.length; index += perRow) rows.push(bars.slice(index, index + perRow));
+  const rows: {bars: Col[][]; chords?: (string | null)[]; start?: number}[] = [];
+  for (let index = 0; index < bars.length; index += perRow) {
+    rows.push({
+      bars: bars.slice(index, index + perRow),
+      chords: chords?.slice(index, index + perRow),
+      start: firstBar !== undefined ? firstBar + index : undefined,
+    });
+  }
   return (
     <div className="tab-block">
       {caption && <p className="tab-caption">{caption}</p>}
-      {rows.map((rowBars, index) => (
+      {rows.map((row, index) => (
         <div className="tab" key={index}>
-          <TabStaff bars={rowBars} />
+          <TabStaff bars={row.bars} chords={row.chords} firstBar={row.start} />
         </div>
       ))}
     </div>
@@ -234,6 +300,10 @@ const STAIRWAY = [
     '|-----------------------|',
   ]),
 ];
+// Chord above each of the 16 bars (the downbeat chord).
+const STAIRWAY_CHORDS = [
+  'Am', 'C', 'FM7', 'G/B', 'E+5/G#', 'C/G', 'FM7', 'G/B', 'C', 'FM7', 'C', 'D', 'C', 'FM7', 'C', 'FM7',
+];
 
 // A Forest — The Cure (intro): a melodic line on the D string over the ringing
 // open A drone. Fingering (for colour coding) is the teacher's: 7→3, 3→3, 2→2,
@@ -263,11 +333,7 @@ export function Exercises() {
     <div className="exercises">
       <section className="exercise">
         <h2>Peter Gunn — riff drill</h2>
-        <p className="exercise-note">
-          Simplified Peter Gunn — the open-string pedal alternating with frets 2·3·5·4, one per finger:{' '}
-          <strong>0·0·2·0·3·0·5·4</strong>. Run the same shape up every string, steady and palm-muted.
-        </p>
-        <TabBlock bars={peterGunnBars()} barsPerRow={3} caption="Riff shape on every string" />
+        <TabBlock bars={peterGunnBars()} barsPerRow={3} caption="Steady and palm-muted, every string" />
       </section>
 
       <section className="exercise">
@@ -286,7 +352,7 @@ export function Exercises() {
         <p className="exercise-note">
           The post-punk intro, in A minor — a melodic line on the D string over the ringing open A.
         </p>
-        <TabBlock bars={FOREST} barsPerRow={4} caption="Intro — let the open A ring" />
+        <TabBlock bars={FOREST} barsPerRow={4} firstBar={1} caption="Intro in Am — let the open A ring" />
       </section>
 
       <section className="exercise">
@@ -295,7 +361,7 @@ export function Exercises() {
           The full fingerpicked intro — let each note ring. The chords move through Am · E/G# · C · D/F# ·
           Fmaj7 · G/B and around.
         </p>
-        <TabBlock bars={STAIRWAY} barsPerRow={2} />
+        <TabBlock bars={STAIRWAY} barsPerRow={2} chords={STAIRWAY_CHORDS} firstBar={1} />
       </section>
     </div>
   );
