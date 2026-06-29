@@ -3,6 +3,7 @@ import {
   CHORDS,
   CHORDS_BY_NAME,
   FILTER_TYPES,
+  FINGER_COLORS,
   frenchName,
   getChord,
   isBarreChord,
@@ -15,8 +16,7 @@ import {Fretboard} from './components/Fretboard';
 import {ChordActions} from './components/ChordActions';
 import {ChordFilters} from './components/ChordFilters';
 import {ChordGrid} from './components/ChordGrid';
-import {ChordNotes} from './components/ChordNotes';
-import {ChordTrainer} from './components/ChordTrainer';
+import {Exercises} from './components/Exercises';
 import {CapoBadge} from './components/CapoBadge';
 import {KeyboardHint} from './components/KeyboardHint';
 import {NextUpCard} from './components/NextUpCard';
@@ -27,6 +27,21 @@ import {useSongPlayback} from './hooks/useSongPlayback';
 import {useKeyboardShortcuts} from './hooks/useKeyboardShortcuts';
 import {usePersistedState} from './hooks/usePersistedState';
 
+type Mode = 'songs' | 'exercises';
+const MODES: {key: Mode; label: string}[] = [
+  {key: 'songs', label: 'Songs'},
+  {key: 'exercises', label: 'Practice'},
+];
+// Standard tuning, low to high, English + French — a reference in the top bar.
+const STRING_NAMES = [
+  {en: 'E', fr: 'Mi'},
+  {en: 'A', fr: 'La'},
+  {en: 'D', fr: 'Ré'},
+  {en: 'G', fr: 'Sol'},
+  {en: 'B', fr: 'Si'},
+  {en: 'e', fr: 'Mi'},
+];
+
 export default function App() {
   const [filter, setFilter] = usePersistedState('chords:filter', 'all');
   const [shape, setShape] = usePersistedState<string>('chords:shape', 'any');
@@ -35,7 +50,7 @@ export default function App() {
   const [bpm, setBpm] = usePersistedState('chords:bpm', SONGS[0].easy.bpm);
   const [sound, setSound] = usePersistedState<string>('chords:sound', GUITAR_SOUNDS[0].id);
   const [level, setLevel] = usePersistedState<string>('chords:level', 'easy');
-  const [mode, setMode] = useState<'songs' | 'trainer'>('songs');
+  const [mode, setMode] = useState<Mode>('songs');
 
   const song = SONGS[songIndex] ?? SONGS[0];
   const activeLevel: SongLevel = level === 'advanced' ? 'advanced' : 'easy';
@@ -56,10 +71,9 @@ export default function App() {
   }, [activeSound.id]);
 
   const playback = useSongPlayback(version.bars, bpm, version.pattern, version.pick, meter.subdivision, setChordName);
-  // The next chord in the song progression — shown whenever we're in songs
-  // mode, playing or not, so you can see what's coming. Trainer mode has no
-  // progression, so it falls back to the chord notes.
-  const nextChordName = mode === 'songs' ? version.bars[playback.nextBarIndex].name : null;
+  // The next chord in the song progression — shown beside the diagram whether
+  // or not playback is running, so you can see what's coming.
+  const nextChordName = version.bars[playback.nextBarIndex].name;
 
   // Brief pulse on the diagram whenever the chord changes (a struck-chord cue).
   const diagramRef = useRef<HTMLDivElement>(null);
@@ -85,16 +99,8 @@ export default function App() {
     strum(next);
   }
 
-  // Trainer pick: show and strum the chord without touching song playback.
-  function flashChord(name: string): void {
-    const next = getChord(name);
-    if (!next) return;
-    setChordName(name);
-    strum(next);
-  }
-
-  function switchMode(next: 'songs' | 'trainer'): void {
-    if (next === 'trainer') playback.stop();
+  function switchMode(next: Mode): void {
+    if (next !== 'songs') playback.stop();
     setMode(next);
   }
 
@@ -150,73 +156,98 @@ export default function App() {
   return (
     <main>
       <div className="topbar">
-        <h1>Chords 🎸</h1>
-        <div className="level-toggle mode-toggle" role="group" aria-label="Mode">
-          <span
-            className="level-indicator"
-            style={{transform: mode === 'trainer' ? 'translateX(100%)' : 'translateX(0)'}}
-            aria-hidden="true"
-          />
-          <button className={mode === 'songs' ? 'active' : ''} onClick={() => switchMode('songs')}>
-            Songs
-          </button>
-          <button className={mode === 'trainer' ? 'active' : ''} onClick={() => switchMode('trainer')}>
-            Trainer
-          </button>
+        <h1>🎸 Chords</h1>
+        <div className="topbar-controls">
+          <div className="finger-legend">
+            <span className="legend-label">Fingers</span>
+            {[1, 2, 3, 4].map(finger => (
+              <span key={finger} className="legend-dot" style={{background: FINGER_COLORS[finger]}}>
+                {finger}
+              </span>
+            ))}
+          </div>
+          <div className="string-legend" aria-label="String names, low to high">
+            <span className="legend-label">Strings</span>
+            {STRING_NAMES.map((name, index) => (
+              <span key={index} className="string-item">
+                <span className="string-en">{name.en}</span>
+                <span className="string-fr">{name.fr}</span>
+              </span>
+            ))}
+          </div>
+          <div className="level-toggle mode-toggle" role="group" aria-label="Mode">
+            <span
+              className="level-indicator"
+              style={{transform: `translateX(${MODES.findIndex(entry => entry.key === mode) * 100}%)`}}
+              aria-hidden="true"
+            />
+            {MODES.map(entry => (
+              <button
+                key={entry.key}
+                className={mode === entry.key ? 'active' : ''}
+                onClick={() => switchMode(entry.key)}
+              >
+                {entry.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-      {mode === 'songs' && (
-        <SongBar
-          songs={SONGS}
-          song={song}
-          songIndex={songIndex}
-          onSongChange={changeSong}
-          level={activeLevel}
-          onLevelChange={changeLevel}
-        />
-      )}
-      {mode === 'songs' ? (
-        <Transport
-          playback={playback}
-          pattern={version.pattern}
-          pick={version.pick}
-          meter={meter}
-          bpm={bpm}
-          recommendedBpm={version.bpm}
-          onBpmChange={setBpm}
-          sound={activeSound.id}
-          onSoundChange={setSound}
-        />
+      {mode === 'exercises' ? (
+        <Exercises />
       ) : (
-        <ChordTrainer chords={visible} onPick={flashChord} />
+        <>
+          <SongBar
+            songs={SONGS}
+            song={song}
+            songIndex={songIndex}
+            onSongChange={changeSong}
+            level={activeLevel}
+            onLevelChange={changeLevel}
+          />
+          <Transport
+            playback={playback}
+            pattern={version.pattern}
+            pick={version.pick}
+            meter={meter}
+            bpm={bpm}
+            recommendedBpm={version.bpm}
+            onBpmChange={setBpm}
+            sound={activeSound.id}
+            onSoundChange={setSound}
+          />
+          <section className="stage">
+            <div className="chord-header">
+              <div className="chord-name-block">
+                <p className="chord-title">{chord.name}</p>
+                <p className="chord-sub">{frenchName(chord.name)}</p>
+              </div>
+              {song.capo ? <CapoBadge fret={song.capo} /> : null}
+              <ChordActions chord={chord} />
+            </div>
+            <div className="chord-diagrams">
+              <div className="diagram-wrap" ref={diagramRef}>
+                <Fretboard chord={chord} />
+              </div>
+              <NextUpCard chordName={nextChordName} />
+            </div>
+            <Progression bars={version.bars} meter={meter} playback={playback} onBarSelect={selectBar} />
+          </section>
+          <h2>Chord library</h2>
+          <ChordFilters
+            filter={activeFilter}
+            onFilterChange={setFilter}
+            shape={activeShape}
+            onShapeChange={setShape}
+          />
+          {visible.length > 0 ? (
+            <ChordGrid chords={visible} selected={chord.name} onSelect={selectChord} />
+          ) : (
+            <p className="empty-grid">No chords match these filters.</p>
+          )}
+          <KeyboardHint />
+        </>
       )}
-      <section className="stage">
-        <div className="chord-header">
-          <div className="chord-name-block">
-            <p className="chord-title">{chord.name}</p>
-            <p className="chord-sub">{frenchName(chord.name)}</p>
-          </div>
-          {mode === 'songs' && song.capo ? <CapoBadge fret={song.capo} /> : null}
-          <ChordActions chord={chord} />
-        </div>
-        <div className="chord-diagrams">
-          <div className="diagram-wrap" ref={diagramRef}>
-            <Fretboard chord={chord} />
-          </div>
-          {nextChordName ? <NextUpCard chordName={nextChordName} /> : <ChordNotes chord={chord} />}
-        </div>
-        {mode === 'songs' && (
-          <Progression bars={version.bars} meter={meter} playback={playback} onBarSelect={selectBar} />
-        )}
-      </section>
-      <h2>Chord library</h2>
-      <ChordFilters filter={activeFilter} onFilterChange={setFilter} shape={activeShape} onShapeChange={setShape} />
-      {visible.length > 0 ? (
-        <ChordGrid chords={visible} selected={chord.name} onSelect={selectChord} />
-      ) : (
-        <p className="empty-grid">No chords match these filters.</p>
-      )}
-      <KeyboardHint />
     </main>
   );
 }

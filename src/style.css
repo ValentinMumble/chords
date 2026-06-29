@@ -42,12 +42,37 @@ h1 {
   margin: 0;
 }
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 28px;
   flex-wrap: wrap;
-  margin-bottom: 1.5rem;
+  background: var(--bg);
+  padding: 0.75rem 0;
+  margin-bottom: 1rem;
+}
+.string-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.string-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+}
+.string-en {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.string-fr {
+  font-size: 12px;
+  color: var(--faint);
 }
 .song-bar {
   display: flex;
@@ -395,6 +420,79 @@ input[type='range']::-moz-range-thumb {
   border-top: 1px solid var(--line);
   font-size: 13px;
   color: var(--muted);
+}
+.exercises {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.topbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.finger-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.legend-label {
+  font-size: 13px;
+  color: var(--muted);
+  margin-right: 2px;
+}
+.legend-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+.exercise {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.75rem;
+}
+.exercise h2 {
+  margin: 0 0 0.6rem;
+  font-size: 18px;
+  font-weight: 500;
+}
+.exercise-note {
+  margin: 0 0 1.25rem;
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 60ch;
+}
+.exercise-note strong {
+  color: var(--accent);
+  font-weight: 500;
+}
+.tab-block + .tab-block {
+  margin-top: 1rem;
+}
+.tab-caption {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--faint);
+}
+.tab {
+  overflow-x: auto;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.tab-staff {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 kbd {
   background: var(--bg);
