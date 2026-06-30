@@ -17,6 +17,7 @@ import {ChordActions} from './components/ChordActions';
 import {ChordFilters} from './components/ChordFilters';
 import {ChordGrid} from './components/ChordGrid';
 import {Exercises} from './components/Exercises';
+import {Fleet} from './components/Fleet';
 import {CapoBadge} from './components/CapoBadge';
 import {KeyboardHint} from './components/KeyboardHint';
 import {NextUpCard} from './components/NextUpCard';
@@ -27,10 +28,11 @@ import {useSongPlayback} from './hooks/useSongPlayback';
 import {useKeyboardShortcuts} from './hooks/useKeyboardShortcuts';
 import {usePersistedState} from './hooks/usePersistedState';
 
-type Mode = 'songs' | 'exercises';
+type Mode = 'songs' | 'exercises' | 'gear';
 const MODES: {key: Mode; label: string}[] = [
   {key: 'songs', label: 'Songs'},
   {key: 'exercises', label: 'Practice'},
+  {key: 'gear', label: 'Gear'},
 ];
 // Standard tuning, low to high, English + French — a reference in the top bar.
 const STRING_NAMES = [
@@ -195,6 +197,8 @@ export default function App() {
       </div>
       {mode === 'exercises' ? (
         <Exercises />
+      ) : mode === 'gear' ? (
+        <Fleet />
       ) : (
         <>
           <SongBar
