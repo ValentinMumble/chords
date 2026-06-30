@@ -5,6 +5,7 @@ interface Instrument {
   kind: string;
   type: GuitarType;
   color: string;
+  image?: string;
   price: number;
   bought: string;
   blurb: string;
@@ -131,6 +132,7 @@ const FLEET: Instrument[] = [
     kind: 'Acoustic-electric',
     type: 'acoustic',
     color: '#d8b074',
+    image: '/gear/apx600.png',
     price: 249,
     bought: 'June 2026',
     blurb:
@@ -152,6 +154,7 @@ const FLEET: Instrument[] = [
     kind: 'Electric guitar · White Blonde',
     type: 'electric',
     color: '#ece0c2',
+    image: '/gear/tele.png',
     price: 429,
     bought: 'June 2026',
     blurb:
@@ -174,6 +177,7 @@ const FLEET: Instrument[] = [
     kind: 'Electric bass · Surf Green',
     type: 'bass',
     color: '#79c9b2',
+    image: '/gear/mustang.png',
     price: 419,
     bought: 'May 2026',
     blurb:
@@ -216,6 +220,7 @@ const FLEET: Instrument[] = [
     kind: 'Practice amp',
     type: 'amp',
     color: '#3a3d42',
+    image: '/gear/katana.png',
     price: 159,
     bought: 'May 2026',
     blurb:
@@ -251,7 +256,11 @@ export function Fleet() {
       {FLEET.map(instrument => (
         <section className="gear-card" key={instrument.name}>
           <div className="gear-head">
-            <GuitarArt type={instrument.type} color={instrument.color} />
+            {instrument.image ? (
+              <img className="gear-photo" src={instrument.image} alt={instrument.name} loading="lazy" />
+            ) : (
+              <GuitarArt type={instrument.type} color={instrument.color} />
+            )}
             <div className="gear-title">
               <h2>{instrument.name}</h2>
               <span className="gear-kind">{instrument.kind}</span>

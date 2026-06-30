@@ -519,6 +519,12 @@ input[type='range']::-moz-range-thumb {
   height: auto;
   flex-shrink: 0;
 }
+.gear-photo {
+  width: 66px;
+  height: 108px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
 .gear-title {
   display: flex;
   flex-direction: column;
