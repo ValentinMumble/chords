@@ -75,17 +75,18 @@ function GuitarArt({type, color}: {type: GuitarType; color: string}) {
           <circle key={y} cx={55} cy={y} r={1.8} fill={DETAIL} />
         ))}
         <rect x={44} y={26} width={12} height={2} fill={DETAIL} />
-        <rect x={45} y={27} width={10} height={58} fill={FRETBOARD} />
+        <rect x={45} y={27} width={10} height={63} fill={FRETBOARD} />
         <path
-          d="M50 84 C64 84 75 90 75 103 C75 112 71 114 71 121 C71 132 83 136 83 149 C83 162 70 167 50 167 C30 167 17 162 17 149 C17 136 29 132 29 121 C29 114 25 112 25 103 C25 90 36 84 50 84 Z"
+          d="M18 54 C11 57 10 68 13 82 C15 96 19 104 22 112 C16 124 12 134 14 148 C16 162 38 169 54 169 C72 169 87 158 86 142 C85 130 79 122 78 110 C80 102 81 96 83 88 C86 73 83 62 74 61 C67 60 63 65 61 73 C59 80 57 87 52 90 L48 90 C43 87 42 80 40 73 C38 63 28 54 18 54 Z"
           fill={color}
           stroke={OUTLINE}
           strokeWidth={1}
         />
-        <rect x={38} y={120} width={24} height={7} rx={1.5} fill={DETAIL} />
-        <rect x={37} y={150} width={26} height={8} rx={2} fill={DETAIL} />
+        <rect x={40} y={108} width={22} height={7} rx={1.5} fill={DETAIL} />
+        <rect x={42} y={128} width={22} height={7} rx={1.5} fill={DETAIL} transform="rotate(-8 53 131)" />
+        <rect x={44} y={150} width={20} height={8} rx={2} fill={DETAIL} />
         {[-4.5, -1.5, 1.5, 4.5].map(dx => (
-          <line key={dx} x1={50 + dx * 0.7} y1={27} x2={50 + dx} y2={152} stroke={STRING} strokeWidth={0.6} />
+          <line key={dx} x1={50 + dx * 0.7} y1={27} x2={50 + dx} y2={150} stroke={STRING} strokeWidth={0.6} />
         ))}
       </svg>
     );
@@ -101,26 +102,26 @@ function GuitarArt({type, color}: {type: GuitarType; color: string}) {
       <rect x={44} y={24} width={12} height={2} fill={DETAIL} />
       <rect x={45} y={25} width={10} height={42} fill={FRETBOARD} />
       <path
-        d="M50 57 C38 56 28 58 22 66 C17 73 15 84 15 102 C15 130 28 153 50 153 C72 153 85 130 85 102 C85 88 84 78 79 71 C75 66 70 64 65 65 C61 66 59 69 60 73 C60 67 56 59 50 57 Z"
+        d="M50 58 C39 57 30 59 25 67 C18 75 16 86 16 102 C16 127 27 147 50 148 C73 147 84 127 84 102 C84 86 83 76 78 70 C74 65 69 64 64 66 C60 68 59 73 60 78 C61 70 57 60 50 58 Z"
         fill={color}
         stroke={OUTLINE}
         strokeWidth={1}
       />
       <path
-        d="M32 64 C45 61 58 63 61 75 C63 89 57 103 48 103 C38 104 28 97 26 85 C25 74 26 68 32 64 Z"
+        d="M28 66 C40 63 51 64 53 72 L53 100 C53 105 48 107 42 106 C34 105 27 98 26 88 C25 78 24 70 28 66 Z"
         fill="rgba(18, 18, 18, 0.82)"
       />
-      <rect x={40} y={89} width={20} height={6} rx={1} fill="#c3c3c6" stroke={OUTLINE} strokeWidth={0.5} />
-      <rect x={36} y={118} width={28} height={22} rx={2} fill="#c3c3c6" stroke={OUTLINE} strokeWidth={0.6} />
-      <rect x={40} y={121} width={20} height={6} rx={1} fill={DETAIL} />
-      {[131, 134, 137].map(y => (
-        <line key={y} x1={40} y1={y} x2={60} y2={y} stroke={DETAIL} strokeWidth={0.6} />
+      <rect x={39} y={88} width={20} height={6} rx={1} fill="#c3c3c6" stroke={OUTLINE} strokeWidth={0.5} />
+      <rect x={37} y={115} width={27} height={21} rx={2} fill="#c3c3c6" stroke={OUTLINE} strokeWidth={0.6} />
+      <rect x={41} y={118} width={19} height={6} rx={1} fill={DETAIL} />
+      {[127, 130, 133].map(y => (
+        <line key={y} x1={41} y1={y} x2={60} y2={y} stroke={DETAIL} strokeWidth={0.6} />
       ))}
-      <rect x={21} y={131} width={15} height={8} rx={2} fill="#c3c3c6" stroke={OUTLINE} strokeWidth={0.5} />
-      <circle cx={25} cy={135} r={1.5} fill={DETAIL} />
-      <circle cx={31} cy={135} r={1.5} fill={DETAIL} />
+      <rect x={21} y={122} width={13} height={8} rx={2} fill="#c3c3c6" stroke={OUTLINE} strokeWidth={0.5} />
+      <circle cx={25} cy={126} r={1.4} fill={DETAIL} />
+      <circle cx={30} cy={126} r={1.4} fill={DETAIL} />
       {[-5, -3, -1, 1, 3, 5].map(dx => (
-        <line key={dx} x1={50 + dx * 0.8} y1={25} x2={50 + dx * 0.7} y2={122} stroke={STRING} strokeWidth={0.5} />
+        <line key={dx} x1={50 + dx * 0.8} y1={25} x2={50 + dx * 0.7} y2={120} stroke={STRING} strokeWidth={0.5} />
       ))}
     </svg>
   );
@@ -200,6 +201,7 @@ const FLEET: Instrument[] = [
     kind: 'Electric bass · Sonic Blue',
     type: 'bass',
     color: '#8dc6e8',
+    image: '/gear/storm.png',
     price: 110,
     bought: 'July 2005',
     blurb:
