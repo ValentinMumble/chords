@@ -1,0 +1,86 @@
+.transport {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.5rem 2rem;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.playBtn {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 19px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  cursor: pointer;
+}
+.playBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.tempo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.tempoText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tempo output {
+  min-width: 58px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.resetTempo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.resetTempo:not(:disabled):hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.resetTempo:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.tuningHint {
+  font-size: 12px;
+  color: var(--muted);
+  animation: tuning-pulse 1s ease-in-out infinite;
+}
+@keyframes tuning-pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+@media (max-width: 560px) {
+  .transport {
+    padding: 1.25rem;
+  }
+  .row {
+    gap: 16px;
+  }
+}

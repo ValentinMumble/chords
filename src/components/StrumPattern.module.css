@@ -1,0 +1,82 @@
+.strum {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-top: 1rem;
+}
+.label {
+  font-size: 13px;
+  color: var(--muted);
+  padding-top: 4px;
+}
+.grid {
+  position: relative;
+  display: flex;
+  gap: 4px;
+}
+.slot {
+  width: 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.arrow {
+  font-size: 17px;
+  line-height: 1;
+  min-height: 19px;
+  color: var(--ink);
+}
+.pluckDot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 19px;
+}
+.pluckDot span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+.slot.accent .pluckDot span {
+  background: var(--accent);
+  width: 10px;
+  height: 10px;
+}
+.slot.up .arrow {
+  color: var(--muted);
+}
+.slot.accent .arrow {
+  color: var(--accent);
+  font-weight: 500;
+}
+.beat {
+  font-size: 11px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+.playhead {
+  position: absolute;
+  top: -3px;
+  bottom: 15px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+  animation-name: strum-sweep;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes strum-sweep {
+  from {
+    left: 0;
+  }
+  to {
+    left: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .playhead {
+    display: none;
+  }
+}

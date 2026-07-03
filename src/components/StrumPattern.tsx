@@ -1,4 +1,5 @@
 import type {PickPattern, StrumPattern as Pattern} from '../songs';
+import styles from './StrumPattern.module.css';
 
 interface StrumPatternProps {
   pattern: Pattern;
@@ -19,11 +20,11 @@ export function StrumPattern({pattern, pick, playing, subdivision, barSeconds}: 
   const picking = pick !== undefined;
   const slots = pick ?? pattern;
   return (
-    <div className="strum">
-      <span className="strum-label">{picking ? 'Pick' : 'Strum'}</span>
-      <div className="strum-grid">
+    <div className={styles.strum}>
+      <span className={styles.label}>{picking ? 'Pick' : 'Strum'}</span>
+      <div className={styles.grid}>
         {playing && (
-          <span className="strum-playhead" style={{animationDuration: `${barSeconds}s`}} aria-hidden="true" />
+          <span className={styles.playhead} style={{animationDuration: `${barSeconds}s`}} aria-hidden="true" />
         )}
         {slots.map((slot, index) => {
           if (picking) {
@@ -31,19 +32,21 @@ export function StrumPattern({pattern, pick, playing, subdivision, barSeconds}: 
             const active = voice !== null;
             const bass = voice === 0;
             return (
-              <div key={index} className={`strum-slot ${active ? 'pluck' : 'rest'}${bass ? ' accent' : ''}`}>
-                <span className="pluck-dot">{active ? <span /> : null}</span>
-                <span className="strum-beat">{slotLabel(index, subdivision)}</span>
+              <div key={index} className={`${styles.slot}${bass ? ` ${styles.accent}` : ''}`}>
+                <span className={styles.pluckDot}>{active ? <span /> : null}</span>
+                <span className={styles.beat}>{slotLabel(index, subdivision)}</span>
               </div>
             );
           }
           const stroke = slot as Pattern[number];
-          const kind = stroke === 'D' ? 'down' : stroke === 'U' ? 'up' : 'rest';
           const accent = stroke === 'D' && index === 0;
+          const slotClass = [styles.slot, stroke === 'U' && styles.up, accent && styles.accent]
+            .filter(Boolean)
+            .join(' ');
           return (
-            <div key={index} className={`strum-slot ${kind}${accent ? ' accent' : ''}`}>
-              <span className="strum-arrow">{stroke === 'D' ? '↓' : stroke === 'U' ? '↑' : ''}</span>
-              <span className="strum-beat">{slotLabel(index, subdivision)}</span>
+            <div key={index} className={slotClass}>
+              <span className={styles.arrow}>{stroke === 'D' ? '↓' : stroke === 'U' ? '↑' : ''}</span>
+              <span className={styles.beat}>{slotLabel(index, subdivision)}</span>
             </div>
           );
         })}

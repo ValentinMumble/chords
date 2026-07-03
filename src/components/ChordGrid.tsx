@@ -1,5 +1,6 @@
 import {frenchShort} from '../chords';
 import type {Chord, ChordType} from '../types';
+import styles from './ChordGrid.module.css';
 
 interface ChordGridProps {
   chords: readonly Chord[];
@@ -24,19 +25,19 @@ export function ChordGrid({chords, selected, onSelect}: ChordGridProps) {
   const showHeaders = sections.length > 1;
 
   return (
-    <div className="chord-sections">
+    <div className={styles.sections}>
       {sections.map(section => (
-        <section key={section.type} className="chord-section">
-          {showHeaders && <h3 className="chord-section-label">{section.label}</h3>}
-          <div className="chord-grid" role="group" aria-label={`${section.label} chords`}>
+        <section key={section.type} className={styles.section}>
+          {showHeaders && <h3 className={styles.sectionLabel}>{section.label}</h3>}
+          <div className={styles.grid} role="group" aria-label={`${section.label} chords`}>
             {section.items.map(chord => (
               <button
                 key={chord.name}
-                className={chord.name === selected ? 'active' : ''}
+                className={chord.name === selected ? styles.active : undefined}
                 onClick={() => onSelect(chord.name)}
               >
                 <span>{chord.name}</span>
-                <span className="fr">{frenchShort(chord.name)}</span>
+                <span className={styles.fr}>{frenchShort(chord.name)}</span>
               </button>
             ))}
           </div>

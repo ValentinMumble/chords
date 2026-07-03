@@ -1,0 +1,20 @@
+.songBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.songBar select {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.songSelect {
+  flex: 1;
+  min-width: 240px;
+}

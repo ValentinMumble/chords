@@ -1,0 +1,118 @@
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  flex-wrap: wrap;
+  background: var(--bg);
+  padding: 0.75rem 0;
+  margin-bottom: 1rem;
+}
+.legends {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.fingerLegend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.legendLabel {
+  font-size: 13px;
+  color: var(--muted);
+  margin-right: 2px;
+}
+.legendDot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+.stringLegend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.stringItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+}
+.stringEn {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.stringFr {
+  font-size: 12px;
+  color: var(--faint);
+}
+.stage {
+  margin-top: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.chordHeader {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+.chordDiagrams {
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.diagramWrap {
+  display: inline-block;
+}
+.diagramWrap svg {
+  width: 330px;
+  height: auto;
+  max-width: 100%;
+}
+.chordTitle {
+  font-size: 38px;
+  font-weight: 600;
+  margin: 0 0 2px;
+}
+.chordSub {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0;
+}
+.emptyGrid {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0 0 2.5rem;
+}
+/* Passed to the SegmentedToggle so the mode switch stays flush right even when
+   the topbar wraps it onto its own line. */
+.modeToggle {
+  margin: 0 0 0 auto;
+}
+@media (max-width: 560px) {
+  .stage {
+    padding: 1.25rem;
+    gap: 1.5rem;
+  }
+}

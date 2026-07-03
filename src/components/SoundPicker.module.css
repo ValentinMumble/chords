@@ -1,0 +1,17 @@
+.sound {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: auto;
+}
+.sound select {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}

@@ -1,0 +1,137 @@
+.fleet {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.summary {
+  display: flex;
+  gap: 12px;
+}
+.stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+}
+.statValue {
+  font-size: 26px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.statLabel {
+  font-size: 13px;
+  color: var(--muted);
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.75rem;
+}
+.head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 1rem;
+}
+.head h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+.photo {
+  width: 66px;
+  height: 108px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+.title {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+.kind {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.blurb {
+  margin: 0 0 1.25rem;
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 62ch;
+}
+.specs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 0 28px;
+  margin: 0;
+}
+.spec {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+.spec dt {
+  color: var(--faint);
+  flex-shrink: 0;
+}
+.spec dd {
+  margin: 0;
+  color: var(--ink);
+  text-align: right;
+}
+.strings {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.stringsHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.stringsTitle {
+  font-size: 14px;
+  color: var(--faint);
+}
+.badge {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+.fresh {
+  color: #2f7a52;
+  background: rgba(47, 122, 82, 0.12);
+}
+.aging {
+  color: #a9781a;
+  background: rgba(169, 120, 26, 0.14);
+}
+.overdue {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.stringsDate {
+  font-size: 13px;
+  color: var(--faint);
+}

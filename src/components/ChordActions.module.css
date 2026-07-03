@@ -1,0 +1,50 @@
+.actions {
+  display: flex;
+  gap: 8px;
+}
+.actions button {
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 14px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.actions button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.actions button:active {
+  transform: scale(0.97);
+}
+.label {
+  position: relative;
+  z-index: 1;
+}
+.arpProgress {
+  position: absolute;
+  inset: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: var(--accent-soft);
+  animation-name: arp-fill;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  pointer-events: none;
+}
+@keyframes arp-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .arpProgress {
+    animation: none;
+  }
+}

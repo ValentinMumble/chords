@@ -1,7 +1,7 @@
 import {instrument, type Player} from 'soundfont-player';
 import type {Chord} from './types';
+import {STRING_MIDI} from './tuning';
 
-const STRING_MIDI = [40, 45, 50, 55, 59, 64];
 const PITCH_CLASSES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const STRUM_STAGGER = 0.014;
 export const ARPEGGIO_STAGGER = 0.35;
@@ -216,6 +216,33 @@ export function pluckVoice(chord: Chord, voiceIndex: number, when: number, gain:
   const midi = voices[Math.min(voiceIndex, voices.length - 1)];
   if (guitar) {
     guitar.play(midiToNote(midi), when, {gain, duration: 1.9});
+  } else {
+    pluckFallback(context, midiToFrequency(midi), when);
+  }
+}
+
+// Pluck a single tab note. Tab rows are high-e first (row 0) down to low-E
+// (row 5), the reverse of STRING_MIDI's low-to-high order.
+export function pluckTab(row: number, fret: number, when: number, gain: number): void {
+  const context = ensureAudio();
+  loadGuitar();
+  const guitar = players.get(currentSound);
+  const midi = STRING_MIDI[5 - row] + fret;
+  if (guitar) {
+    guitar.play(midiToNote(midi), when, {gain, duration: 1.9});
+  } else {
+    pluckFallback(context, midiToFrequency(midi), when);
+  }
+}
+
+// Pluck a raw MIDI note — used for scale runs, where the pitch is computed
+// directly rather than from a string/fret position.
+export function pluckMidi(midi: number, when: number, gain: number): void {
+  const context = ensureAudio();
+  loadGuitar();
+  const guitar = players.get(currentSound);
+  if (guitar) {
+    guitar.play(midiToNote(midi), when, {gain, duration: 1.4});
   } else {
     pluckFallback(context, midiToFrequency(midi), when);
   }

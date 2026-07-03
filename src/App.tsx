@@ -17,31 +17,27 @@ import {ChordActions} from './components/ChordActions';
 import {ChordFilters} from './components/ChordFilters';
 import {ChordGrid} from './components/ChordGrid';
 import {Exercises} from './components/Exercises';
+import {Scales} from './components/Scales';
 import {Fleet} from './components/Fleet';
 import {CapoBadge} from './components/CapoBadge';
 import {KeyboardHint} from './components/KeyboardHint';
 import {NextUpCard} from './components/NextUpCard';
 import {SongBar} from './components/SongBar';
 import {Progression} from './components/Progression';
+import {SegmentedToggle} from './components/SegmentedToggle';
 import {Transport} from './components/Transport';
+import {TUNING} from './tuning';
 import {useSongPlayback} from './hooks/useSongPlayback';
 import {useKeyboardShortcuts} from './hooks/useKeyboardShortcuts';
 import {usePersistedState} from './hooks/usePersistedState';
+import styles from './App.module.css';
 
-type Mode = 'songs' | 'exercises' | 'gear';
+type Mode = 'songs' | 'exercises' | 'scales' | 'gear';
 const MODES: {key: Mode; label: string}[] = [
   {key: 'songs', label: 'Songs'},
   {key: 'exercises', label: 'Practice'},
+  {key: 'scales', label: 'Scales'},
   {key: 'gear', label: 'Gear'},
-];
-// Standard tuning, low to high, English + French — a reference in the top bar.
-const STRING_NAMES = [
-  {en: 'E', fr: 'Mi'},
-  {en: 'A', fr: 'La'},
-  {en: 'D', fr: 'Ré'},
-  {en: 'G', fr: 'Sol'},
-  {en: 'B', fr: 'Si'},
-  {en: 'e', fr: 'Mi'},
 ];
 
 export default function App() {
@@ -53,6 +49,9 @@ export default function App() {
   const [sound, setSound] = usePersistedState<string>('chords:sound', GUITAR_SOUNDS[0].id);
   const [level, setLevel] = usePersistedState<string>('chords:level', 'easy');
   const [mode, setMode] = useState<Mode>('songs');
+  // Which Practice exercise is currently playing (its storageKey), so the space
+  // bar can stop it. Owned here because the keyboard handler lives in App.
+  const [activeExercise, setActiveExercise] = useState<string | null>(null);
 
   const song = SONGS[songIndex] ?? SONGS[0];
   const activeLevel: SongLevel = level === 'advanced' ? 'advanced' : 'easy';
@@ -103,6 +102,7 @@ export default function App() {
 
   function switchMode(next: Mode): void {
     if (next !== 'songs') playback.stop();
+    if (next !== 'exercises') setActiveExercise(null);
     setMode(next);
   }
 
@@ -150,53 +150,50 @@ export default function App() {
         selectChord(visible[(index + step + visible.length) % visible.length].name);
       }
     },
-    onPlayPause: () => (mode === 'songs' ? playback.togglePlay() : strum(chord)),
+    onPlayPause: () => {
+      if (mode === 'songs') playback.togglePlay();
+      else if (mode === 'exercises' && activeExercise) setActiveExercise(null);
+      else strum(chord);
+    },
     onStrum: () => strum(chord),
     onArpeggio: () => arpeggio(chord),
   });
 
   return (
     <main>
-      <div className="topbar">
+      <div className={styles.topbar}>
         <h1>🎸 Chords</h1>
-        <div className="topbar-controls">
-          <div className="finger-legend">
-            <span className="legend-label">Fingers</span>
+        <div className={styles.legends}>
+          <div className={styles.fingerLegend}>
+            <span className={styles.legendLabel}>Fingers</span>
             {[1, 2, 3, 4].map(finger => (
-              <span key={finger} className="legend-dot" style={{background: FINGER_COLORS[finger]}}>
+              <span key={finger} className={styles.legendDot} style={{background: FINGER_COLORS[finger]}}>
                 {finger}
               </span>
             ))}
           </div>
-          <div className="string-legend" aria-label="String names, low to high">
-            <span className="legend-label">Strings</span>
-            {STRING_NAMES.map((name, index) => (
-              <span key={index} className="string-item">
-                <span className="string-en">{name.en}</span>
-                <span className="string-fr">{name.fr}</span>
+          <div className={styles.stringLegend} aria-label="String names, low to high">
+            <span className={styles.legendLabel}>Strings</span>
+            {TUNING.map((string, index) => (
+              <span key={index} className={styles.stringItem}>
+                <span className={styles.stringEn}>{string.en}</span>
+                <span className={styles.stringFr}>{string.fr}</span>
               </span>
             ))}
           </div>
-          <div className="level-toggle mode-toggle" role="group" aria-label="Mode">
-            <span
-              className="level-indicator"
-              style={{transform: `translateX(${MODES.findIndex(entry => entry.key === mode) * 100}%)`}}
-              aria-hidden="true"
-            />
-            {MODES.map(entry => (
-              <button
-                key={entry.key}
-                className={mode === entry.key ? 'active' : ''}
-                onClick={() => switchMode(entry.key)}
-              >
-                {entry.label}
-              </button>
-            ))}
-          </div>
         </div>
+        <SegmentedToggle
+          className={styles.modeToggle}
+          ariaLabel="Mode"
+          items={MODES}
+          value={mode}
+          onChange={switchMode}
+        />
       </div>
       {mode === 'exercises' ? (
-        <Exercises />
+        <Exercises activeTab={activeExercise} onActivate={setActiveExercise} />
+      ) : mode === 'scales' ? (
+        <Scales />
       ) : mode === 'gear' ? (
         <Fleet />
       ) : (
@@ -220,17 +217,17 @@ export default function App() {
             sound={activeSound.id}
             onSoundChange={setSound}
           />
-          <section className="stage">
-            <div className="chord-header">
-              <div className="chord-name-block">
-                <p className="chord-title">{chord.name}</p>
-                <p className="chord-sub">{frenchName(chord.name)}</p>
+          <section className={styles.stage}>
+            <div className={styles.chordHeader}>
+              <div>
+                <p className={styles.chordTitle}>{chord.name}</p>
+                <p className={styles.chordSub}>{frenchName(chord.name)}</p>
               </div>
               {song.capo ? <CapoBadge fret={song.capo} /> : null}
               <ChordActions chord={chord} />
             </div>
-            <div className="chord-diagrams">
-              <div className="diagram-wrap" ref={diagramRef}>
+            <div className={styles.chordDiagrams}>
+              <div className={styles.diagramWrap} ref={diagramRef}>
                 <Fretboard chord={chord} />
               </div>
               <NextUpCard chordName={nextChordName} />
@@ -238,16 +235,11 @@ export default function App() {
             <Progression bars={version.bars} meter={meter} playback={playback} onBarSelect={selectBar} />
           </section>
           <h2>Chord library</h2>
-          <ChordFilters
-            filter={activeFilter}
-            onFilterChange={setFilter}
-            shape={activeShape}
-            onShapeChange={setShape}
-          />
+          <ChordFilters filter={activeFilter} onFilterChange={setFilter} shape={activeShape} onShapeChange={setShape} />
           {visible.length > 0 ? (
             <ChordGrid chords={visible} selected={chord.name} onSelect={selectChord} />
           ) : (
-            <p className="empty-grid">No chords match these filters.</p>
+            <p className={styles.emptyGrid}>No chords match these filters.</p>
           )}
           <KeyboardHint />
         </>

@@ -1,4 +1,5 @@
 import {FILTER_TYPES, SHAPE_FILTERS, type ChordFilter, type ShapeFilter} from '../chords';
+import styles from './ChordFilters.module.css';
 
 interface ChordFiltersProps {
   filter: ChordFilter;
@@ -9,24 +10,24 @@ interface ChordFiltersProps {
 
 export function ChordFilters({filter, onFilterChange, shape, onShapeChange}: ChordFiltersProps) {
   return (
-    <div className="filters">
+    <div className={styles.filters}>
       <div role="group" aria-label="Filter chords by type" style={{display: 'contents'}}>
         {FILTER_TYPES.map(type => (
           <button
             key={type.key}
-            className={filter === type.key ? 'active' : ''}
+            className={filter === type.key ? styles.active : undefined}
             onClick={() => onFilterChange(type.key)}
           >
             {type.label}
           </button>
         ))}
       </div>
-      <span className="filter-divider" aria-hidden="true" />
+      <span className={styles.divider} aria-hidden="true" />
       <div role="group" aria-label="Filter chords by shape" style={{display: 'contents'}}>
         {SHAPE_FILTERS.map(entry => (
           <button
             key={entry.key}
-            className={shape === entry.key ? 'active' : ''}
+            className={shape === entry.key ? styles.active : undefined}
             onClick={() => onShapeChange(shape === entry.key ? 'any' : entry.key)}
           >
             {entry.label}

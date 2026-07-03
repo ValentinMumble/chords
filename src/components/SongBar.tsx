@@ -1,4 +1,11 @@
 import {DIFFICULTY_LABELS, type Song, type SongLevel} from '../songs';
+import {SegmentedToggle} from './SegmentedToggle';
+import styles from './SongBar.module.css';
+
+const LEVELS: readonly {key: SongLevel; label: string}[] = [
+  {key: 'easy', label: 'Easy'},
+  {key: 'advanced', label: 'Advanced'},
+];
 
 interface SongBarProps {
   songs: readonly Song[];
@@ -12,9 +19,9 @@ interface SongBarProps {
 // The slim top-of-page selector: which song, and (if it has one) its level.
 export function SongBar({songs, song, songIndex, onSongChange, level, onLevelChange}: SongBarProps) {
   return (
-    <div className="song-bar">
+    <div className={styles.songBar}>
       <select
-        className="song-select"
+        className={styles.songSelect}
         aria-label="Choose a song"
         value={songIndex}
         onChange={event => onSongChange(Number(event.target.value))}
@@ -34,19 +41,7 @@ export function SongBar({songs, song, songIndex, onSongChange, level, onLevelCha
           ))}
       </select>
       {song.advanced && (
-        <div className="level-toggle" role="group" aria-label="Difficulty">
-          <span
-            className="level-indicator"
-            style={{transform: level === 'advanced' ? 'translateX(100%)' : 'translateX(0)'}}
-            aria-hidden="true"
-          />
-          <button className={level === 'easy' ? 'active' : ''} onClick={() => onLevelChange('easy')}>
-            Easy
-          </button>
-          <button className={level === 'advanced' ? 'active' : ''} onClick={() => onLevelChange('advanced')}>
-            Advanced
-          </button>
-        </div>
+        <SegmentedToggle ariaLabel="Difficulty" items={LEVELS} value={level} onChange={onLevelChange} />
       )}
     </div>
   );

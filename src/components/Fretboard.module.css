@@ -1,0 +1,25 @@
+.fretDot {
+  transition:
+    transform 0.25s ease,
+    opacity 0.2s ease;
+}
+.marker {
+  transition: opacity 0.2s ease;
+}
+.barre {
+  animation: fade-in 0.25s ease;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fretDot,
+  .marker {
+    transition: none;
+  }
+  .barre {
+    animation: none;
+  }
+}

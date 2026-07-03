@@ -1,0 +1,114 @@
+.progression {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bars {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  user-select: none;
+}
+.loopBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 22px;
+  font-size: 12px;
+}
+.loopHint {
+  color: var(--faint);
+}
+.loopInfo {
+  color: var(--accent);
+}
+.loopClear {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.loopClear:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.barChip {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-width: 54px;
+  padding: 6px 0;
+  text-align: center;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  touch-action: none;
+  transition: border-color 0.15s;
+}
+.barChip:hover {
+  border-color: var(--accent);
+}
+.barChip.inLoop {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.barChip.current {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.barChip.next {
+  border-style: dashed;
+  border-color: var(--accent);
+  color: var(--ink);
+}
+.loopMarker {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 7px;
+  background: var(--accent);
+  border-radius: 999px;
+  cursor: ew-resize;
+  touch-action: none;
+}
+.loopMarker.left {
+  left: -5px;
+}
+.loopMarker.right {
+  right: -5px;
+}
+.chipTicks {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  height: 5px;
+}
+.tick {
+  width: 7px;
+  height: 4px;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.45;
+}
+.tick.half {
+  width: 3px;
+}
+:global(body.looping-drag) {
+  cursor: ew-resize;
+  user-select: none;
+}

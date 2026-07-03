@@ -1,19 +1,11 @@
 import {useEffect, useRef} from 'react';
 import {FINGER_COLORS, findBarres} from '../chords';
 import type {Chord, Finger} from '../types';
+import styles from './Fretboard.module.css';
+// Open-string names (low to high), shown under each string in English + French.
+import {TUNING as OPEN_STRINGS} from '../tuning';
 
 const fingerColor = (finger: number) => FINGER_COLORS[finger] ?? 'var(--ink)';
-
-// Standard tuning, low to high — shown under each string in English and French
-// so the open-string names are easy to memorise.
-const OPEN_STRINGS = [
-  {en: 'E', fr: 'Mi'},
-  {en: 'A', fr: 'La'},
-  {en: 'D', fr: 'Ré'},
-  {en: 'G', fr: 'Sol'},
-  {en: 'B', fr: 'Si'},
-  {en: 'E', fr: 'Mi'},
-] as const;
 
 type Variant = 'full' | 'mini';
 
@@ -179,7 +171,7 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
         findBarres(chord).map(barre => (
           <rect
             key={`${barre.finger}:${barre.fret}`}
-            className="barre"
+            className={styles.barre}
             x={stringX(barre.fromString) - geo.dotRadius + 1}
             y={dotY(barre.fret) - geo.dotRadius + 1}
             width={(barre.toString - barre.fromString) * geo.stringGap + (geo.dotRadius - 1) * 2}
@@ -192,7 +184,7 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
       {chord.frets.map((fret, stringIndex) => (
         <g key={stringIndex}>
           <text
-            className="marker"
+            className={styles.marker}
             x={stringX(stringIndex)}
             y={geo.nutY - geo.muteOffset}
             textAnchor="middle"
@@ -203,7 +195,7 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
             ✕
           </text>
           <circle
-            className="marker"
+            className={styles.marker}
             cx={stringX(stringIndex)}
             cy={geo.nutY - geo.openOffset}
             r={geo.openRadius}
@@ -241,7 +233,7 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
         dot.position ? (
           <g key={`finger-${dot.finger}`}>
             <g
-              className="fret-dot"
+              className={styles.fretDot}
               style={{
                 transform: `translate(${dot.position.x}px, ${dot.position.y}px)`,
                 opacity: dot.visible ? 1 : 0,
@@ -259,7 +251,11 @@ export function Fretboard({chord, variant = 'full'}: {chord: Chord; variant?: Va
               </text>
             </g>
             {dot.extras.map((extra, extraIndex) => (
-              <g key={extraIndex} className="fret-dot" style={{transform: `translate(${extra.x}px, ${extra.y}px)`}}>
+              <g
+                key={extraIndex}
+                className={styles.fretDot}
+                style={{transform: `translate(${extra.x}px, ${extra.y}px)`}}
+              >
                 <circle r={geo.dotRadius} fill={fingerColor(dot.finger)} />
                 <text
                   y={geo.dotFontSize * 0.35}

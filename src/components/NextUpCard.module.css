@@ -1,0 +1,35 @@
+/* Fixed footprint so the diagram doesn't jump when play/stop shows or hides it. */
+.nextBox {
+  box-sizing: border-box;
+  width: 198px;
+  min-height: 270px;
+  background: var(--bg);
+  border: 1px dashed var(--accent);
+  border-radius: var(--radius);
+  padding: 16px 22px 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.nextBox svg {
+  width: 152px;
+  height: auto;
+}
+.label {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+}
+.name {
+  font-size: 30px;
+  font-weight: 600;
+  margin: 3px 0 0;
+  min-height: 38px;
+}
+.fr {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 6px;
+}

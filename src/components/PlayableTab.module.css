@@ -1,0 +1,23 @@
+.playable + .playable {
+  margin-top: 1.25rem;
+}
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+.tempo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tempo input[type='range'] {
+  width: 130px;
+  accent-color: var(--accent);
+}
+.tempoValue {
+  font-size: 13px;
+  color: var(--muted);
+  min-width: 56px;
+}

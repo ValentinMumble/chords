@@ -4,6 +4,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
 } from 'react';
+import styles from './Metronome.module.css';
 
 interface MetronomeProps {
   playing: boolean;
@@ -81,7 +82,7 @@ export function Metronome({playing, beatSeconds, bpm, min, max, step, onBpmChang
   return (
     <svg
       ref={svgRef}
-      className={isDragging ? 'metronome dragging' : 'metronome'}
+      className={isDragging ? `${styles.metronome} ${styles.dragging}` : styles.metronome}
       viewBox="0 0 40 56"
       width="62"
       height="86"
@@ -100,11 +101,11 @@ export function Metronome({playing, beatSeconds, bpm, min, max, step, onBpmChang
       <path d="M13 10 L27 10 L33 50 L7 50 Z" fill="none" stroke="var(--line)" strokeWidth="2" strokeLinejoin="round" />
       <line x1="7" y1="50" x2="33" y2="50" stroke="var(--line)" strokeWidth="2" strokeLinecap="round" />
       <g
-        className={playing ? 'metronome-arm swinging' : 'metronome-arm'}
+        className={playing ? `${styles.arm} ${styles.swinging}` : styles.arm}
         style={{animationDuration: `${beatSeconds}s`}}
       >
         <line x1="20" y1="50" x2="20" y2="12" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
-        <circle className="metronome-weight" cx="20" cy={weightY} r="5" fill="var(--accent)" />
+        <circle className={styles.weight} cx="20" cy={weightY} r="5" fill="var(--accent)" />
       </g>
     </svg>
   );

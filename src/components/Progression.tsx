@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import type {Bar, Meter} from '../songs';
 import type {SongPlayback} from '../hooks/useSongPlayback';
+import styles from './Progression.module.css';
 
 // Chord length as bars, given the meter's beats per bar.
 function barLength(beats: number, beatsPerBar: number): string {
@@ -98,18 +99,26 @@ export function Progression({bars, meter, playback, onBarSelect}: ProgressionPro
   }
 
   return (
-    <div className="progression">
-      <div className="bars" aria-label="Chord progression, one chip per chord">
+    <div className={styles.progression}>
+      <div className={styles.bars} aria-label="Chord progression, one chip per chord">
         {bars.map((bar, index) => {
           const isCurrent = playing && index === barIndex;
           const isNext = playing && index === nextBarIndex && nextBarIndex !== barIndex;
           const inLoop = loop !== null && index >= loop.start && index <= loop.end;
+          const chipClass = [
+            styles.barChip,
+            inLoop && styles.inLoop,
+            isCurrent && styles.current,
+            isNext && styles.next,
+          ]
+            .filter(Boolean)
+            .join(' ');
           return (
             <button
               key={index}
               type="button"
               data-bar-index={index}
-              className={`bar-chip${inLoop ? ' in-loop' : ''}${isCurrent ? ' current' : ''}${isNext ? ' next' : ''}`}
+              className={chipClass}
               style={{minWidth: 46 + (bar.beats / meter.beats) * 24}}
               onPointerDown={event => startSelect(index, event)}
               onClick={event => handleClick(index, event)}
@@ -117,21 +126,21 @@ export function Progression({bars, meter, playback, onBarSelect}: ProgressionPro
             >
               {loop !== null && index === loop.start && (
                 <span
-                  className="loop-marker left"
+                  className={`${styles.loopMarker} ${styles.left}`}
                   onPointerDown={event => startMarker('start', event)}
                   aria-label="Loop start"
                 />
               )}
-              <span className="chip-name">{bar.name}</span>
-              <span className="chip-ticks" aria-label={barLength(bar.beats, meter.beats)}>
+              <span>{bar.name}</span>
+              <span className={styles.chipTicks} aria-label={barLength(bar.beats, meter.beats)}>
                 {Array.from({length: Math.floor(bar.beats / meter.beats)}).map((_, tick) => (
-                  <span key={tick} className="tick" />
+                  <span key={tick} className={styles.tick} />
                 ))}
-                {bar.beats % meter.beats >= meter.beats / 2 && <span className="tick half" />}
+                {bar.beats % meter.beats >= meter.beats / 2 && <span className={`${styles.tick} ${styles.half}`} />}
               </span>
               {loop !== null && index === loop.end && (
                 <span
-                  className="loop-marker right"
+                  className={`${styles.loopMarker} ${styles.right}`}
                   onPointerDown={event => startMarker('end', event)}
                   aria-label="Loop end"
                 />
@@ -140,19 +149,19 @@ export function Progression({bars, meter, playback, onBarSelect}: ProgressionPro
           );
         })}
       </div>
-      <div className="loop-bar">
+      <div className={styles.loopBar}>
         {loop ? (
           <>
-            <span className="loop-info">
+            <span className={styles.loopInfo}>
               Looping {bars[loop.start].name}
               {loop.end !== loop.start ? ` → ${bars[loop.end].name}` : ''}
             </span>
-            <button type="button" className="loop-clear" onClick={clearLoop}>
+            <button type="button" className={styles.loopClear} onClick={clearLoop}>
               Clear loop
             </button>
           </>
         ) : (
-          <span className="loop-hint">Drag across chords to set a practice loop</span>
+          <span className={styles.loopHint}>Drag across chords to set a practice loop</span>
         )}
       </div>
     </div>

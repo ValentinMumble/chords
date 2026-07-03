@@ -1,0 +1,23 @@
+.staff {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.playhead {
+  transition: x 0.05s linear;
+}
+.block + .block {
+  margin-top: 1rem;
+}
+.caption {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--faint);
+}
+.row {
+  overflow-x: auto;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 14px;
+}

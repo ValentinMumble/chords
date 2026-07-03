@@ -1,9 +1,11 @@
+import styles from './CapoBadge.module.css';
+
 // A small capo on a neck: faint strings running across a fretboard, with the
 // capo bar (and its grip) clamped over them.
 export function CapoBadge({fret}: {fret: number}) {
   return (
-    <span className="capo-badge">
-      <svg className="capo-icon" viewBox="0 0 46 30" width="34" height="22" aria-hidden="true">
+    <span className={styles.badge}>
+      <svg className={styles.icon} viewBox="0 0 46 30" width="34" height="22" aria-hidden="true">
         <rect
           x="3"
           y="6"

@@ -1,0 +1,39 @@
+.metronome {
+  flex-shrink: 0;
+  cursor: ns-resize;
+  touch-action: none;
+  border-radius: 8px;
+}
+.metronome:focus {
+  outline: none;
+}
+.metronome:hover .arm.swinging,
+.metronome.dragging .arm.swinging {
+  animation: none;
+}
+.weight {
+  cursor: grab;
+}
+.arm {
+  transform-box: view-box;
+  transform-origin: 20px 50px;
+}
+.arm.swinging {
+  animation-name: tick-tock;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+@keyframes tick-tock {
+  from {
+    transform: rotate(-24deg);
+  }
+  to {
+    transform: rotate(24deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .arm.swinging {
+    animation: none;
+  }
+}

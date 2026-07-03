@@ -5,6 +5,7 @@ import {isSoundLoaded, preloadSound, whenSoundReady} from '../audio';
 import {SoundPicker} from './SoundPicker';
 import {Metronome} from './Metronome';
 import {StrumPattern} from './StrumPattern';
+import styles from './Transport.module.css';
 
 interface TransportProps {
   playback: SongPlayback;
@@ -48,10 +49,10 @@ export function Transport({
   }
 
   return (
-    <div className="transport">
-      <div className="transport-row">
+    <div className={styles.transport}>
+      <div className={styles.row}>
         <button
-          className="play-btn"
+          className={styles.playBtn}
           aria-label={playing ? 'Stop' : 'Play'}
           onPointerEnter={preloadSound}
           onClick={handlePlay}
@@ -66,7 +67,7 @@ export function Transport({
             </svg>
           )}
         </button>
-        <div className="tempo">
+        <div className={styles.tempo}>
           <Metronome
             key={playing ? 'play' : 'idle'}
             playing={playing}
@@ -77,12 +78,12 @@ export function Transport({
             step={BPM_STEP}
             onBpmChange={onBpmChange}
           />
-          <div className="tempo-text">
-            <span className="tempo-label">Tempo</span>
+          <div className={styles.tempoText}>
+            <span>Tempo</span>
             <output>{bpm} bpm</output>
           </div>
           <button
-            className="reset-tempo"
+            className={styles.resetTempo}
             aria-label="Reset to recommended tempo"
             title="Reset to recommended tempo"
             disabled={bpm === recommendedBpm}
@@ -104,7 +105,7 @@ export function Transport({
             </svg>
           </button>
         </div>
-        {tuning && <span className="tuning-hint">tuning up…</span>}
+        {tuning && <span className={styles.tuningHint}>tuning up…</span>}
         <SoundPicker sound={sound} onChange={onSoundChange} />
       </div>
       <StrumPattern
