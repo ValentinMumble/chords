@@ -108,16 +108,15 @@ export const STAIRWAY_CHORDS = [
   'FM7',
 ];
 
-// A Forest — The Cure (intro): built from a literal, spacing-accurate tab so the
-// dash spacing IS the rhythm — one character = one slot, dashes are rests, and a
-// note rings until the next event on its string (multi-digit frets sound on the
-// first digit). Fingers are coloured by fret. Re-space the tab to change the feel.
+// A Forest — The Cure (intro): the open-A bass alternates with the D-string
+// melody — 7·3·2·3 twice, then one long run up-and-down 7·9·10·7·5·3·2. The
+// opening 7 of each phrase is held a touch longer, and there's a pause between
+// phrases (trailing rests). One character = one slot; edit the gaps to retime.
 const FOREST_FINGER: Record<number, number> = {2: 2, 3: 3, 5: 1, 7: 1, 9: 3, 10: 4};
 export const FOREST = parseSpacedTab(
   [
-    {row: 3, text: 'D|----7---3---2---3-|---7---3---2---3-|---7---9---10---7---5---3---2---0-----|'},
-    {row: 4, text: 'A|--0---0---0---0---|-0---0---0---0---|-0---0---0----0---0---0---0---0---0---|'},
-    {row: 5, text: 'E|------------------|-----------------|------------------------------------0-|'},
+    {row: 3, text: 'D|-7---3--2--3----|-7---3--2--3----|-7---9--10-7--5--3--2-------|'},
+    {row: 4, text: 'A|0---0--0--0-----|0---0--0--0-----|0---0--0--0--0--0--0--0--0--|'},
   ],
   FOREST_FINGER,
 );

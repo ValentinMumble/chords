@@ -32,17 +32,11 @@ export function Exercises({
           Slow and even — and <strong>pick strict down-up-down-up</strong> throughout, even across string changes.
         </p>
         <PlayableTab
-          bars={chromaticBars(false)}
-          storageKey="chromatic-up"
+          bars={[...chromaticBars(false), ...chromaticBars(true)]}
+          storageKey="chromatic"
           defaultTempo={90}
-          caption="Going up"
-          {...shared}
-        />
-        <PlayableTab
-          bars={chromaticBars(true)}
-          storageKey="chromatic-down"
-          defaultTempo={90}
-          caption="Coming back down"
+          barsPerRow={6}
+          caption="Up, then back down"
           {...shared}
         />
       </section>
@@ -54,12 +48,12 @@ export function Exercises({
         </p>
         <PlayableTab
           bars={FOREST}
-          storageKey="a-forest-3"
-          defaultTempo={116}
-          subdiv={4}
+          storageKey="a-forest-5"
+          defaultTempo={112}
+          subdiv={6}
           barsPerRow={2}
           firstBar={1}
-          caption="Intro in Am — plays the tab's exact spacing (dashes = duration)"
+          caption="Intro in Am — open-A bass alternating with the melody"
           {...shared}
         />
       </section>
