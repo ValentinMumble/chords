@@ -50,6 +50,7 @@ export function Exercises({
           bars={FOREST}
           storageKey="a-forest-5"
           defaultTempo={112}
+          minTempo={20}
           subdiv={6}
           barsPerRow={2}
           firstBar={1}

@@ -16,6 +16,7 @@ export function PlayableTab({
   activeTab,
   onActivate,
   defaultTempo = 120,
+  minTempo = 40,
   subdiv = 1,
   evenNotes = false,
   ...blockProps
@@ -25,6 +26,7 @@ export function PlayableTab({
   activeTab: string | null;
   onActivate: (key: string | null) => void;
   defaultTempo?: number;
+  minTempo?: number;
   subdiv?: number;
   evenNotes?: boolean;
   caption?: string;
@@ -60,7 +62,7 @@ export function PlayableTab({
         <label className={styles.tempo}>
           <input
             type="range"
-            min={40}
+            min={minTempo}
             max={220}
             step={5}
             value={tempo}
