@@ -44,3 +44,12 @@ h1 {
   font-weight: 500;
   margin: 0;
 }
+/* Short viewport (phone landscape): trim the page's vertical padding. */
+@media (max-height: 500px) {
+  main {
+    padding: 1rem 1.5rem 2rem;
+  }
+  h1 {
+    font-size: 20px;
+  }
+}

@@ -116,3 +116,33 @@
     gap: 1.5rem;
   }
 }
+/* Short viewport (phone landscape): compact the sticky header and cap the chord
+   diagram height so it fits without dominating the screen. */
+@media (max-height: 500px) {
+  .topbar {
+    gap: 12px;
+    padding: 0.4rem 0;
+    margin-bottom: 0.5rem;
+  }
+  .legends {
+    gap: 14px;
+  }
+  .stage {
+    margin-top: 0.75rem;
+    padding: 1rem 1.25rem;
+    gap: 1rem;
+  }
+  .chordHeader {
+    gap: 1.25rem;
+  }
+  .chordDiagrams {
+    gap: 1.5rem;
+  }
+  .diagramWrap svg {
+    width: auto;
+    height: 200px;
+  }
+  .chordTitle {
+    font-size: 28px;
+  }
+}

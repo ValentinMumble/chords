@@ -91,3 +91,16 @@ h2 {
   background: var(--accent);
   color: #fff;
 }
+
+/* Short viewport (phone landscape): tighten the practice/gear cards + headings. */
+@media (max-height: 500px) {
+  h2 {
+    margin: 1.25rem 0 0.75rem;
+  }
+  .exercises {
+    gap: 1rem;
+  }
+  .exercise {
+    padding: 1rem 1.25rem;
+  }
+}
