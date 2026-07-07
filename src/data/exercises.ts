@@ -3,7 +3,7 @@ import {parseTab, parseSpacedTab, type Col} from '../tab';
 // The chromatic finger exercise: low E at fret 1 with fingers 1-2-3-4, then each
 // higher string starts one fret higher, up to the high E with finger 4 on fret
 // 9. Grouped four-to-a-bar so the position shift reads as a staircase.
-export function chromaticBars(descending: boolean): Col[][] {
+function chromaticBars(descending: boolean): Col[][] {
   const notes: {physicalString: number; fret: number; finger: number}[] = [];
   for (let physicalString = 0; physicalString < 6; physicalString++) {
     for (let step = 0; step < 4; step++) {
@@ -27,7 +27,7 @@ export function chromaticBars(descending: boolean): Col[][] {
 // Peter Gunn (simplified): the open-string pedal alternating with frets 2·3·5·4
 // — one per finger — giving 0·0·2·0·3·0·5·4. Shown on the low E only (played
 // twice); run the same shape up every string.
-export function peterGunnBars(): Col[][] {
+function peterGunnBars(): Col[][] {
   const pattern = [0, 0, 2, 0, 3, 0, 5, 4];
   const bar: Col[] = pattern.map(fret => {
     const column: Col = [null, null, null, null, null, null];
@@ -36,6 +36,11 @@ export function peterGunnBars(): Col[][] {
   });
   return [bar, bar];
 }
+
+// Computed once at module load (stable references), so switching to Practice and
+// re-renders don't rebuild these arrays or the tabs derived from them.
+export const PETER_GUNN = peterGunnBars();
+export const CHROMATIC = [...chromaticBars(false), ...chromaticBars(true)];
 
 // The full fingerpicked intro (Am · E/G# · C · D/F# · Fmaj7 · G/B …), 16 bars.
 export const STAIRWAY = [

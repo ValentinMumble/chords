@@ -1,5 +1,5 @@
 import {PlayableTab} from './PlayableTab';
-import {chromaticBars, peterGunnBars, FOREST, STAIRWAY, STAIRWAY_CHORDS, DUST} from '../data/exercises';
+import {PETER_GUNN, CHROMATIC, FOREST, STAIRWAY, STAIRWAY_CHORDS, DUST} from '../data/exercises';
 
 export function Exercises({
   activeTab,
@@ -16,7 +16,7 @@ export function Exercises({
       <section className="exercise">
         <h2>Peter Gunn — riff drill</h2>
         <PlayableTab
-          bars={peterGunnBars()}
+          bars={PETER_GUNN}
           storageKey="peter-gunn"
           defaultTempo={130}
           barsPerRow={2}
@@ -32,7 +32,7 @@ export function Exercises({
           Slow and even — and <strong>pick strict down-up-down-up</strong> throughout, even across string changes.
         </p>
         <PlayableTab
-          bars={[...chromaticBars(false), ...chromaticBars(true)]}
+          bars={CHROMATIC}
           storageKey="chromatic"
           defaultTempo={90}
           barsPerRow={6}
