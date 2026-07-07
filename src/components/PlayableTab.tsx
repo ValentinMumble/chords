@@ -1,4 +1,5 @@
 import {useEffect, useMemo} from 'react';
+import {ensureAudio} from '../audio';
 import {usePersistedState} from '../hooks/usePersistedState';
 import {useTabPlayback} from '../hooks/useTabPlayback';
 import type {Col} from '../tab';
@@ -44,6 +45,7 @@ export function PlayableTab({
   }, [activeTab, playing, storageKey, stop]);
 
   function handleToggle(): void {
+    ensureAudio(); // resume the audio context within the tap (needed on iOS)
     onActivate(playing ? null : storageKey);
     toggle();
   }

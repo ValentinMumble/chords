@@ -11,7 +11,7 @@ import {
   type ShapeFilter,
 } from './chords';
 import {FOUR_FOUR, SONGS, songVersion, type SongLevel} from './songs';
-import {arpeggio, GUITAR_SOUNDS, setGuitarSound, strum} from './audio';
+import {arpeggio, ensureAudio, GUITAR_SOUNDS, setGuitarSound, strum} from './audio';
 import {Fretboard} from './components/Fretboard';
 import {ChordActions} from './components/ChordActions';
 import {ChordFilters} from './components/ChordFilters';
@@ -70,6 +70,20 @@ export default function App() {
   useEffect(() => {
     setGuitarSound(activeSound.id);
   }, [activeSound.id]);
+
+  // iOS only unlocks the AudioContext when it's resumed inside a user gesture.
+  // Practice playback schedules its first note in a timer (not in the click), so
+  // on iPhone the context would stay suspended and nothing sounds. Resume it on
+  // the first tap/key anywhere, which counts as an in-gesture unlock.
+  useEffect(() => {
+    const unlock = () => ensureAudio();
+    window.addEventListener('pointerdown', unlock, {once: true});
+    window.addEventListener('keydown', unlock, {once: true});
+    return () => {
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('keydown', unlock);
+    };
+  }, []);
 
   const playback = useSongPlayback(version.bars, bpm, version.pattern, version.pick, meter.subdivision, setChordName);
   // The next chord in the song progression — shown beside the diagram whether
