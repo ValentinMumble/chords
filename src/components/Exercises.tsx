@@ -1,5 +1,5 @@
 import {PlayableTab} from './PlayableTab';
-import {chromaticBars, peterGunnBars, FOREST, STAIRWAY, STAIRWAY_CHORDS} from '../data/exercises';
+import {chromaticBars, peterGunnBars, FOREST, STAIRWAY, STAIRWAY_CHORDS, DUST} from '../data/exercises';
 
 export function Exercises({
   activeTab,
@@ -73,6 +73,23 @@ export function Exercises({
           evenNotes
           barsPerRow={2}
           chords={STAIRWAY_CHORDS}
+          firstBar={1}
+          {...shared}
+        />
+      </section>
+
+      <section className="exercise">
+        <h2>Dust in the Wind — Kansas</h2>
+        <p className="exercise-note">
+          The Travis-picking intro: one steady fingerpicking pattern the whole way, just moving the chord shape (C ·
+          Cmaj7 · Cadd9 · C, then the A variations). The thumb keeps the alternating bass throughout.
+        </p>
+        <PlayableTab
+          bars={DUST}
+          storageKey="dust"
+          defaultTempo={86}
+          subdiv={4}
+          barsPerRow={4}
           firstBar={1}
           {...shared}
         />
