@@ -86,8 +86,8 @@ export function Exercises({
         </p>
         <PlayableTab
           bars={DUST}
-          storageKey="dust"
-          defaultTempo={86}
+          storageKey="dust-2"
+          defaultTempo={170}
           subdiv={4}
           barsPerRow={4}
           firstBar={1}
