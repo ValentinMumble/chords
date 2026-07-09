@@ -27,6 +27,27 @@ export const ADVANCED_PATTERN: StrumPattern = ['D', '-', 'D', 'U', '-', 'U', 'D'
 export const DRIVING_PATTERN: StrumPattern = ['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']; // eighth-note rock chug
 export const BALLAD_PATTERN: StrumPattern = ['D', '-', '-', '-', 'D', '-', 'U', '-']; // sparse and gentle
 export const ANTHEM_PATTERN: StrumPattern = ['D', '-', 'D', 'U', 'D', '-', 'D', 'U']; // strong, with up-strokes
+// A Horse with No Name: "D D DUDUDU U UDU" (spaces = rests) — one continuous
+// two-bar pattern, so on the eighth grid its 16 slots span both chords: Em gets
+// the first bar (slots 0-7), D6/9 the second (slots 8-15).
+export const HORSE_PATTERN: StrumPattern = [
+  'D',
+  '-',
+  'D',
+  '-',
+  'D',
+  'U',
+  'D',
+  'U',
+  'D',
+  'U',
+  '-',
+  'U',
+  '-',
+  'U',
+  'D',
+  'U',
+];
 // 6/8 patterns (6 slots): strum the two dotted-quarter pulses, with a lilt.
 export const EASY_PATTERN_68: StrumPattern = ['D', '-', '-', 'D', '-', '-'];
 export const ADVANCED_PATTERN_68: StrumPattern = ['D', '-', 'U', 'D', '-', 'U'];
@@ -187,7 +208,7 @@ export const SONGS: readonly Song[] = [
     sound: 'acoustic_guitar_steel',
     difficulty: 1,
     easy: {bpm: 122, pattern: EASY_PATTERN, bars: horseEasy},
-    advanced: {bpm: 122, pattern: ADVANCED_PATTERN, bars: horseAdvanced},
+    advanced: {bpm: 122, pattern: HORSE_PATTERN, bars: horseAdvanced},
   },
   {
     name: 'Sweet Home Alabama — Lynyrd Skynyrd',

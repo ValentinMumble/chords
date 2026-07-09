@@ -113,7 +113,7 @@ export function Transport({
         pick={pick}
         playing={playing}
         subdivision={meter.subdivision}
-        barSeconds={(meter.beats * 60) / bpm}
+        sweepSeconds={((pick ?? pattern).length * 60) / (bpm * meter.subdivision)}
       />
     </div>
   );

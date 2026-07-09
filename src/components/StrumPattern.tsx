@@ -6,7 +6,9 @@ interface StrumPatternProps {
   pick?: PickPattern;
   playing: boolean;
   subdivision: number;
-  barSeconds: number;
+  // Time for the playhead to sweep the whole grid — the full pattern's duration,
+  // which is one bar for a bar-length pattern but more for a multi-bar one.
+  sweepSeconds: number;
 }
 
 // Beat label under each slot: simple meters count "1 & 2 & …"; compound meters
@@ -16,7 +18,7 @@ function slotLabel(index: number, subdivision: number): string {
   return String(index + 1);
 }
 
-export function StrumPattern({pattern, pick, playing, subdivision, barSeconds}: StrumPatternProps) {
+export function StrumPattern({pattern, pick, playing, subdivision, sweepSeconds}: StrumPatternProps) {
   const picking = pick !== undefined;
   const slots = pick ?? pattern;
   return (
@@ -24,7 +26,7 @@ export function StrumPattern({pattern, pick, playing, subdivision, barSeconds}: 
       <span className={styles.label}>{picking ? 'Pick' : 'Strum'}</span>
       <div className={styles.grid}>
         {playing && (
-          <span className={styles.playhead} style={{animationDuration: `${barSeconds}s`}} aria-hidden="true" />
+          <span className={styles.playhead} style={{animationDuration: `${sweepSeconds}s`}} aria-hidden="true" />
         )}
         {slots.map((slot, index) => {
           if (picking) {
