@@ -27,26 +27,29 @@ export const ADVANCED_PATTERN: StrumPattern = ['D', '-', 'D', 'U', '-', 'U', 'D'
 export const DRIVING_PATTERN: StrumPattern = ['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']; // eighth-note rock chug
 export const BALLAD_PATTERN: StrumPattern = ['D', '-', '-', '-', 'D', '-', 'U', '-']; // sparse and gentle
 export const ANTHEM_PATTERN: StrumPattern = ['D', '-', 'D', 'U', 'D', '-', 'D', 'U']; // strong, with up-strokes
-// A Horse with No Name: "D D DUDUDU U UDU" (spaces = rests) — one continuous
-// two-bar pattern, so on the eighth grid its 16 slots span both chords: Em gets
-// the first bar (slots 0-7), D6/9 the second (slots 8-15).
+// A Horse with No Name — a two-bar strum, one chord per bar (Em then D6/9), so
+// its 16 eighth-note slots span both chords. Per chord:
+//   Em:  E down up  E up down up   → D D U D U D U ·
+//   F#:  F# up slap up down up down up → D U · U D U D U
+// The app only strums whole chords, so the bass root (E/F#) is mapped to a down,
+// and the slap becomes a rest (there's no percussive/muted stroke).
 export const HORSE_PATTERN: StrumPattern = [
   'D',
-  '-',
-  'D',
-  '-',
   'D',
   'U',
   'D',
   'U',
   'D',
   'U',
-  '-',
+  '-', // Em bar
+  'D',
   'U',
   '-',
   'U',
   'D',
   'U',
+  'D',
+  'U', // F# (D6/9) bar
 ];
 // 6/8 patterns (6 slots): strum the two dotted-quarter pulses, with a lilt.
 export const EASY_PATTERN_68: StrumPattern = ['D', '-', '-', 'D', '-', '-'];
@@ -132,13 +135,9 @@ const wonderwallAdvanced = bars([
   ['Dsus4', 4],
   ['A7sus4', 4],
 ]);
-const horseEasy = bars([
-  ['Em', 4],
-  ['D', 4],
-  ['Em', 4],
-  ['D', 4],
-]);
-const horseAdvanced = bars([
+// Horse is only two chords: Em and D6/9 (the F# one) — the same for both levels,
+// which differ only in the strum. (D6/9 is an easy shape, close to Em.)
+const horse = bars([
   ['Em', 4],
   ['D6/9', 4],
   ['Em', 4],
@@ -207,8 +206,8 @@ export const SONGS: readonly Song[] = [
     name: 'A Horse with No Name — America',
     sound: 'acoustic_guitar_steel',
     difficulty: 1,
-    easy: {bpm: 122, pattern: EASY_PATTERN, bars: horseEasy},
-    advanced: {bpm: 122, pattern: HORSE_PATTERN, bars: horseAdvanced},
+    easy: {bpm: 122, pattern: EASY_PATTERN, bars: horse},
+    advanced: {bpm: 122, pattern: HORSE_PATTERN, bars: horse},
   },
   {
     name: 'Sweet Home Alabama — Lynyrd Skynyrd',
