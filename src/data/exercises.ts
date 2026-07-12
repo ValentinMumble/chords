@@ -42,6 +42,25 @@ function peterGunnBars(): Col[][] {
 export const PETER_GUNN = peterGunnBars();
 export const CHROMATIC = [...chromaticBars(false), ...chromaticBars(true)];
 
+// Staircase finger-independence drill: within the same shifting four-fret box as
+// the chromatic walk (one fret higher per string), each string plays all four
+// notes — the odd fingers (1 & 3) then the even fingers (2 & 4) on that same
+// string — before moving up. Finger n frets baseFret + (n-1). Coming back down
+// mirrors it: strings high-to-low, fingers 4·2·3·1.
+function staircaseBars(descending: boolean): Col[][] {
+  const strings = descending ? [5, 4, 3, 2, 1, 0] : [0, 1, 2, 3, 4, 5];
+  const fingers = descending ? [4, 2, 3, 1] : [1, 3, 2, 4];
+  return strings.map(physicalString => {
+    const baseFret = physicalString + 1;
+    return fingers.map(finger => {
+      const column: Col = [null, null, null, null, null, null];
+      column[5 - physicalString] = {fret: baseFret + (finger - 1), finger};
+      return column;
+    });
+  });
+}
+export const STAIRCASE = [...staircaseBars(false), ...staircaseBars(true)];
+
 // The full fingerpicked intro (Am · E/G# · C · D/F# · Fmaj7 · G/B …), 16 bars.
 export const STAIRWAY = [
   ...parseTab([
@@ -124,6 +143,31 @@ export const FOREST = parseSpacedTab(
     {row: 4, text: 'A|0---0--0--0-----|0---0--0--0-----|0---0--0--0--0--0--0--0--0--|'},
   ],
   FOREST_FINGER,
+);
+
+// A Forest — the driving double-stop riff that follows the intro and runs under
+// most of the song: each bar is one two-note stop hit as eight even eighths, in
+// a 3+3+2 feel (accent beats 1·4·7). The A0/D2 vamp holds, then it climbs and
+// falls. Each entry is [low string row, low fret, high string row, high fret]
+// with rows 3 = D, 4 = A, 5 = E.
+const FOREST_RIFF_STOPS: [number, number, number, number][] = [
+  [4, 0, 3, 2], // A0 + D2 — the vamp under most of the song
+  [4, 2, 3, 4], // A2 + D4
+  [4, 3, 3, 5], // A3 + D5
+  [5, 2, 4, 4], // E2 + A4
+  [4, 3, 3, 5], // A3 + D5
+  [4, 2, 3, 4], // A2 + D4
+  [4, 3, 3, 5], // A3 + D5
+  [5, 2, 4, 4], // E2 + A4
+  [5, 1, 4, 3], // E1 + A3
+];
+export const FOREST_RIFF: Col[][] = FOREST_RIFF_STOPS.map(([loRow, loFret, hiRow, hiFret]) =>
+  Array.from({length: 8}, () => {
+    const column: Col = [null, null, null, null, null, null];
+    column[loRow] = {fret: loFret};
+    column[hiRow] = {fret: hiFret};
+    return column;
+  }),
 );
 
 // Fingering for the Dust shapes, keyed by "row,fret" (row 0 = high e … 5 = low

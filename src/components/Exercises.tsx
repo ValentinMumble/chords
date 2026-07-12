@@ -1,5 +1,14 @@
 import {PlayableTab} from './PlayableTab';
-import {PETER_GUNN, CHROMATIC, FOREST, STAIRWAY, STAIRWAY_CHORDS, DUST} from '../data/exercises';
+import {
+  PETER_GUNN,
+  CHROMATIC,
+  STAIRCASE,
+  FOREST,
+  FOREST_RIFF,
+  STAIRWAY,
+  STAIRWAY_CHORDS,
+  DUST,
+} from '../data/exercises';
 
 export function Exercises({
   activeTab,
@@ -39,6 +48,18 @@ export function Exercises({
           caption="Up, then back down"
           {...shared}
         />
+        <p className="exercise-note">
+          A staircase, four notes per string: the odd fingers (1 · 3) then the even ones (2 · 4) on the same string,
+          before moving up a fret to the next string — then reverse back down (4 · 2 · 3 · 1).
+        </p>
+        <PlayableTab
+          bars={STAIRCASE}
+          storageKey="staircase-3"
+          defaultTempo={90}
+          barsPerRow={6}
+          caption="On each string 1·3 then 2·4 — up, then back down"
+          {...shared}
+        />
       </section>
 
       <section className="exercise">
@@ -55,6 +76,22 @@ export function Exercises({
           barsPerRow={2}
           firstBar={1}
           caption="Intro in Am — open-A bass alternating with the melody"
+          {...shared}
+        />
+        <p className="exercise-note">
+          The driving double-stop riff after the intro. Each shape is hit as eight even eighths in a{' '}
+          <strong>3+3+2 feel</strong> — accent beats 1, 4 and 7. The A0/D2 vamp runs through most of the song, then it
+          climbs and falls.
+        </p>
+        <PlayableTab
+          bars={FOREST_RIFF}
+          storageKey="a-forest-riff"
+          defaultTempo={120}
+          minTempo={20}
+          subdiv={2}
+          barsPerRow={3}
+          firstBar={1}
+          caption="Two-note stops — let them ring, dig into the accents"
           {...shared}
         />
       </section>
