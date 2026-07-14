@@ -20,6 +20,7 @@ export function PlayableTab({
   minTempo = 40,
   subdiv = 1,
   evenNotes = false,
+  showRhythm = false,
   ...blockProps
 }: {
   bars: Col[][];
@@ -30,6 +31,7 @@ export function PlayableTab({
   minTempo?: number;
   subdiv?: number;
   evenNotes?: boolean;
+  showRhythm?: boolean;
   caption?: string;
   barsPerRow?: number;
   chords?: (string | null)[];
@@ -73,7 +75,13 @@ export function PlayableTab({
           <span className={styles.tempoValue}>{tempo} bpm</span>
         </label>
       </div>
-      <TabBlock bars={bars} playingCol={playing ? column : -1} {...blockProps} />
+      <TabBlock
+        bars={bars}
+        playingCol={playing ? column : -1}
+        subdiv={subdiv}
+        showRhythm={showRhythm}
+        {...blockProps}
+      />
     </div>
   );
 }

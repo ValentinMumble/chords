@@ -1,3 +1,4 @@
+import type {ReactNode} from 'react';
 import {FINGER_COLORS} from '../chords';
 import {STRING_LABELS} from '../tuning';
 import type {Col} from '../tab';
@@ -25,24 +26,30 @@ function TabStaff({
   chords,
   firstBar,
   activeCol,
+  subdiv = 1,
+  showRhythm = false,
 }: {
   bars: Col[][];
   chords?: (string | null)[];
   firstBar?: number;
   // Index (within this staff's columns) of the column the playhead is on, or -1.
   activeCol?: number;
+  // Grid columns per beat — used to work out each note's length for the rhythm lane.
+  subdiv?: number;
+  // Draw note-value stems (quarter/eighth/sixteenth) below the staff, like a real tab.
+  showRhythm?: boolean;
 }) {
   const totalCols = bars.reduce((sum, bar) => sum + bar.length, 0);
   const available = VIEW_W - PAD_LEFT - PAD_RIGHT;
   const colW = (available - bars.length * BAR_GAP) / Math.max(totalCols, 1);
-  const columns: {col: Col; x: number}[] = [];
+  const columns: {col: Col; x: number; bar: number; colInBar: number}[] = [];
   const barLines: number[] = [];
   let cursor = PAD_LEFT;
-  bars.forEach(bar => {
+  bars.forEach((bar, barIndex) => {
     barLines.push(cursor + BAR_GAP / 2);
     cursor += BAR_GAP;
-    bar.forEach(col => {
-      columns.push({col, x: cursor + colW / 2});
+    bar.forEach((col, colInBar) => {
+      columns.push({col, x: cursor + colW / 2, bar: barIndex, colInBar});
       cursor += colW;
     });
   });
@@ -53,7 +60,7 @@ function TabStaff({
   const hasHeader = firstBar !== undefined || !!chords?.some(Boolean);
   const headerH = hasHeader ? 26 : 0;
   const stringY = (row: number) => PAD_TOP + headerH + row * ROW_H;
-  const height = stringY(5) + PAD_BOTTOM;
+  const height = stringY(5) + PAD_BOTTOM + (showRhythm ? 30 : 0);
 
   return (
     <svg className={styles.staff} viewBox={`0 0 ${VIEW_W} ${height}`} role="img" aria-label="Guitar tab">
@@ -153,6 +160,73 @@ function TabStaff({
           );
         }),
       )}
+      {showRhythm &&
+        (() => {
+          const top = stringY(5) + 16;
+          const stemBottom = top + 13;
+          const beamGap = 3.5;
+          // Sounding columns with their explicit note length (beats) and which
+          // beat of the bar they fall on, so eighths/sixteenths beam within a beat.
+          const notes = columns
+            .filter(entry => entry.col.some(Boolean))
+            .map(entry => {
+              const beats = entry.col.find(cell => cell?.beats)?.beats ?? 1;
+              return {x: entry.x, bar: entry.bar, beat: Math.floor(entry.colInBar / subdiv), beats};
+            });
+          const flagsOf = (beats: number) =>
+            beats >= 1 ? 0 : Math.max(1, Math.min(2, Math.round(Math.log2(1 / beats))));
+          const marks: ReactNode[] = notes.map((note, i) => (
+            <g key={`stem-${i}`} stroke="var(--muted)" strokeWidth={1}>
+              <circle cx={note.x} cy={top} r={2.3} fill="var(--muted)" stroke="none" />
+              <line x1={note.x} y1={top} x2={note.x} y2={stemBottom} />
+            </g>
+          ));
+          // Beams: for each level, join runs of consecutive notes in the same beat.
+          for (let level = 1; level <= 2; level += 1) {
+            const y = stemBottom - (level - 1) * beamGap;
+            let i = 0;
+            while (i < notes.length) {
+              if (flagsOf(notes[i].beats) < level) {
+                i += 1;
+                continue;
+              }
+              let j = i;
+              while (
+                j + 1 < notes.length &&
+                notes[j + 1].bar === notes[i].bar &&
+                notes[j + 1].beat === notes[i].beat &&
+                flagsOf(notes[j + 1].beats) >= level
+              ) {
+                j += 1;
+              }
+              marks.push(
+                j > i ? (
+                  <line
+                    key={`beam-${level}-${i}`}
+                    x1={notes[i].x}
+                    y1={y}
+                    x2={notes[j].x}
+                    y2={y}
+                    stroke="var(--muted)"
+                    strokeWidth={2}
+                  />
+                ) : (
+                  <line
+                    key={`flag-${level}-${i}`}
+                    x1={notes[i].x}
+                    y1={y}
+                    x2={notes[i].x + 5}
+                    y2={y - 3.5}
+                    stroke="var(--muted)"
+                    strokeWidth={1.4}
+                  />
+                ),
+              );
+              i = j + 1;
+            }
+          }
+          return marks;
+        })()}
     </svg>
   );
 }
@@ -166,6 +240,8 @@ export function TabBlock({
   chords,
   firstBar,
   playingCol,
+  subdiv,
+  showRhythm,
 }: {
   bars: Col[][];
   caption?: string;
@@ -174,6 +250,8 @@ export function TabBlock({
   firstBar?: number;
   // Playhead position as a column index across all of `bars`, or -1/undefined.
   playingCol?: number;
+  subdiv?: number;
+  showRhythm?: boolean;
 }) {
   const perRow = barsPerRow ?? bars.length;
   const rows: {bars: Col[][]; chords?: (string | null)[]; start?: number; colOffset: number}[] = [];
@@ -201,6 +279,8 @@ export function TabBlock({
               chords={row.chords}
               firstBar={row.start}
               activeCol={local >= 0 && local < rowCols ? local : -1}
+              subdiv={subdiv}
+              showRhythm={showRhythm}
             />
           </div>
         );

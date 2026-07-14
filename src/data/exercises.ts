@@ -1,4 +1,4 @@
-import {parseTab, parseSpacedTab, type Col} from '../tab';
+import {parseTab, parseSpacedTab, applyRhythm, type Col} from '../tab';
 
 // The chromatic finger exercise: low E at fret 1 with fingers 1-2-3-4, then each
 // higher string starts one fret higher, up to the high E with finger 4 on fret
@@ -37,10 +37,14 @@ function peterGunnBars(): Col[][] {
   return [bar, bar];
 }
 
+// Tag every note as an even eighth (0.5 beat) on a two-per-beat grid, so the
+// rhythm lane can draw and beam them. Used by the drills and the even arpeggios.
+const evenEighths = (bars: Col[][]): Col[][] => applyRhythm(bars, () => [0.5], 2);
+
 // Computed once at module load (stable references), so switching to Practice and
 // re-renders don't rebuild these arrays or the tabs derived from them.
-export const PETER_GUNN = peterGunnBars();
-export const CHROMATIC = [...chromaticBars(false), ...chromaticBars(true)];
+export const PETER_GUNN = evenEighths(peterGunnBars());
+export const CHROMATIC = evenEighths([...chromaticBars(false), ...chromaticBars(true)]);
 
 // Staircase finger-independence drill: within the same shifting four-fret box as
 // the chromatic walk (one fret higher per string), each string plays all four
@@ -59,10 +63,11 @@ function staircaseBars(descending: boolean): Col[][] {
     });
   });
 }
-export const STAIRCASE = [...staircaseBars(false), ...staircaseBars(true)];
+export const STAIRCASE = evenEighths([...staircaseBars(false), ...staircaseBars(true)]);
 
-// The full fingerpicked intro (Am · E/G# · C · D/F# · Fmaj7 · G/B …), 16 bars.
-export const STAIRWAY = [
+// The full fingerpicked intro (Am · E/G# · C · D/F# · Fmaj7 · G/B …), 16 bars —
+// a flowing even-eighth arpeggio, re-gridded so the notes beam in pairs.
+export const STAIRWAY = evenEighths([
   ...parseTab([
     'E||-----------5--7------------7--|--8---------8--2----------2--|--0---------------0--------|',
     'B||--------5------------5--------|------5-------------3--------|------1-----1--------1-----|',
@@ -111,7 +116,7 @@ export const STAIRWAY = [
     '|-----------------------|',
     '|-----------------------|',
   ]),
-];
+]);
 // Chord above each of the 16 bars (the downbeat chord).
 export const STAIRWAY_CHORDS = [
   'Am',
@@ -161,13 +166,15 @@ const FOREST_RIFF_STOPS: [number, number, number, number][] = [
   [5, 2, 4, 4], // E2 + A4
   [5, 1, 4, 3], // E1 + A3
 ];
-export const FOREST_RIFF: Col[][] = FOREST_RIFF_STOPS.map(([loRow, loFret, hiRow, hiFret]) =>
-  Array.from({length: 8}, () => {
-    const column: Col = [null, null, null, null, null, null];
-    column[loRow] = {fret: loFret};
-    column[hiRow] = {fret: hiFret};
-    return column;
-  }),
+export const FOREST_RIFF: Col[][] = evenEighths(
+  FOREST_RIFF_STOPS.map(([loRow, loFret, hiRow, hiFret]) =>
+    Array.from({length: 8}, () => {
+      const column: Col = [null, null, null, null, null, null];
+      column[loRow] = {fret: loFret};
+      column[hiRow] = {fret: hiFret};
+      return column;
+    }),
+  ),
 );
 
 // Fingering for the Dust shapes, keyed by "row,fret" (row 0 = high e … 5 = low
@@ -195,41 +202,49 @@ function colorByFret(bars: Col[][], fingers: Record<string, number>): Col[][] {
 
 // Dust in the Wind — Kansas (intro): one Travis-picking figure the whole way,
 // just moving the chord shape (C · Cmaj7 · Cadd9 · C, then the A variations),
-// the thumb keeping an alternating bass. 16 bars of standard-aligned tab.
-export const DUST = colorByFret(
-  [
-    ...parseTab([
-      'e|-----------------|-----------------|-----------------|-----------------|',
-      'B|-1---------1-----|-0---------0-----|-3---------3-----|-1---------1-----|',
-      'G|-------0-------0-|-------0-------0-|-------0-------0-|-------0-------0-|',
-      'D|-----2-------2---|-----2-------2---|-----2-------2---|-----2-------2---|',
-      'A|-3-------3-------|-3-------3-------|-3-------3-------|-3-------3-------|',
-      'E|-----------------|-----------------|-----------------|-----------------|',
-    ]),
-    ...parseTab([
-      'e|-----------------|-----------------|-----------------|-----------------|',
-      'B|-0---------0-----|-3---------3-----|-1---------1-----|-0---------0-----|',
-      'G|-------2-------2-|-------2-------2-|-------2-------2-|-------2-------2-|',
-      'D|-----2-------2---|-----2-------2---|-----2-------2---|-----2-------2---|',
-      'A|-0-------0-------|-0-------0-------|-0-------0-------|-0-------0-------|',
-      'E|-----------------|-----------------|-----------------|-----------------|',
-    ]),
-    ...parseTab([
-      'e|-----------------|-----------------|-----------------|-----------------|',
-      'B|-3---------3-----|-1---------1-----|-0---------0-----|-3---------3-----|',
-      'G|-------0-------0-|-------0-------0-|-------0-------0-|-------0-------0-|',
-      'D|-----2-------2---|-----2-------2---|-----2-------2---|-----2-------2---|',
-      'A|-3-------3-------|-3-------3-------|-3-------3-------|-3-------3-------|',
-      'E|-----------------|-----------------|-----------------|-----------------|',
-    ]),
-    ...parseTab([
-      'e|-----------------|-----------------|-----------------|-----------------|',
-      'B|-1---------1-----|-0---------0-----|-3---------3-----|-1-------1---3---|',
-      'G|-------2-------2-|-------2-------2-|-------2-------2-|-------2---------|',
-      'D|-----2-------2---|-----2-------2---|-----2-------2---|-----2-----------|',
-      'A|-0-------0-------|-0-------0-------|-0-------0-------|-0-------0---2---|',
-      'E|-----------------|-----------------|-----------------|-----------------|',
-    ]),
-  ],
-  DUST_FINGERS,
+// the thumb keeping an alternating bass. 16 bars of standard-aligned tab, given
+// an explicit rhythm: each bar is a quarter-note pinch then six eighths, except
+// the last bar (a quarter, two eighths, then two quarters walking down).
+const DUST_BAR_RHYTHM = [1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5];
+const DUST_LAST_RHYTHM = [1, 0.5, 0.5, 1, 1];
+export const DUST = applyRhythm(
+  colorByFret(
+    [
+      ...parseTab([
+        'e|-----------------|-----------------|-----------------|-----------------|',
+        'B|-1---------1-----|-0---------0-----|-3---------3-----|-1---------1-----|',
+        'G|-------0-------0-|-------0-------0-|-------0-------0-|-------0-------0-|',
+        'D|-----2-------2---|-----2-------2---|-----2-------2---|-----2-------2---|',
+        'A|-3-------3-------|-3-------3-------|-3-------3-------|-3-------3-------|',
+        'E|-----------------|-----------------|-----------------|-----------------|',
+      ]),
+      ...parseTab([
+        'e|-----------------|-----------------|-----------------|-----------------|',
+        'B|-0---------0-----|-3---------3-----|-1---------1-----|-0---------0-----|',
+        'G|-------2-------2-|-------2-------2-|-------2-------2-|-------2-------2-|',
+        'D|-----2-------2---|-----2-------2---|-----2-------2---|-----2-------2---|',
+        'A|-0-------0-------|-0-------0-------|-0-------0-------|-0-------0-------|',
+        'E|-----------------|-----------------|-----------------|-----------------|',
+      ]),
+      ...parseTab([
+        'e|-----------------|-----------------|-----------------|-----------------|',
+        'B|-3---------3-----|-1---------1-----|-0---------0-----|-3---------3-----|',
+        'G|-------0-------0-|-------0-------0-|-------0-------0-|-------0-------0-|',
+        'D|-----2-------2---|-----2-------2---|-----2-------2---|-----2-------2---|',
+        'A|-3-------3-------|-3-------3-------|-3-------3-------|-3-------3-------|',
+        'E|-----------------|-----------------|-----------------|-----------------|',
+      ]),
+      ...parseTab([
+        'e|-----------------|-----------------|-----------------|-----------------|',
+        'B|-1---------1-----|-0---------0-----|-3---------3-----|-1-------1---3---|',
+        'G|-------2-------2-|-------2-------2-|-------2-------2-|-------2---------|',
+        'D|-----2-------2---|-----2-------2---|-----2-------2---|-----2-----------|',
+        'A|-0-------0-------|-0-------0-------|-0-------0-------|-0-------0---2---|',
+        'E|-----------------|-----------------|-----------------|-----------------|',
+      ]),
+    ],
+    DUST_FINGERS,
+  ),
+  barIndex => (barIndex === 15 ? DUST_LAST_RHYTHM : DUST_BAR_RHYTHM),
+  4,
 );

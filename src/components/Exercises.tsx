@@ -48,8 +48,10 @@ export function Exercises({
       <CollapsibleExercise id="peter-gunn" title="Peter Gunn — riff drill">
         <PlayableTab
           bars={PETER_GUNN}
-          storageKey="peter-gunn"
-          defaultTempo={130}
+          storageKey="peter-gunn-2"
+          defaultTempo={65}
+          subdiv={2}
+          showRhythm
           barsPerRow={2}
           caption="On the low E, played twice — then run the same shape up each string"
           {...shared}
@@ -63,8 +65,10 @@ export function Exercises({
         </p>
         <PlayableTab
           bars={CHROMATIC}
-          storageKey="chromatic"
-          defaultTempo={90}
+          storageKey="chromatic-2"
+          defaultTempo={45}
+          subdiv={2}
+          showRhythm
           barsPerRow={6}
           caption="Up, then back down"
           {...shared}
@@ -75,8 +79,10 @@ export function Exercises({
         </p>
         <PlayableTab
           bars={STAIRCASE}
-          storageKey="staircase-3"
-          defaultTempo={90}
+          storageKey="staircase-4"
+          defaultTempo={45}
+          subdiv={2}
+          showRhythm
           barsPerRow={6}
           caption="On each string 1·3 then 2·4 — up, then back down"
           {...shared}
@@ -104,6 +110,7 @@ export function Exercises({
           defaultTempo={120}
           minTempo={20}
           subdiv={2}
+          showRhythm
           barsPerRow={3}
           firstBar={1}
           caption="Two-note stops — let them ring, dig into the accents"
@@ -121,7 +128,7 @@ export function Exercises({
           storageKey="stairway-2"
           defaultTempo={72}
           subdiv={2}
-          evenNotes
+          showRhythm
           barsPerRow={2}
           chords={STAIRWAY_CHORDS}
           firstBar={1}
@@ -139,6 +146,7 @@ export function Exercises({
           storageKey="dust-2"
           defaultTempo={170}
           subdiv={4}
+          showRhythm
           barsPerRow={4}
           firstBar={1}
           {...shared}

@@ -3,9 +3,10 @@
 // component importing from another component.
 
 // A note on the tab: the fret, the finger (1-4) that plays it (for colour
-// coding, like the chord diagram), and `slur` = it connects to the next note on
-// the same string (hammer-on / pull-off / slide).
-export type Cell = {fret: number; finger?: number; slur?: boolean} | null;
+// coding, like the chord diagram), `slur` = it connects to the next note on the
+// same string (hammer-on / pull-off / slide), and `beats` = its explicit note
+// length in beats (0.25 sixteenth, 0.5 eighth, 1 quarter …) for the rhythm lane.
+export type Cell = {fret: number; finger?: number; slur?: boolean; beats?: number} | null;
 
 // A column is one time-slot across the six strings, high E first (index 0) to
 // low E (index 5); null means that string isn't played on that slot.
@@ -98,4 +99,24 @@ export function parseSpacedTab(
     bars.push(columns);
   }
   return bars;
+}
+
+// Re-grid a tab onto an explicit note-value rhythm. `rhythmFor(barIndex)` returns
+// the length in beats of each sounding attack in that bar (0.5 = eighth, 1 =
+// quarter …). Each attack becomes one column tagged with `beats`, followed by
+// enough rest columns to fill its length on a `subdiv`-per-beat grid — so the
+// grid is beat-aligned and the rhythm lane can draw exact, beamed note values.
+// Rest columns in the input are dropped (the rhythm defines the spacing now).
+export function applyRhythm(bars: Col[][], rhythmFor: (barIndex: number) => number[], subdiv: number): Col[][] {
+  return bars.map((bar, barIndex) => {
+    const rhythm = rhythmFor(barIndex);
+    const attacks = bar.filter(column => column.some(Boolean));
+    return attacks.flatMap((column, index) => {
+      const beats = rhythm[index] ?? rhythm[rhythm.length - 1] ?? 1;
+      const width = Math.max(1, Math.round(beats * subdiv));
+      const first: Col = column.map(cell => (cell ? {...cell, beats} : null));
+      const rests: Col[] = Array.from({length: width - 1}, emptyColumn);
+      return [first, ...rests];
+    });
+  });
 }
