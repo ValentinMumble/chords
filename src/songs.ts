@@ -28,28 +28,28 @@ export const DRIVING_PATTERN: StrumPattern = ['D', 'D', 'D', 'D', 'D', 'D', 'D',
 export const BALLAD_PATTERN: StrumPattern = ['D', '-', '-', '-', 'D', '-', 'U', '-']; // sparse and gentle
 export const ANTHEM_PATTERN: StrumPattern = ['D', '-', 'D', 'U', 'D', '-', 'D', 'U']; // strong, with up-strokes
 // A Horse with No Name — a two-bar strum, one chord per bar (Em then D6/9), so
-// its 16 eighth-note slots span both chords. Per chord:
-//   Em:  E down up  E up down up   → D D U D U D U ·
-//   F#:  F# up slap up down up down up → D U · U D U D U
-// The app only strums whole chords, so the bass root (E/F#) is mapped to a down,
-// and the slap becomes a rest (there's no percussive/muted stroke).
+// its 16 eighth-note slots span both chords. Downs fall on the beats, ups on the
+// offbeats; the written strokes land on that motion. Per chord:
+//   Em:  D d u u d u    → D · D U · U D U   (the classic D-DU-UDU)
+//   F#:  D u x u u d u  → D U · U · U D U   (x is a muted chuck)
+// The 'x' becomes a rest — the engine has no muted/percussive stroke.
 export const HORSE_PATTERN: StrumPattern = [
   'D',
-  'D',
-  'U',
-  'D',
-  'U',
-  'D',
-  'U',
-  '-', // Em bar
+  '-',
   'D',
   'U',
   '-',
   'U',
   'D',
+  'U', // Em bar
+  'D',
+  'U',
+  '-',
+  'U',
+  '-',
   'U',
   'D',
-  'U', // F# (D6/9) bar
+  'U', // F# (D6/9) bar — x → rest at slot 2
 ];
 // 6/8 patterns (6 slots): strum the two dotted-quarter pulses, with a lilt.
 export const EASY_PATTERN_68: StrumPattern = ['D', '-', '-', 'D', '-', '-'];

@@ -64,6 +64,35 @@ h2 {
   font-size: 18px;
   font-weight: 500;
 }
+/* The card header doubles as a collapse toggle. */
+.exercise-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: 0 0 0.6rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.exercise-toggle.collapsed {
+  margin: 0;
+}
+.exercise-toggle h2 {
+  margin: 0;
+}
+.exercise-caret {
+  flex-shrink: 0;
+  width: 12px;
+  font-size: 11px;
+  color: var(--faint);
+}
+.exercise-toggle:hover .exercise-caret {
+  color: var(--accent);
+}
 .exercise-note {
   margin: 0 0 1.25rem;
   font-size: 14px;
