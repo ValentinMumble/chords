@@ -1,4 +1,3 @@
-import {useEffect, useState} from 'react';
 import {currentTime, pluckMidi, pluckTab} from '../audio';
 import {usePersistedState} from '../hooks/usePersistedState';
 // OPEN_PC / STRING_LABELS are high-e first (row 0), the row order pluckTab uses.
@@ -23,8 +22,8 @@ const SCALES: Scale[] = [
   {key: 'blues', name: 'Blues', intervals: [0, 3, 5, 6, 7, 10]},
 ];
 
-// A single movable box: SPAN frets shown at a time.
-const SPAN = 5;
+// A single movable box: SPAN frets shown at a time (first position, frets 1-3).
+const SPAN = 3;
 const MAX_START = 12;
 const VIEW_W = 380;
 const NUT_X = 46;
@@ -37,19 +36,15 @@ const DOT_R = 12;
 const INLAY_FRETS = [3, 5, 7, 9, 12, 15, 17];
 
 export function Scales() {
-  const [root, setRoot] = usePersistedState('scales:root', 9); // A by default
-  const [scaleKey, setScaleKey] = usePersistedState('scales:scale', 'minor-pent');
+  const [root, setRoot] = usePersistedState('scales:root2', 0); // Do (C) by default
+  const [scaleKey, setScaleKey] = usePersistedState('scales:scale2', 'major');
   const scale = SCALES.find(entry => entry.key === scaleKey) ?? SCALES[0];
 
   const inScale = new Set(scale.intervals.map(interval => (root + interval) % 12));
 
-  // Home the box on the root's position on the low-E string, re-homing when the
-  // root changes; the arrows then shift it freely up and down the neck.
-  const homeFret = (((root - OPEN_PC[5]) % 12) + 12) % 12;
-  const [startFret, setStartFret] = useState(homeFret);
-  useEffect(() => {
-    setStartFret(homeFret);
-  }, [homeFret]);
+  // Which frets the box shows — persisted, starting at the nut (frets 1-3) so Do
+  // majeur reads in first position. The arrows shift it up and down the neck.
+  const [startFret, setStartFret] = usePersistedState('scales:start', 0);
 
   const stringY = (row: number) => TOP_Y + row * STRING_GAP;
   // A window index of 1..SPAN maps to a fret just right of the (index-1)th wire.
@@ -92,7 +87,7 @@ export function Scales() {
           <div className={styles.field}>
             <span className={styles.label}>Root</span>
             <div className={styles.rootGrid}>
-              {PITCH_CLASSES.map((name, pc) => (
+              {FRENCH.map((name, pc) => (
                 <button
                   key={pc}
                   className={`${styles.rootBtn}${pc === root ? ' ' + styles.active : ''}`}
@@ -120,8 +115,8 @@ export function Scales() {
         </div>
 
         <p className={styles.title}>
-          {PITCH_CLASSES[root]} {scale.name}
-          <span className={styles.french}> · {FRENCH[root]}</span>
+          {FRENCH[root]} {scale.name}
+          <span className={styles.french}> · {PITCH_CLASSES[root]}</span>
         </p>
 
         <div className={styles.position}>
@@ -219,7 +214,7 @@ export function Scales() {
                   className={styles.note}
                   onClick={() => pluckTab(row, fret, currentTime() + 0.02, 0.8)}
                   role="button"
-                  aria-label={`${PITCH_CLASSES[pc]} on string ${STRING_LABELS[row]}, fret ${fret}`}
+                  aria-label={`${FRENCH[pc]} on string ${STRING_LABELS[row]}, fret ${fret}`}
                 >
                   <circle
                     cx={cx}
@@ -238,7 +233,7 @@ export function Scales() {
                     fontWeight={600}
                     fill={isRoot ? '#fff' : 'var(--accent)'}
                   >
-                    {isRoot ? 'R' : PITCH_CLASSES[pc]}
+                    {FRENCH[pc]}
                   </text>
                 </g>
               );
@@ -246,8 +241,9 @@ export function Scales() {
           </svg>
         </div>
         <p className="exercise-note">
-          One box position at a time. Filled dot = root (<strong>R</strong>). Use the arrows to slide the same shape up
-          or down the neck — a new key, same fingering. Tap any note to hear it.
+          One box position at a time — first position, frets 1–3. Note names are in French; the filled dot is the
+          root. Use the arrows to slide the same shape up or down the neck — a new key, same fingering. Tap any note to
+          hear it.
         </p>
       </section>
     </div>
