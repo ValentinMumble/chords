@@ -150,22 +150,21 @@ export const FOREST = parseSpacedTab(
   FOREST_FINGER,
 );
 
-// A Forest — the driving double-stop riff that follows the intro and runs under
-// most of the song: each bar is one two-note stop hit as eight even eighths, in
-// a 3+3+2 feel (accent beats 1·4·7). The A0/D2 vamp holds, then it climbs and
-// falls. Each entry is [low string row, low fret, high string row, high fret]
-// with rows 3 = D, 4 = A, 5 = E.
+// A Forest — the verse and chorus that follow the intro, straight from the song:
+// two-string power chords hit as eight even eighth notes per bar. Verse is
+// A5·C5·F5·D5, chorus is B5·C5·F♯5·C5. Each entry is [low string row, low fret,
+// high string row, high fret] with rows 3 = D, 4 = A, 5 = E.
 const FOREST_RIFF_STOPS: [number, number, number, number][] = [
-  [4, 0, 3, 2], // A0 + D2 — the vamp under most of the song
-  [4, 2, 3, 4], // A2 + D4
-  [4, 3, 3, 5], // A3 + D5
-  [5, 2, 4, 4], // E2 + A4
-  [4, 3, 3, 5], // A3 + D5
-  [4, 2, 3, 4], // A2 + D4
-  [4, 3, 3, 5], // A3 + D5
-  [5, 2, 4, 4], // E2 + A4
-  [5, 1, 4, 3], // E1 + A3
+  [4, 0, 3, 2], // A5 — A0 + D2
+  [4, 3, 3, 5], // C5 — A3 + D5
+  [5, 1, 4, 3], // F5 — E1 + A3
+  [4, 5, 3, 7], // D5 — A5 + D7
+  [4, 2, 3, 4], // B5 — A2 + D4
+  [4, 3, 3, 5], // C5 — A3 + D5
+  [5, 2, 4, 4], // F♯5 — E2 + A4
+  [4, 3, 3, 5], // C5 — A3 + D5
 ];
+export const FOREST_RIFF_CHORDS = ['A5', 'C5', 'F5', 'D5', 'B5', 'C5', 'F♯5', 'C5'];
 export const FOREST_RIFF: Col[][] = evenEighths(
   FOREST_RIFF_STOPS.map(([loRow, loFret, hiRow, hiFret]) =>
     Array.from({length: 8}, () => {

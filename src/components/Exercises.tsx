@@ -7,6 +7,7 @@ import {
   STAIRCASE,
   FOREST,
   FOREST_RIFF,
+  FOREST_RIFF_CHORDS,
   STAIRWAY,
   STAIRWAY_CHORDS,
   DUST,
@@ -106,14 +107,15 @@ export function Exercises({
         />
         <PlayableTab
           bars={FOREST_RIFF}
-          storageKey="a-forest-riff"
-          defaultTempo={120}
+          storageKey="a-forest-riff-2"
+          defaultTempo={160}
           minTempo={20}
           subdiv={2}
           showRhythm
-          barsPerRow={3}
-          firstBar={1}
-          caption="Two-note stops — let them ring, dig into the accents"
+          barsPerRow={4}
+          chords={FOREST_RIFF_CHORDS}
+          firstBar={12}
+          caption="Verses then chorus — palm-muted (P.M.) power chords in straight eighths, down-picked"
           {...shared}
         />
       </CollapsibleExercise>
