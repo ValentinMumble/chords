@@ -65,6 +65,33 @@ function staircaseBars(descending: boolean): Col[][] {
 }
 export const STAIRCASE = evenEighths([...staircaseBars(false), ...staircaseBars(true)]);
 
+// Exercice de dextérité — a finger-independence drill that crosses the low E and
+// A strings with the 1-3-2-4 finger pattern. First half of the bar: low E plays
+// frets k and k+1 (fingers 1·2) against the A string's k+2 and k+3 (fingers 3·4).
+// Second half reverses the strings — fingers 1·2 move to the A string and 3·4 to
+// the low E. Eight even eighths per bar, then the whole shape climbs one fret.
+// Rows 4 = A, 5 = low E; fingers stay 1·3·2·4 throughout.
+function dexterityBars(positions: number): Col[][] {
+  return Array.from({length: positions}, (_unused, index) => {
+    const fret = index + 1; // hand position: bar 1 starts at fret 1, bar 2 at 2 …
+    // low string carries fingers 1·2, high string carries 3·4, interleaved.
+    const half = (lowRow: number, highRow: number) => [
+      {row: lowRow, fret, finger: 1},
+      {row: highRow, fret: fret + 2, finger: 3},
+      {row: lowRow, fret: fret + 1, finger: 2},
+      {row: highRow, fret: fret + 3, finger: 4},
+    ];
+    // first half low E → A, second half flips to A → low E.
+    const notes = [...half(5, 4), ...half(4, 5)];
+    return notes.map(({row, fret: noteFret, finger}) => {
+      const column: Col = [null, null, null, null, null, null];
+      column[row] = {fret: noteFret, finger};
+      return column;
+    });
+  });
+}
+export const DEXTERITY = evenEighths(dexterityBars(4));
+
 // The full fingerpicked intro (Am · E/G# · C · D/F# · Fmaj7 · G/B …), 16 bars —
 // a flowing even-eighth arpeggio, re-gridded so the notes beam in pairs.
 export const STAIRWAY = evenEighths([

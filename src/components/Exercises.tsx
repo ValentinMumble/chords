@@ -5,6 +5,7 @@ import {
   PETER_GUNN,
   CHROMATIC,
   STAIRCASE,
+  DEXTERITY,
   FOREST,
   FOREST_RIFF,
   FOREST_RIFF_CHORDS,
@@ -86,6 +87,24 @@ export function Exercises({
           showRhythm
           barsPerRow={6}
           caption="On each string 1·3 then 2·4 — up, then back down"
+          {...shared}
+        />
+      </CollapsibleExercise>
+
+      <CollapsibleExercise id="dexterity" title="Dexterity exercise">
+        <p className="exercise-note">
+          Finger independence across the low E and A strings, one finger per fret. On each hand position play E frets{' '}
+          <strong>1·2</strong> (fingers 1·2) against A frets <strong>3·4</strong> (fingers 3·4), alternating string to
+          string in a <strong>1·3·2·4</strong> pattern. Slow and even, then shift the whole shape up a fret each bar.
+        </p>
+        <PlayableTab
+          bars={DEXTERITY}
+          storageKey="dexterity"
+          defaultTempo={60}
+          subdiv={2}
+          showRhythm
+          barsPerRow={2}
+          caption="Climbs one fret per bar — keep every note the same length"
           {...shared}
         />
       </CollapsibleExercise>
