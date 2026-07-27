@@ -114,6 +114,33 @@ const standByMe = bars([
   ['D', 4],
   ['G', 8],
 ]);
+// Neil Young, in Em, no capo. Em is home (the verse riff), then a quick C–D
+// passing motion resolves up to G — the "heart of gold" hook — before the chorus
+// tag C–G. Advanced just swaps Em7 for Em for the record's colour.
+const heartOfGoldEasy = bars([
+  ['Em', 4],
+  ['Em', 4],
+  ['C', 2],
+  ['D', 2],
+  ['G', 4],
+  ['C', 2],
+  ['D', 2],
+  ['G', 4],
+  ['C', 4],
+  ['G', 4],
+]);
+const heartOfGoldAdvanced = bars([
+  ['Em7', 4],
+  ['Em7', 4],
+  ['C', 2],
+  ['D', 2],
+  ['G', 4],
+  ['C', 2],
+  ['D', 2],
+  ['G', 4],
+  ['C', 4],
+  ['G', 4],
+]);
 // Easy: basic open chords. Advanced: the song's real, richer voicings.
 const wonderwallEasy = bars([
   ['Em', 4],
@@ -243,6 +270,13 @@ export const SONGS: readonly Song[] = [
     difficulty: 2,
     easy: {bpm: 118, pattern: EASY_PATTERN, bars: standByMe},
     advanced: {bpm: 118, pattern: BALLAD_PATTERN, bars: standByMe},
+  },
+  {
+    name: 'Heart of Gold — Neil Young',
+    sound: 'acoustic_guitar_steel',
+    difficulty: 2,
+    easy: {bpm: 82, pattern: EASY_PATTERN, bars: heartOfGoldEasy},
+    advanced: {bpm: 82, pattern: ADVANCED_PATTERN, bars: heartOfGoldAdvanced},
   },
   {
     name: 'Wonderwall — Oasis',
