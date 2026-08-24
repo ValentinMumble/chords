@@ -12,6 +12,10 @@ import {
   STAIRWAY,
   STAIRWAY_CHORDS,
   DUST,
+  MISS_YOU,
+  MISS_YOU_CHORDS,
+  POLLY,
+  POLLY_CHORDS,
 } from '../data/exercises';
 
 // An exercise card whose open/closed state is remembered per card in localStorage,
@@ -170,6 +174,45 @@ export function Exercises({
           showRhythm
           barsPerRow={4}
           firstBar={1}
+          {...shared}
+        />
+      </CollapsibleExercise>
+
+      <CollapsibleExercise id="miss-you" title="Miss You — The Rolling Stones">
+        <p className="exercise-note">
+          The disco-blues hook in open position, on the G and B strings — one finger per fret (1 · 2 · 3). Two bars
+          over Am sing the "ooh ooh" line, and the Dm7 bar answers — let that last note ring.
+        </p>
+        <PlayableTab
+          bars={MISS_YOU}
+          storageKey="miss-you"
+          defaultTempo={110}
+          subdiv={2}
+          showRhythm
+          barsPerRow={3}
+          chords={MISS_YOU_CHORDS}
+          firstBar={1}
+          caption="The guitar hook — loop it until it swings"
+          {...shared}
+        />
+      </CollapsibleExercise>
+
+      <CollapsibleExercise id="polly" title="Polly — Nirvana">
+        <p className="exercise-note">
+          Power chords, one ringing strum each, two beats apiece. Verse: E5 · G5 · D5 · C5, then the chorus answers
+          with D5 · C5 · G5 · B♭5. Full three-string shapes: index on the root, ring on the fifth, pinky on the
+          octave. Slide the same shape between positions and keep the strums lazy.
+        </p>
+        <PlayableTab
+          bars={POLLY}
+          storageKey="polly"
+          defaultTempo={120}
+          subdiv={2}
+          showRhythm
+          barsPerRow={2}
+          chords={POLLY_CHORDS}
+          firstBar={1}
+          caption="Four chords, one strum each — the whole verse"
           {...shared}
         />
       </CollapsibleExercise>

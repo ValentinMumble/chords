@@ -274,3 +274,66 @@ export const DUST = applyRhythm(
   barIndex => (barIndex === 15 ? DUST_LAST_RHYTHM : DUST_BAR_RHYTHM),
   4,
 );
+
+// Miss You — The Rolling Stones: the guitar hook in open (first) position — the
+// same G·A·D·C melody, on the open G, G2, B3 and B1. Two Am bars sing the
+// "ooh ooh" line — two eighths up, a quarter on the high D, then four eighths
+// falling back — and the Dm7 bar answers it, letting the last note ring.
+const MISS_YOU_RHYTHM = [0.5, 0.5, 1, 0.5, 0.5, 0.5, 0.5];
+const MISS_YOU_LAST_RHYTHM = [0.5, 0.5, 1, 2];
+export const MISS_YOU = applyRhythm(
+  parseSpacedTab(
+    [
+      {row: 1, text: 'B|-----3-1--------|-----3-1--------|------1----|'},
+      {row: 2, text: 'G|-0-2------2-0-2-|-0-2------2-0-2-|-0-2----2--|'},
+    ],
+    {1: 1, 2: 2, 3: 3},
+  ),
+  barIndex => (barIndex === 2 ? MISS_YOU_LAST_RHYTHM : MISS_YOU_RHYTHM),
+  2,
+);
+export const MISS_YOU_CHORDS = ['Am', 'Am', 'Dm7'];
+
+// Polly — Nirvana: the power chords, one ringing strum each, two beats apiece.
+// Verse: E5 · G5 · D5 · C5; chorus ("isn't me…"): D5 · C5 · G5 · B♭5. Full
+// three-string shapes (root, fifth, octave): index root, ring fifth, pinky
+// octave. Two chords per bar, so the loop is verse row then chorus row.
+const POLLY_E5: [number, number][] = [
+  [5, 0],
+  [4, 2],
+  [3, 2],
+]; // open E + A2 + D2
+const POLLY_G5: [number, number][] = [
+  [5, 3],
+  [4, 5],
+  [3, 5],
+]; // E3 + A5 + D5
+const POLLY_D5: [number, number][] = [
+  [4, 5],
+  [3, 7],
+  [2, 7],
+]; // A5 + D7 + G7
+const POLLY_C5: [number, number][] = [
+  [4, 3],
+  [3, 5],
+  [2, 5],
+]; // A3 + D5 + G5
+const POLLY_BB5: [number, number][] = [
+  [4, 1],
+  [3, 3],
+  [2, 3],
+]; // A1 + D3 + G3
+const POLLY_SHAPES = [POLLY_E5, POLLY_G5, POLLY_D5, POLLY_C5, POLLY_D5, POLLY_C5, POLLY_G5, POLLY_BB5];
+const POLLY_SHAPE_FINGERS = [1, 3, 4]; // root · fifth · octave
+const pollyBars = (): Col[][] => {
+  const stops = POLLY_SHAPES.map(shape => {
+    const column: Col = [null, null, null, null, null, null];
+    shape.forEach(([row, fret], voice) => {
+      column[row] = {fret, finger: fret === 0 ? undefined : POLLY_SHAPE_FINGERS[voice]};
+    });
+    return column;
+  });
+  return [stops.slice(0, 2), stops.slice(2, 4), stops.slice(4, 6), stops.slice(6)];
+};
+export const POLLY = applyRhythm(pollyBars(), () => [2, 2], 2);
+export const POLLY_CHORDS = ['E5 · G5', 'D5 · C5', 'D5 · C5', 'G5 · B♭5'];
