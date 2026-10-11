@@ -337,3 +337,84 @@ const pollyBars = (): Col[][] => {
 };
 export const POLLY = applyRhythm(pollyBars(), () => [2, 2], 2);
 export const POLLY_CHORDS = ['E5 · G5', 'D5 · C5', 'D5 · C5', 'G5 · B♭5'];
+
+// Someday — The Strokes: Albert Hammond Jr's intro/verse lead, three-note shapes
+// on the G·B·e strings over A and D. Each stop is [e fret, B fret, G fret].
+// Verse rhythm simplified to mostly quarter-note hits so it is easy to lock in:
+// bar 1 A then the D shape, bar 2 the high C# pull back to A, bar 3 the A held.
+type SomedayStop = [number, number, number];
+const SOMEDAY_FINGER: Record<number, number> = {5: 1, 6: 2, 7: 3, 9: 4};
+const SOMEDAY_A: SomedayStop = [5, 5, 6];
+const SOMEDAY_D: SomedayStop = [5, 7, 7];
+const somedayBars = (bars: SomedayStop[][]): Col[][] =>
+  bars.map(bar =>
+    bar.map(([eFret, bFret, gFret]) => {
+      const column: Col = [null, null, null, null, null, null];
+      column[0] = {fret: eFret, finger: SOMEDAY_FINGER[eFret]};
+      column[1] = {fret: bFret, finger: SOMEDAY_FINGER[bFret]};
+      column[2] = {fret: gFret, finger: SOMEDAY_FINGER[gFret]};
+      return column;
+    }),
+  );
+const SOMEDAY_RHYTHM = [[1, 1, 1, 1], [1, 1, 2], [4]];
+export const SOMEDAY = applyRhythm(
+  somedayBars([
+    [
+      SOMEDAY_A,
+      [7, 5, 6], // A, top note up to B
+      SOMEDAY_D,
+      [7, 7, 7], // D6
+    ],
+    [
+      [9, 7, 7], // Dmaj7, top C#
+      [7, 7, 7], // D6
+      [7, 5, 6], // back to A
+    ],
+    [SOMEDAY_A], // let it ring
+  ]),
+  barIndex => SOMEDAY_RHYTHM[barIndex],
+  2,
+);
+export const SOMEDAY_CHORDS = ['A · D', 'D · A', 'A'];
+
+// The chorus lead (Albert Hammond Jr), moved one string down from the record
+// (same notes, on the B and G strings): double-stops with a high note on top,
+// stepping down A → C#m → F#m, then the D and A shapes back up on the G·B·e
+// strings in 5th position (as in the verse lead). Each group lands its
+// double-stop on beat 3, the high note on 4, and repeats the same
+// double-stop on the next downbeat. Built slot by slot (two per beat) so the
+// rests stay silent. Notes read like tab: 'B14/1' = B string, fret 14, finger 1.
+const SOMEDAY_STRING_ROW: Record<string, number> = {e: 0, B: 1, G: 2, D: 3};
+type SomedayPlacement = {slot: number; beats: number; notes: string};
+const SOMEDAY_CHORUS_BARS: SomedayPlacement[][] = [
+  [
+    {slot: 4, beats: 1, notes: 'B14/1 G14/1'}, // C# · A
+    {slot: 6, beats: 1, notes: 'B17/4'}, // E
+  ],
+  [
+    {slot: 0, beats: 2, notes: 'B14/1 G14/1'},
+    {slot: 4, beats: 1, notes: 'B12/1 G13/2'}, // B · G#
+    {slot: 6, beats: 1, notes: 'B15/4'}, // D
+  ],
+  [
+    {slot: 0, beats: 2, notes: 'B12/1 G13/2'},
+    {slot: 4, beats: 1, notes: 'B10/1 G11/2'}, // A · F#
+    {slot: 6, beats: 1, notes: 'B14/4'}, // C#
+  ],
+  [
+    {slot: 0, beats: 2, notes: 'B10/1 G11/2'},
+    {slot: 4, beats: 2, notes: 'e5/1 B7/3 G7/3'}, // D
+  ],
+  [{slot: 0, beats: 4, notes: 'e5/1 B5/1 G6/2'}], // A, let it ring
+];
+export const SOMEDAY_CHORUS: Col[][] = SOMEDAY_CHORUS_BARS.map(placements => {
+  const bar: Col[] = Array.from({length: 8}, () => [null, null, null, null, null, null]);
+  placements.forEach(({slot, beats, notes}) => {
+    notes.split(' ').forEach(note => {
+      const [, string, fret, finger] = /^([eBGD])(\d+)\/(\d)$/.exec(note) ?? [];
+      bar[slot][SOMEDAY_STRING_ROW[string]] = {fret: Number(fret), finger: Number(finger), beats};
+    });
+  });
+  return bar;
+});
+export const SOMEDAY_CHORUS_CHORDS = ['A', 'C#m', 'F#m', 'D', 'A'];

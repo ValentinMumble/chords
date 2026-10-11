@@ -16,6 +16,10 @@ import {
   MISS_YOU_CHORDS,
   POLLY,
   POLLY_CHORDS,
+  SOMEDAY,
+  SOMEDAY_CHORDS,
+  SOMEDAY_CHORUS,
+  SOMEDAY_CHORUS_CHORDS,
 } from '../data/exercises';
 
 // An exercise card whose open/closed state is remembered per card in localStorage,
@@ -180,8 +184,8 @@ export function Exercises({
 
       <CollapsibleExercise id="miss-you" title="Miss You — The Rolling Stones">
         <p className="exercise-note">
-          The disco-blues hook in open position, on the G and B strings — one finger per fret (1 · 2 · 3). Two bars
-          over Am sing the "ooh ooh" line, and the Dm7 bar answers — let that last note ring.
+          The disco-blues hook in open position, on the G and B strings — one finger per fret (1 · 2 · 3). Two bars over
+          Am sing the "ooh ooh" line, and the Dm7 bar answers — let that last note ring.
         </p>
         <PlayableTab
           bars={MISS_YOU}
@@ -199,9 +203,9 @@ export function Exercises({
 
       <CollapsibleExercise id="polly" title="Polly — Nirvana">
         <p className="exercise-note">
-          Power chords, one ringing strum each, two beats apiece. Verse: E5 · G5 · D5 · C5, then the chorus answers
-          with D5 · C5 · G5 · B♭5. Full three-string shapes: index on the root, ring on the fifth, pinky on the
-          octave. Slide the same shape between positions and keep the strums lazy.
+          Power chords, one ringing strum each, two beats apiece. Verse: E5 · G5 · D5 · C5, then the chorus answers with
+          D5 · C5 · G5 · B♭5. Full three-string shapes: index on the root, ring on the fifth, pinky on the octave. Slide
+          the same shape between positions and keep the strums lazy.
         </p>
         <PlayableTab
           bars={POLLY}
@@ -213,6 +217,38 @@ export function Exercises({
           chords={POLLY_CHORDS}
           firstBar={1}
           caption="Four chords, one strum each — the whole verse"
+          {...shared}
+        />
+      </CollapsibleExercise>
+
+      <CollapsibleExercise id="someday" title="Someday — The Strokes">
+        <p className="exercise-note">
+          Albert Hammond Jr's intro lead: three-note shapes on the top three strings, moving between A and D around the
+          5th to 9th frets. Index barres fret 5, middle on 6, ring on 7, pinky reaches the 9. Rhythm simplified to
+          steady hits so you can lock the shapes in first.
+        </p>
+        <PlayableTab
+          bars={SOMEDAY}
+          storageKey="someday"
+          defaultTempo={110}
+          subdiv={2}
+          showRhythm
+          barsPerRow={3}
+          chords={SOMEDAY_CHORDS}
+          firstBar={1}
+          caption="The intro riff — let the last A ring before looping"
+          {...shared}
+        />
+        <PlayableTab
+          bars={SOMEDAY_CHORUS}
+          storageKey="someday-chorus"
+          defaultTempo={110}
+          subdiv={2}
+          showRhythm
+          barsPerRow={3}
+          chords={SOMEDAY_CHORUS_CHORDS}
+          firstBar={1}
+          caption="Chorus lead — double-stop on 3, high note on 4, then the double-stop again on the next downbeat"
           {...shared}
         />
       </CollapsibleExercise>
