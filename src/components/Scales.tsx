@@ -114,31 +114,33 @@ export function Scales() {
           </button>
         </div>
 
-        <p className={styles.title}>
-          {FRENCH[root]} {scale.name}
-          <span className={styles.french}> · {PITCH_CLASSES[root]}</span>
-        </p>
+        <div className={styles.heading}>
+          <p className={styles.title}>
+            {FRENCH[root]} {scale.name}
+            <span className={styles.french}> · {PITCH_CLASSES[root]}</span>
+          </p>
 
-        <div className={styles.position}>
-          <button
-            className={styles.shift}
-            onClick={() => setStartFret(current => Math.max(0, current - 1))}
-            disabled={startFret === 0}
-            aria-label="Move box toward the nut"
-          >
-            ◀
-          </button>
-          <span className={styles.posLabel}>
-            {startFret === 0 ? `Open · frets 0–${SPAN}` : `Frets ${lowFret}–${highFret}`}
-          </span>
-          <button
-            className={styles.shift}
-            onClick={() => setStartFret(current => Math.min(MAX_START, current + 1))}
-            disabled={startFret >= MAX_START}
-            aria-label="Move box toward the body"
-          >
-            ▶
-          </button>
+          <div className={styles.position}>
+            <button
+              className={styles.shift}
+              onClick={() => setStartFret(current => Math.max(0, current - 1))}
+              disabled={startFret === 0}
+              aria-label="Move box toward the nut"
+            >
+              ◀
+            </button>
+            <span className={styles.posLabel}>
+              {startFret === 0 ? `Open · frets 0–${SPAN}` : `Frets ${lowFret}–${highFret}`}
+            </span>
+            <button
+              className={styles.shift}
+              onClick={() => setStartFret(current => Math.min(MAX_START, current + 1))}
+              disabled={startFret >= MAX_START}
+              aria-label="Move box toward the body"
+            >
+              ▶
+            </button>
+          </div>
         </div>
 
         <div className={styles.board}>
@@ -241,9 +243,9 @@ export function Scales() {
           </svg>
         </div>
         <p className="exercise-note">
-          One box position at a time — first position, frets 1–3. Note names are in French; the filled dot is the
-          root. Use the arrows to slide the same shape up or down the neck — a new key, same fingering. Tap any note to
-          hear it.
+          One box position at a time — first position, frets 1–3. Note names are in French; the filled dot is the root.
+          Use the arrows to slide the same shape up or down the neck — a new key, same fingering. Tap any note to hear
+          it.
         </p>
       </section>
     </div>

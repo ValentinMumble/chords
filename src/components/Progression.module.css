@@ -25,18 +25,15 @@
   color: var(--accent);
 }
 .loopClear {
-  border: 1px solid var(--line);
-  background: transparent;
-  color: var(--muted);
+  border: none;
+  background: var(--fill);
+  color: var(--accent);
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
   padding: 3px 12px;
   border-radius: 999px;
   cursor: pointer;
-}
-.loopClear:hover {
-  border-color: var(--accent);
-  color: var(--accent);
 }
 .barChip {
   position: relative;
@@ -44,31 +41,27 @@
   flex-direction: column;
   align-items: center;
   gap: 1px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 1.5px solid transparent;
+  border-radius: 10px;
   min-width: 54px;
   padding: 6px 0;
   text-align: center;
   font-size: 14px;
+  font-weight: 500;
   font-family: inherit;
-  color: var(--muted);
-  background: transparent;
+  color: var(--ink);
+  background: var(--fill);
   cursor: pointer;
   touch-action: none;
-  transition: border-color 0.15s;
-}
-.barChip:hover {
-  border-color: var(--accent);
+  transition: background 0.15s;
 }
 .barChip.inLoop {
   background: var(--accent-soft);
-  border-color: var(--accent);
   color: var(--accent);
 }
 .barChip.current {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: var(--accent);
+  background: var(--accent);
+  color: #fff;
   font-weight: 600;
 }
 .barChip.next {

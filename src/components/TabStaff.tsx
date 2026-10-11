@@ -125,7 +125,7 @@ function TabStaff({
                 y={stringY(row) - 9}
                 width={cell.fret > 9 ? 20 : 14}
                 height={18}
-                fill={activeCol === colIndex ? 'var(--accent-soft)' : 'var(--bg)'}
+                fill={activeCol === colIndex ? 'var(--accent-soft)' : 'var(--panel)'}
               />
               <text
                 x={x}

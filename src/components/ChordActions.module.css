@@ -5,20 +5,17 @@
 .actions button {
   position: relative;
   overflow: hidden;
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--ink);
-  font-size: 14px;
+  background: var(--fill);
+  border: none;
+  color: var(--accent);
+  font-size: 15px;
+  font-weight: 600;
   padding: 9px 18px;
-  border-radius: 8px;
+  border-radius: 999px;
   cursor: pointer;
 }
-.actions button:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
 .actions button:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 .label {
   position: relative;

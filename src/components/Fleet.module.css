@@ -13,13 +13,13 @@
   flex-direction: column;
   gap: 2px;
   background: var(--surface);
-  border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 1rem 1.25rem;
 }
 .statValue {
-  font-size: 26px;
-  font-weight: 500;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--ink);
 }
 .statLabel {
@@ -28,9 +28,8 @@
 }
 .card {
   background: var(--surface);
-  border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 1.5rem 1.75rem;
+  padding: 1.25rem 1.5rem;
 }
 .head {
   display: flex;
@@ -40,8 +39,8 @@
 }
 .head h2 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 19px;
+  font-weight: 600;
 }
 .photo {
   width: 66px;
@@ -79,8 +78,8 @@
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  padding: 7px 0;
-  border-top: 1px solid var(--line);
+  padding: 8px 0;
+  border-top: 0.5px solid var(--line);
   font-size: 14px;
 }
 .spec dt {
@@ -95,7 +94,7 @@
 .strings {
   margin-top: 1.25rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--line);
+  border-top: 0.5px solid var(--line);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -118,18 +117,18 @@
   border-radius: 999px;
   border: 1px solid transparent;
 }
+/* iOS system green / orange / red. */
 .fresh {
-  color: #2f7a52;
-  background: rgba(47, 122, 82, 0.12);
+  color: #248a3d;
+  background: rgba(52, 199, 89, 0.15);
 }
 .aging {
-  color: #a9781a;
-  background: rgba(169, 120, 26, 0.14);
+  color: #c93400;
+  background: rgba(255, 149, 0, 0.16);
 }
 .overdue {
-  color: var(--accent);
-  background: var(--accent-soft);
-  border-color: var(--accent);
+  color: #ff3b30;
+  background: rgba(255, 59, 48, 0.12);
 }
 .stringsDate {
   font-size: 13px;

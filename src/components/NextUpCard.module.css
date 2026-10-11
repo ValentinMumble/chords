@@ -3,8 +3,8 @@
   box-sizing: border-box;
   width: 198px;
   min-height: 270px;
-  background: var(--bg);
-  border: 1px dashed var(--accent);
+  background: var(--panel);
+  border: 1.5px dashed var(--accent);
   border-radius: var(--radius);
   padding: 16px 22px 12px;
   text-align: center;
@@ -36,11 +36,12 @@
 /* Short viewport (phone landscape): shrink so it doesn't force a tall diagram row. */
 @media (max-height: 500px) {
   .nextBox {
+    width: 130px;
     min-height: 0;
-    padding: 10px 18px;
+    padding: 8px 10px;
   }
   .nextBox svg {
-    width: 110px;
+    width: 96px;
   }
   .name {
     font-size: 24px;

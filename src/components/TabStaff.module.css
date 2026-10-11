@@ -16,8 +16,21 @@
 }
 .row {
   overflow-x: auto;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  background: var(--panel);
+  border-radius: 12px;
   padding: 10px 14px;
+}
+/* Phone landscape: size each staff so exactly two rows fill the screen height
+   (dvh follows Safari's collapsing bars). The SVG keeps its aspect ratio, so a
+   capped height just draws it a little smaller, centred. */
+@media (max-height: 500px) {
+  .row {
+    padding: 6px 10px;
+  }
+  .row + .row {
+    margin-top: 6px;
+  }
+  .staff {
+    height: calc(50dvh - 18px);
+  }
 }

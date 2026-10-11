@@ -23,31 +23,20 @@
   font: inherit;
   font-size: 12px;
   cursor: pointer;
-  padding: 5px 0;
+  padding: 6px 0;
   min-width: 34px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--surface);
-  color: var(--muted);
-}
-.rootBtn:hover {
-  border-color: var(--accent);
+  border: none;
+  border-radius: 8px;
+  background: var(--fill);
   color: var(--ink);
 }
 .rootBtn.active {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: var(--accent);
-  font-weight: 500;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
 }
 .select {
-  font: inherit;
-  font-size: 14px;
-  padding: 6px 10px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--bg);
-  color: var(--ink);
+  font-size: 15px;
 }
 .title {
   margin: 0 0 10px;
@@ -60,9 +49,8 @@
 }
 .board {
   overflow-x: auto;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  background: var(--panel);
+  border-radius: 12px;
   padding: 10px 14px;
 }
 .board svg {
@@ -90,15 +78,11 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--muted);
+  border: none;
+  background: var(--fill);
+  color: var(--accent);
   font-size: 14px;
   cursor: pointer;
-}
-.shift:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
 }
 .shift:disabled {
   opacity: 0.4;
@@ -109,4 +93,43 @@
 }
 .note:hover circle {
   filter: brightness(0.94);
+}
+/* Title + position nav. Stacked by default; one row in phone landscape. */
+.heading {
+  display: contents;
+}
+/* Phone landscape (~370px tall): drop the field labels, put the title and the
+   position nav on one row, and cap the board so the whole box fits. */
+@media (max-height: 500px) {
+  .controls {
+    gap: 12px;
+    margin-bottom: 0.75rem;
+  }
+  .label {
+    display: none;
+  }
+  .heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .title,
+  .position {
+    margin: 0;
+  }
+  .board {
+    padding: 6px 10px;
+  }
+  .board svg {
+    width: auto;
+    max-width: 100%;
+    max-height: 200px;
+  }
+}
+@media (max-height: 500px) {
+  .rootBtn {
+    min-width: 30px;
+  }
 }

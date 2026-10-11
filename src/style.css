@@ -13,32 +13,58 @@ input[type='range'] {
   border-radius: 2px;
   cursor: pointer;
 }
+/* iOS slider: thin track, large white thumb with a soft shadow. */
 input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: var(--accent);
+  background: #fff;
+  box-shadow:
+    0 0.5px 4px rgba(0, 0, 0, 0.12),
+    0 4px 10px rgba(0, 0, 0, 0.14),
+    0 0 0 0.5px rgba(0, 0, 0, 0.04);
 }
 input[type='range']::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
   border: none;
   border-radius: 50%;
-  background: var(--accent);
+  background: #fff;
+  box-shadow:
+    0 0.5px 4px rgba(0, 0, 0, 0.12),
+    0 4px 10px rgba(0, 0, 0, 0.14);
+}
+/* iOS-style pop-up menu button: filled, borderless, with a chevron. */
+select {
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  background-color: var(--fill);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5 6 7.5 9 4.5' fill='none' stroke='%238e8e93' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 32px 8px 12px;
+  cursor: pointer;
 }
 kbd {
-  background: var(--bg);
-  border: 1px solid var(--line);
+  background: var(--fill);
+  border: none;
   border-radius: 4px;
   padding: 1px 6px;
   font-size: 12px;
   font-family: ui-monospace, monospace;
 }
 h2 {
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   margin: 2.5rem 0 1rem;
 }
 
@@ -50,9 +76,8 @@ h2 {
 }
 .exercise {
   background: var(--surface);
-  border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 1.5rem 1.75rem;
+  padding: 1.25rem 1.5rem;
   /* Skip rendering exercises that are off-screen until scrolled near — the tab
      SVGs are heavy, so this keeps the Practice tab fast to open (esp. on mobile).
      The intrinsic size reserves space so the scrollbar doesn't jump. */
@@ -61,8 +86,9 @@ h2 {
 }
 .exercise h2 {
   margin: 0 0 0.6rem;
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 /* The card header doubles as a collapse toggle. */
 .exercise-toggle {
@@ -105,18 +131,23 @@ h2 {
 }
 
 /* Shared: the play/stop pill, used by PlayableTab and the Scales "Play scale". */
+/* iOS "tinted" capsule button; filled with the tint while playing. */
 .tab-play {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 6px 16px;
-  border: 1px solid var(--accent);
+  padding: 7px 18px;
+  border: none;
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent);
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
+  transition: scale 0.15s ease;
+}
+.tab-play:active {
+  scale: 0.96;
 }
 .tab-play span {
   font-size: 11px;

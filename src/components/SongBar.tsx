@@ -1,23 +1,14 @@
-import {DIFFICULTY_LABELS, type Song, type SongLevel} from '../songs';
-import {SegmentedToggle} from './SegmentedToggle';
+import {DIFFICULTY_LABELS, type Song} from '../songs';
 import styles from './SongBar.module.css';
-
-const LEVELS: readonly {key: SongLevel; label: string}[] = [
-  {key: 'easy', label: 'Easy'},
-  {key: 'advanced', label: 'Advanced'},
-];
 
 interface SongBarProps {
   songs: readonly Song[];
-  song: Song;
   songIndex: number;
   onSongChange: (index: number) => void;
-  level: SongLevel;
-  onLevelChange: (level: SongLevel) => void;
 }
 
-// The slim top-of-page selector: which song, and (if it has one) its level.
-export function SongBar({songs, song, songIndex, onSongChange, level, onLevelChange}: SongBarProps) {
+// The slim top-of-page selector: which song.
+export function SongBar({songs, songIndex, onSongChange}: SongBarProps) {
   return (
     <div className={styles.songBar}>
       <select
@@ -40,9 +31,6 @@ export function SongBar({songs, song, songIndex, onSongChange, level, onLevelCha
             </optgroup>
           ))}
       </select>
-      {song.advanced && (
-        <SegmentedToggle ariaLabel="Difficulty" items={LEVELS} value={level} onChange={onLevelChange} />
-      )}
     </div>
   );
 }

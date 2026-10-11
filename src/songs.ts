@@ -84,17 +84,10 @@ export interface Song {
   readonly sound: GuitarSoundId;
   readonly difficulty: Difficulty;
   readonly capo?: number;
-  readonly easy: SongVersion;
-  readonly advanced?: SongVersion;
+  readonly version: SongVersion;
 }
 
-export type SongLevel = 'easy' | 'advanced';
-
-export function songVersion(song: Song, level: SongLevel): SongVersion {
-  return level === 'advanced' && song.advanced ? song.advanced : song.easy;
-}
-
-// Build the easy version's bars from a compact [name, beats] list.
+// Build a song's bars from a compact [name, beats] list.
 function bars(steps: readonly [ChordName, number][]): readonly Bar[] {
   return steps.map(([name, beats]) => ({name, beats}));
 }
@@ -116,20 +109,8 @@ const standByMe = bars([
 ]);
 // Neil Young, in Em, no capo. Em is home (the verse riff), then a quick C–D
 // passing motion resolves up to G — the "heart of gold" hook — before the chorus
-// tag C–G. Advanced just swaps Em7 for Em for the record's colour.
-const heartOfGoldEasy = bars([
-  ['Em', 4],
-  ['Em', 4],
-  ['C', 2],
-  ['D', 2],
-  ['G', 4],
-  ['C', 2],
-  ['D', 2],
-  ['G', 4],
-  ['C', 4],
-  ['G', 4],
-]);
-const heartOfGoldAdvanced = bars([
+// tag C–G, with the record's Em7 colour.
+const heartOfGold = bars([
   ['Em7', 4],
   ['Em7', 4],
   ['C', 2],
@@ -141,18 +122,8 @@ const heartOfGoldAdvanced = bars([
   ['C', 4],
   ['G', 4],
 ]);
-// Easy: basic open chords. Advanced: the song's real, richer voicings.
-const wonderwallEasy = bars([
-  ['Em', 4],
-  ['G', 4],
-  ['D', 4],
-  ['A', 4],
-  ['Em', 4],
-  ['G', 4],
-  ['D', 4],
-  ['A', 4],
-]);
-const wonderwallAdvanced = bars([
+// The song's real, richer voicings.
+const wonderwall = bars([
   ['Em7', 4],
   ['G', 4],
   ['Dsus4', 4],
@@ -162,8 +133,8 @@ const wonderwallAdvanced = bars([
   ['Dsus4', 4],
   ['A7sus4', 4],
 ]);
-// Horse is only two chords: Em and D6/9 (the F# one) — the same for both levels,
-// which differ only in the strum. (D6/9 is an easy shape, close to Em.)
+// Horse is only two chords: Em and D6/9 (the F# one), an easy shape close to Em.
+// The feel comes from the two-bar strum.
 const horse = bars([
   ['Em', 4],
   ['D6/9', 4],
@@ -233,79 +204,69 @@ export const SONGS: readonly Song[] = [
     name: 'A Horse with No Name — America',
     sound: 'acoustic_guitar_steel',
     difficulty: 1,
-    easy: {bpm: 122, pattern: EASY_PATTERN, bars: horse},
-    advanced: {bpm: 122, pattern: HORSE_PATTERN, bars: horse},
+    version: {bpm: 122, pattern: HORSE_PATTERN, bars: horse},
   },
   {
     name: 'Sweet Home Alabama — Lynyrd Skynyrd',
     sound: 'electric_guitar_clean',
     difficulty: 1,
-    easy: {bpm: 98, pattern: EASY_PATTERN, bars: sweetHomeAlabama},
-    advanced: {bpm: 98, pattern: DRIVING_PATTERN, bars: sweetHomeAlabama},
+    version: {bpm: 98, pattern: DRIVING_PATTERN, bars: sweetHomeAlabama},
   },
   {
     name: "Knockin' on Heaven's Door — Bob Dylan",
     sound: 'acoustic_guitar_steel',
     difficulty: 1,
-    easy: {bpm: 72, pattern: EASY_PATTERN, bars: knockin},
-    advanced: {bpm: 72, pattern: ADVANCED_PATTERN, bars: knockin},
+    version: {bpm: 72, pattern: ADVANCED_PATTERN, bars: knockin},
   },
   {
     name: 'Zombie — The Cranberries',
     sound: 'overdriven_guitar',
     difficulty: 1,
-    easy: {bpm: 84, pattern: EASY_PATTERN, bars: zombie},
-    advanced: {bpm: 84, pattern: DRIVING_PATTERN, bars: zombie},
+    version: {bpm: 84, pattern: DRIVING_PATTERN, bars: zombie},
   },
   {
     name: 'Anyone Else But You — The Moldy Peaches',
     sound: 'acoustic_guitar_steel',
     difficulty: 1,
-    easy: {bpm: 120, pattern: EASY_PATTERN, bars: anyoneElseButYou},
-    advanced: {bpm: 120, pattern: ADVANCED_PATTERN, bars: anyoneElseButYou},
+    version: {bpm: 120, pattern: ADVANCED_PATTERN, bars: anyoneElseButYou},
   },
   {
     name: 'Stand by Me — Ben E. King',
     sound: 'electric_guitar_clean',
     difficulty: 2,
-    easy: {bpm: 118, pattern: EASY_PATTERN, bars: standByMe},
-    advanced: {bpm: 118, pattern: BALLAD_PATTERN, bars: standByMe},
+    version: {bpm: 118, pattern: BALLAD_PATTERN, bars: standByMe},
   },
   {
     name: 'Heart of Gold — Neil Young',
     sound: 'acoustic_guitar_steel',
     difficulty: 2,
-    easy: {bpm: 82, pattern: EASY_PATTERN, bars: heartOfGoldEasy},
-    advanced: {bpm: 82, pattern: ADVANCED_PATTERN, bars: heartOfGoldAdvanced},
+    version: {bpm: 82, pattern: ADVANCED_PATTERN, bars: heartOfGold},
   },
   {
     name: 'Wonderwall — Oasis',
     sound: 'acoustic_guitar_steel',
     difficulty: 2,
     capo: 2,
-    easy: {bpm: 87, pattern: EASY_PATTERN, bars: wonderwallEasy},
-    advanced: {bpm: 87, pattern: ANTHEM_PATTERN, bars: wonderwallAdvanced},
+    version: {bpm: 87, pattern: ANTHEM_PATTERN, bars: wonderwall},
   },
   {
     name: 'Comme toi — Jean-Jacques Goldman',
     sound: 'acoustic_guitar_nylon',
     difficulty: 2,
     capo: 5,
-    easy: {bpm: 96, pattern: EASY_PATTERN, bars: commeToi},
-    advanced: {bpm: 96, pattern: EASY_PATTERN, pick: PICK_44, bars: commeToi},
+    version: {bpm: 96, pattern: EASY_PATTERN, pick: PICK_44, bars: commeToi},
   },
   {
     name: 'House of the Rising Sun — The Animals',
     sound: 'acoustic_guitar_steel',
     difficulty: 3,
-    easy: {bpm: 56, meter: SIX_EIGHT, pattern: EASY_PATTERN_68, pick: PICK_68, bars: houseOfRisingSun},
+    version: {bpm: 56, meter: SIX_EIGHT, pattern: EASY_PATTERN_68, pick: PICK_68, bars: houseOfRisingSun},
   },
   {
     name: "Je l'aime à mourir — Francis Cabrel",
     sound: 'acoustic_guitar_nylon',
     difficulty: 3,
     capo: 2,
-    easy: {bpm: 100, pattern: EASY_PATTERN, bars: jeLAimeAMourir},
-    advanced: {bpm: 100, pattern: EASY_PATTERN, pick: PICK_FLOW, bars: jeLAimeAMourir},
+    version: {bpm: 100, pattern: EASY_PATTERN, pick: PICK_FLOW, bars: jeLAimeAMourir},
   },
 ];

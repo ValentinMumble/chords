@@ -1,8 +1,7 @@
 .transport {
   background: var(--surface);
-  border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 1.5rem 2rem;
+  padding: 1.25rem 1.5rem;
 }
 .row {
   display: flex;
@@ -21,14 +20,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--ink);
+  background: var(--accent);
+  border: none;
+  color: #fff;
   cursor: pointer;
+  transition: scale 0.15s ease;
 }
-.playBtn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+.playBtn:active {
+  scale: 0.92;
 }
 .tempo {
   display: flex;
@@ -52,15 +51,11 @@
   align-items: center;
   justify-content: center;
   padding: 6px;
-  background: transparent;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: var(--muted);
-  cursor: pointer;
-}
-.resetTempo:not(:disabled):hover {
-  border-color: var(--accent);
+  background: var(--fill);
+  border: none;
+  border-radius: 999px;
   color: var(--accent);
+  cursor: pointer;
 }
 .resetTempo:disabled {
   opacity: 0.35;
@@ -82,5 +77,15 @@
   }
   .row {
     gap: 16px;
+  }
+}
+/* Phone landscape: the transport sits in a narrow left column next to the chord
+   stage, so trim its padding and gaps. */
+@media (max-height: 500px) {
+  .transport {
+    padding: 0.9rem 1rem;
+  }
+  .row {
+    gap: 14px;
   }
 }

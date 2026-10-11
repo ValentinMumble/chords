@@ -5,18 +5,18 @@
   flex-wrap: wrap;
 }
 .filters button {
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 13px;
+  background: var(--fill);
+  border: none;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
   padding: 6px 14px;
   border-radius: 999px;
   cursor: pointer;
 }
 .filters button.active {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: var(--accent);
+  background: var(--accent);
+  color: #fff;
 }
 .divider {
   width: 1px;

@@ -56,7 +56,7 @@ export function useSongPlayback(
     return (index + 1) % bars.length;
   }
 
-  // A loop can become invalid when the song or level changes (different bar
+  // A loop can become invalid when the song changes (different bar
   // count); drop it so we never index past the end.
   useEffect(() => {
     setLoopRange(null);

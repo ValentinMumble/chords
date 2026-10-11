@@ -1,3 +1,4 @@
+import type {ReactNode} from 'react';
 import {useEffect, useRef, useState} from 'react';
 import {
   CHORDS,
@@ -10,7 +11,7 @@ import {
   type ChordFilter,
   type ShapeFilter,
 } from './chords';
-import {FOUR_FOUR, SONGS, songVersion, type SongLevel} from './songs';
+import {FOUR_FOUR, SONGS} from './songs';
 import {arpeggio, ensureAudio, GUITAR_SOUNDS, setGuitarSound, strum} from './audio';
 import {Fretboard} from './components/Fretboard';
 import {ChordActions} from './components/ChordActions';
@@ -33,11 +34,61 @@ import {usePersistedState} from './hooks/usePersistedState';
 import styles from './App.module.css';
 
 type Mode = 'songs' | 'exercises' | 'scales' | 'gear';
-const MODES: {key: Mode; label: string}[] = [
-  {key: 'songs', label: 'Songs'},
-  {key: 'exercises', label: 'Practice'},
-  {key: 'scales', label: 'Scales'},
-  {key: 'gear', label: 'Gear'},
+
+// Line icons for the phone tab bar, drawn in the SF Symbols spirit (24x24,
+// rounded strokes, coloured by the tab's text colour).
+const iconProps = {
+  viewBox: '0 0 24 24',
+  width: 24,
+  height: 24,
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 1.9,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+  'aria-hidden': true,
+};
+const MODES: {key: Mode; label: string; icon: ReactNode}[] = [
+  {
+    key: 'songs',
+    label: 'Songs',
+    icon: (
+      <svg {...iconProps}>
+        <path d="M9 18V5l11-2v13" />
+        <circle cx="6" cy="18" r="3" />
+        <circle cx="17" cy="16" r="3" />
+      </svg>
+    ),
+  },
+  {
+    key: 'exercises',
+    label: 'Practice',
+    icon: (
+      <svg {...iconProps}>
+        <path d="M8.5 3h7l4 18h-15z" />
+        <path d="M12 17l4.5-9" />
+        <path d="M6 14h12" />
+      </svg>
+    ),
+  },
+  {
+    key: 'scales',
+    label: 'Scales',
+    icon: (
+      <svg {...iconProps}>
+        <path d="M5 20v-4M10 20v-8M15 20V8M20 20V4" strokeWidth={2.4} />
+      </svg>
+    ),
+  },
+  {
+    key: 'gear',
+    label: 'Gear',
+    icon: (
+      <svg {...iconProps}>
+        <path d="M12 21c-3.2-3.1-7-8.2-7-12 0-3.4 3.1-5 7-5s7 1.6 7 5c0 3.8-3.8 8.9-7 12z" />
+      </svg>
+    ),
+  },
 ];
 
 export default function App() {
@@ -45,17 +96,15 @@ export default function App() {
   const [shape, setShape] = usePersistedState<string>('chords:shape', 'any');
   const [chordName, setChordName] = usePersistedState('chords:chord', 'C');
   const [songIndex, setSongIndex] = usePersistedState('chords:song', 0);
-  const [bpm, setBpm] = usePersistedState('chords:bpm', SONGS[0].easy.bpm);
+  const [bpm, setBpm] = usePersistedState('chords:bpm', SONGS[0].version.bpm);
   const [sound, setSound] = usePersistedState<string>('chords:sound', GUITAR_SOUNDS[0].id);
-  const [level, setLevel] = usePersistedState<string>('chords:level', 'easy');
   const [mode, setMode] = useState<Mode>('songs');
   // Which Practice exercise is currently playing (its storageKey), so the space
   // bar can stop it. Owned here because the keyboard handler lives in App.
   const [activeExercise, setActiveExercise] = useState<string | null>(null);
 
   const song = SONGS[songIndex] ?? SONGS[0];
-  const activeLevel: SongLevel = level === 'advanced' ? 'advanced' : 'easy';
-  const version = songVersion(song, activeLevel);
+  const version = song.version;
   const meter = version.meter ?? FOUR_FOUR;
   const chord = getChord(chordName) ?? CHORDS_BY_NAME.C;
   const activeFilter = (FILTER_TYPES.some(type => type.key === filter) ? filter : 'all') as ChordFilter;
@@ -140,18 +189,10 @@ export default function App() {
   function changeSong(index: number): void {
     playback.stop();
     setSongIndex(index);
-    const nextVersion = songVersion(SONGS[index], activeLevel);
+    const nextVersion = SONGS[index].version;
     setBpm(nextVersion.bpm);
     setSound(SONGS[index].sound);
     // Show the new song's first chord right away, not only once playback starts.
-    setChordName(nextVersion.bars[0].name);
-  }
-
-  function changeLevel(next: SongLevel): void {
-    playback.stop();
-    setLevel(next);
-    const nextVersion = songVersion(song, next);
-    setBpm(nextVersion.bpm);
     setChordName(nextVersion.bars[0].name);
   }
 
@@ -212,42 +253,37 @@ export default function App() {
         <Fleet />
       ) : (
         <>
-          <SongBar
-            songs={SONGS}
-            song={song}
-            songIndex={songIndex}
-            onSongChange={changeSong}
-            level={activeLevel}
-            onLevelChange={changeLevel}
-          />
-          <Transport
-            playback={playback}
-            pattern={version.pattern}
-            pick={version.pick}
-            meter={meter}
-            bpm={bpm}
-            recommendedBpm={version.bpm}
-            onBpmChange={setBpm}
-            sound={activeSound.id}
-            onSoundChange={setSound}
-          />
-          <section className={styles.stage}>
-            <div className={styles.chordHeader}>
-              <div>
-                <p className={styles.chordTitle}>{chord.name}</p>
-                <p className={styles.chordSub}>{frenchName(chord.name)}</p>
+          <SongBar songs={SONGS} songIndex={songIndex} onSongChange={changeSong} />
+          <div className={styles.player}>
+            <Transport
+              playback={playback}
+              pattern={version.pattern}
+              pick={version.pick}
+              meter={meter}
+              bpm={bpm}
+              recommendedBpm={version.bpm}
+              onBpmChange={setBpm}
+              sound={activeSound.id}
+              onSoundChange={setSound}
+            />
+            <section className={styles.stage}>
+              <div className={styles.chordHeader}>
+                <div>
+                  <p className={styles.chordTitle}>{chord.name}</p>
+                  <p className={styles.chordSub}>{frenchName(chord.name)}</p>
+                </div>
+                {song.capo ? <CapoBadge fret={song.capo} /> : null}
+                <ChordActions chord={chord} />
               </div>
-              {song.capo ? <CapoBadge fret={song.capo} /> : null}
-              <ChordActions chord={chord} />
-            </div>
-            <div className={styles.chordDiagrams}>
-              <div className={styles.diagramWrap} ref={diagramRef}>
-                <Fretboard chord={chord} />
+              <div className={styles.chordDiagrams}>
+                <div className={styles.diagramWrap} ref={diagramRef}>
+                  <Fretboard chord={chord} />
+                </div>
+                <NextUpCard chordName={nextChordName} />
               </div>
-              <NextUpCard chordName={nextChordName} />
-            </div>
-            <Progression bars={version.bars} meter={meter} playback={playback} onBarSelect={selectBar} />
-          </section>
+              <Progression bars={version.bars} meter={meter} playback={playback} onBarSelect={selectBar} />
+            </section>
+          </div>
           <h2>Chord library</h2>
           <ChordFilters filter={activeFilter} onFilterChange={setFilter} shape={activeShape} onShapeChange={setShape} />
           {visible.length > 0 ? (
@@ -258,6 +294,21 @@ export default function App() {
           <KeyboardHint />
         </>
       )}
+      {/* Phone portrait: the sections move to a floating glass tab bar, like an
+          iOS app. Hidden (CSS) wherever the top switcher is shown. */}
+      <nav className={styles.tabBar} aria-label="Sections">
+        {MODES.map(item => (
+          <button
+            key={item.key}
+            className={`${styles.tab}${item.key === mode ? ` ${styles.tabActive}` : ''}`}
+            aria-current={item.key === mode ? 'page' : undefined}
+            onClick={() => switchMode(item.key)}
+          >
+            {item.icon}
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
     </main>
   );
 }
