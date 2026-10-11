@@ -178,7 +178,7 @@ h2 {
 @media (max-height: 500px) {
   .practice {
     display: grid;
-    grid-template-columns: 104px minmax(0, 1fr);
+    grid-template-columns: 96px minmax(0, 1fr);
     gap: 8px;
     align-items: start;
   }
@@ -193,7 +193,7 @@ h2 {
   }
   /* Quiet sidebar: small grey labels on one line, no card behind them. */
   .practice-index button {
-    padding: 5px 8px;
+    padding: 5px 6px;
     border: none;
     border-radius: 8px;
     background: transparent;
