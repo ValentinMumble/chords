@@ -13,7 +13,7 @@
   top: 2px;
   bottom: 2px;
   left: 2px;
-  width: 84px;
+  width: 72px;
   border-radius: 7px;
   background: #ffffff;
   box-shadow:
@@ -30,7 +30,7 @@
 .toggle button {
   position: relative;
   z-index: 1;
-  width: 84px;
+  width: 72px;
   text-align: center;
   background: transparent;
   border: none;

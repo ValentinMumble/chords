@@ -66,7 +66,7 @@ button {
   user-select: none;
 }
 main {
-  max-width: 860px;
+  max-width: 1100px;
   margin: 0 auto;
   /* Respect the notch / Dynamic Island and home indicator (viewport-fit=cover). */
   padding: 0 max(1.25rem, var(--safe-right)) calc(4rem + env(safe-area-inset-bottom)) max(1.25rem, var(--safe-left));
@@ -89,11 +89,10 @@ h1 {
     padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
   }
 }
-/* Landscape phone: leave room on the right for the vertical tab rail (64px tab
-   + 8px padding + 8px gap to the edge + breathing room). */
+/* Landscape phone: small margins; only the Dynamic Island side keeps its inset. */
 @media (max-height: 500px) {
   main {
     padding-left: max(12px, var(--safe-left));
-    padding-right: calc(86px + var(--safe-right));
+    padding-right: max(12px, var(--safe-right));
   }
 }
