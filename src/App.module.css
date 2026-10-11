@@ -19,9 +19,11 @@
   z-index: -1;
   top: 0;
   bottom: 0;
-  /* Reach past both edges whatever the side margins (html clips the overflow). */
-  left: -50vw;
-  right: -50vw;
+  /* Reach exactly the screen edges: the gap beside the centred 1100px column
+     plus main's side padding. Never further: on phones any overflow widens the
+     layout viewport, and pinned elements then drift with the page. */
+  left: calc(-1 * (max(0px, (100vw - 1100px) / 2) + var(--main-pad-left)));
+  right: calc(-1 * (max(0px, (100vw - 1100px) / 2) + var(--main-pad-right)));
   background: var(--bar);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   backdrop-filter: blur(20px) saturate(180%);

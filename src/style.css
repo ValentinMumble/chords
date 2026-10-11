@@ -170,8 +170,9 @@ h2 {
   }
 }
 
-/* Practice jump index: hidden by default. In phone landscape it is a sticky
-   column beside the cards; tap a name to scroll to that card. */
+/* Practice jump index: hidden by default. In phone landscape it is a column
+   beside the cards, pinned to the top of the screen once you scroll; tap a
+   name to jump to that card. */
 .practice-index {
   display: none;
 }
@@ -182,12 +183,15 @@ h2 {
     gap: 8px;
     align-items: start;
   }
+  /* Starts level with the first card, then pins to the top of the screen and
+     fills its height, so ↑ Top sits at the very bottom. (main's landscape
+     bottom padding is trimmed so it fits exactly even at the end of the page.) */
   .practice-index {
     position: sticky;
     top: calc(8px + env(safe-area-inset-top));
+    height: calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     display: flex;
     flex-direction: column;
-    max-height: calc(100dvh - 16px);
     overflow-y: auto;
     padding: 2px 0;
   }
@@ -210,6 +214,15 @@ h2 {
   .practice-index button:active {
     background: var(--fill);
     color: var(--ink);
+  }
+  /* Back to top: an action, so tinted, with a hairline above it, pushed to the
+     bottom of the screen. */
+  .practice-index .practice-index-top {
+    margin-top: auto;
+    border-top: 0.5px solid var(--line);
+    border-radius: 0 0 8px 8px;
+    color: var(--accent);
+    font-weight: 500;
   }
   /* Land a jumped-to card just below the top edge. */
   .exercise {

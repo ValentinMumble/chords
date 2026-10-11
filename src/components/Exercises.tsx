@@ -79,13 +79,16 @@ export function Exercises({
   const shared = {activeTab, onActivate};
   return (
     <div className="practice">
-      {/* Phone landscape only (CSS): a sticky index to jump straight to a card. */}
+      {/* Phone landscape only (CSS): a pinned index to jump straight to a card. */}
       <nav className="practice-index" aria-label="Jump to exercise">
         {INDEX.map(({id, label}) => (
           <button key={id} onClick={() => jumpTo(id)}>
             {label}
           </button>
         ))}
+        <button className="practice-index-top" onClick={() => window.scrollTo(0, 0)}>
+          ↑ Top
+        </button>
       </nav>
       <div className="exercises">
         <CollapsibleExercise id="someday" title="Someday — The Strokes">
