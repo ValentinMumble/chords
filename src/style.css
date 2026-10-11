@@ -183,13 +183,11 @@ h2 {
     gap: 8px;
     align-items: start;
   }
-  /* Starts level with the first card, then pins to the top of the screen and
-     fills its height, so ↑ Top sits at the very bottom. (main's landscape
-     bottom padding is trimmed so it fits exactly even at the end of the page.) */
+  /* Starts level with the first card, then pins to the top of the screen. */
   .practice-index {
     position: sticky;
     top: calc(8px + env(safe-area-inset-top));
-    height: calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    max-height: calc(100dvh - 64px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -215,10 +213,14 @@ h2 {
     background: var(--fill);
     color: var(--ink);
   }
-  /* Back to top: an action, so tinted, with a hairline above it, pushed to the
-     bottom of the screen. */
+  /* Back to top: an action, so tinted, with a hairline above it, pinned to the
+     bottom of the screen in the index column so it is always visible. */
   .practice-index .practice-index-top {
-    margin-top: auto;
+    position: fixed;
+    left: var(--main-pad-left);
+    bottom: calc(8px + env(safe-area-inset-bottom));
+    width: 96px;
+    background: var(--bg);
     border-top: 0.5px solid var(--line);
     border-radius: 0 0 8px 8px;
     color: var(--accent);
