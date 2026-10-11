@@ -169,3 +169,56 @@ h2 {
     padding: 1rem 1.25rem;
   }
 }
+
+/* Practice jump index: hidden by default. In phone landscape it is a sticky
+   column beside the cards; tap a name to scroll to that card. */
+.practice-index {
+  display: none;
+}
+@media (max-height: 500px) {
+  .practice {
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 8px;
+    align-items: start;
+  }
+  .practice-index {
+    position: sticky;
+    top: calc(8px + env(safe-area-inset-top));
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100dvh - 16px);
+    overflow-y: auto;
+    padding: 2px 0;
+  }
+  /* Quiet sidebar: small grey labels on one line, no card behind them. */
+  .practice-index button {
+    padding: 5px 8px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.3;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+  .practice-index button:active {
+    background: var(--fill);
+    color: var(--ink);
+  }
+  /* Land a jumped-to card just below the top edge. */
+  .exercise {
+    scroll-margin-top: 8px;
+  }
+}
+/* Hover only where a pointer can hover (a tap would leave it stuck on iOS). */
+@media (max-height: 500px) and (hover: hover) {
+  .practice-index button:hover {
+    color: var(--ink);
+  }
+}

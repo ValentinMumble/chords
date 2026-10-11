@@ -20,9 +20,9 @@
   border-radius: 12px;
   padding: 10px 14px;
 }
-/* Phone landscape: size each staff so exactly two rows fill the screen height
-   (dvh follows Safari's collapsing bars). The SVG keeps its aspect ratio, so a
-   capped height just draws it a little smaller, centred. */
+/* Phone landscape: cap each staff so two rows always fit the screen height
+   (dvh follows Safari's collapsing bars). A max (not fixed) height keeps the
+   panel hugging the tab, with no empty bands above and below it. */
 @media (max-height: 500px) {
   .row {
     padding: 6px 10px;
@@ -31,6 +31,6 @@
     margin-top: 6px;
   }
   .staff {
-    height: calc(50dvh - 18px);
+    max-height: calc(50dvh - 18px);
   }
 }

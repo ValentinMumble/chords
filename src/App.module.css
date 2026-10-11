@@ -315,3 +315,14 @@
     padding: 7px 0 5px;
   }
 }
+/* Desktop: title and the section switcher share the first row (like an iOS
+   navigation bar with a segmented control); the legends sit on a second row. */
+@media (min-width: 601px) and (min-height: 501px) {
+  .topbar {
+    row-gap: 10px;
+  }
+  .legends {
+    order: 1;
+    flex-basis: 100%;
+  }
+}
