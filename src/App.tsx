@@ -20,6 +20,7 @@ import {ChordGrid} from './components/ChordGrid';
 import {Exercises} from './components/Exercises';
 import {Scales} from './components/Scales';
 import {Fleet} from './components/Fleet';
+import {Tuner} from './components/Tuner';
 import {CapoBadge} from './components/CapoBadge';
 import {KeyboardHint} from './components/KeyboardHint';
 import {NextUpCard} from './components/NextUpCard';
@@ -33,7 +34,7 @@ import {useKeyboardShortcuts} from './hooks/useKeyboardShortcuts';
 import {usePersistedState} from './hooks/usePersistedState';
 import styles from './App.module.css';
 
-type Mode = 'songs' | 'exercises' | 'scales' | 'gear';
+type Mode = 'songs' | 'exercises' | 'scales' | 'tuner' | 'gear';
 
 // Line icons for the phone tab bar, drawn in the SF Symbols spirit (24x24,
 // rounded strokes, coloured by the tab's text colour).
@@ -77,6 +78,16 @@ const MODES: {key: Mode; label: string; icon: ReactNode}[] = [
     icon: (
       <svg {...iconProps}>
         <path d="M5 20v-4M10 20v-8M15 20V8M20 20V4" strokeWidth={2.4} />
+      </svg>
+    ),
+  },
+  {
+    key: 'tuner',
+    label: 'Tuner',
+    icon: (
+      <svg {...iconProps}>
+        <path d="M8.5 3v7a3.5 3.5 0 0 0 7 0V3" />
+        <path d="M12 13.5V21" />
       </svg>
     ),
   },
@@ -249,6 +260,8 @@ export default function App() {
         <Exercises activeTab={activeExercise} onActivate={setActiveExercise} />
       ) : mode === 'scales' ? (
         <Scales />
+      ) : mode === 'tuner' ? (
+        <Tuner />
       ) : mode === 'gear' ? (
         <Fleet />
       ) : (
