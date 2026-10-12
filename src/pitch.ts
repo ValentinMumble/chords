@@ -7,49 +7,67 @@ import {TUNING} from './tuning';
 // high e (330 Hz), so harmonics or a badly detuned string still register.
 const MIN_HZ = 60;
 const MAX_HZ = 1000;
-// Below this loudness (RMS of the window) we treat the input as silence.
-const SILENCE_RMS = 0.01;
+// Only true digital silence is rejected by level: a guitar a metre from a
+// phone mic (no auto gain) is quiet, so noise is rejected by clarity instead.
+const SILENCE_RMS = 0.0005;
+// How periodic the signal must be (normalized peak height, 0 to 1) to count.
+const MIN_CLARITY = 0.7;
 
-// Estimate the fundamental frequency of one window of samples, or null when it
-// is too quiet or no clear period is found. Autocorrelation with the lag search
-// limited to the guitar range, then parabolic interpolation around the peak for
-// sub-sample precision (a cent is ~0.06% of the period).
-export function detectPitch(samples: Float32Array, sampleRate: number): number | null {
+// The signal level (RMS) of a window, for the mic level meter.
+export function signalLevel(samples: Float32Array): number {
   let sumSquares = 0;
   for (const sample of samples) sumSquares += sample * sample;
-  if (Math.sqrt(sumSquares / samples.length) < SILENCE_RMS) return null;
+  return Math.sqrt(sumSquares / samples.length);
+}
 
+// Estimate the fundamental frequency of one window of samples, or null when it
+// is silent or no clear period is found. McLeod's normalized square difference
+// (NSDF): autocorrelation divided by the energy of the overlapping parts, so the
+// result is the same at any volume and on a decaying note. Lags are limited to
+// the guitar range; parabolic interpolation gives sub-sample precision.
+export function detectPitch(samples: Float32Array, sampleRate: number): number | null {
+  if (signalLevel(samples) < SILENCE_RMS) return null;
+
+  const size = samples.length;
+  const maxLag = Math.min(Math.ceil(sampleRate / MIN_HZ), size - 2);
   const minLag = Math.floor(sampleRate / MAX_HZ);
-  const maxLag = Math.min(Math.ceil(sampleRate / MIN_HZ), samples.length - 1);
-  const size = samples.length - maxLag;
-  const correlation = new Float32Array(maxLag + 2);
+  const nsdf = new Float32Array(maxLag + 2);
+  // m(lag) = sum of squares of both overlapping parts, updated incrementally.
+  let energy = 0;
+  for (const sample of samples) energy += 2 * sample * sample;
   for (let lag = 0; lag <= maxLag + 1; lag++) {
-    let sum = 0;
-    for (let index = 0; index < size; index++) sum += samples[index] * samples[index + lag];
-    correlation[lag] = sum;
+    if (lag > 0) energy -= samples[lag - 1] ** 2 + samples[size - lag] ** 2;
+    let correlation = 0;
+    for (let index = 0; index < size - lag; index++) correlation += samples[index] * samples[index + lag];
+    nsdf[lag] = energy > 0 ? (2 * correlation) / energy : 0;
   }
 
-  // Skip the central peak (lag 0 slope), then collect the local peaks after it.
-  let lag = minLag;
-  while (lag < maxLag && correlation[lag] > correlation[lag + 1]) lag++;
+  // Key maxima: the highest point of each positive lobe after the first
+  // negative zero crossing (which skips the central peak at lag 0).
+  let lag = 1;
+  while (lag <= maxLag && nsdf[lag] > 0) lag++;
   const peaks: number[] = [];
   let strongest = 0;
-  for (; lag <= maxLag; lag++) {
-    if (correlation[lag] > correlation[lag - 1] && correlation[lag] >= correlation[lag + 1]) {
-      peaks.push(lag);
-      strongest = Math.max(strongest, correlation[lag]);
+  while (lag <= maxLag) {
+    while (lag <= maxLag && nsdf[lag] <= 0) lag++;
+    let best = -1;
+    while (lag <= maxLag && nsdf[lag] > 0) {
+      if (lag >= minLag && (best < 0 || nsdf[lag] > nsdf[best])) best = lag;
+      lag++;
+    }
+    if (best > 0) {
+      peaks.push(best);
+      strongest = Math.max(strongest, nsdf[best]);
     }
   }
-  // Reject weak periodicity (noise, a strum of many notes).
-  if (peaks.length === 0 || strongest < correlation[0] * 0.5) return null;
-  // Multiples of the period correlate almost as well as the period itself, so
-  // take the first peak that is nearly as strong as the best (avoids octave errors).
-  const bestLag = peaks.find(peak => correlation[peak] >= strongest * 0.9) ?? peaks[0];
-  const bestValue = correlation[bestLag];
+  if (peaks.length === 0 || strongest < MIN_CLARITY) return null;
+  // Multiples of the period score almost as well as the period itself, so take
+  // the first peak that is nearly as strong as the best (avoids octave errors).
+  const bestLag = peaks.find(peak => nsdf[peak] >= strongest * 0.9) ?? peaks[0];
 
-  const before = correlation[bestLag - 1];
-  const after = correlation[bestLag + 1];
-  const curve = before + after - 2 * bestValue;
+  const before = nsdf[bestLag - 1];
+  const after = nsdf[bestLag + 1];
+  const curve = before + after - 2 * nsdf[bestLag];
   const shift = curve !== 0 ? (before - after) / (2 * curve) : 0;
   return sampleRate / (bestLag + shift);
 }

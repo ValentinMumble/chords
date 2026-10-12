@@ -176,6 +176,21 @@
   font-size: 13px;
   color: var(--muted);
 }
+/* Mic level: shows the tuner is hearing you even before a note is clear. */
+.level {
+  width: 72px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--fill);
+  overflow: hidden;
+}
+.levelFill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: #34c759;
+  transition: width 0.08s linear;
+}
 
 /* Phone landscape (~370px tall): tighter so the whole tuner fits on screen. */
 @media (max-height: 500px) {

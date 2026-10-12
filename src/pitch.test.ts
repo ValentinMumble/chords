@@ -16,6 +16,26 @@ function tone(hz: number, sampleRate: number, length = 4096): Float32Array {
   return samples;
 }
 
+// Half a second into a decaying pluck, at a given peak level plus white noise.
+function pluck(hz: number, sampleRate: number, peak: number, noise: number): Float32Array {
+  const samples = new Float32Array(4096);
+  let seed = 7;
+  const random = () => ((seed = (seed * 16807) % 2147483647) / 2147483647) * 2 - 1;
+  for (let index = 0; index < samples.length; index++) {
+    const time = (index + sampleRate / 2) / sampleRate;
+    const decay = Math.exp(-time * 1.5);
+    samples[index] =
+      peak *
+        decay *
+        (0.5 * Math.sin(2 * Math.PI * hz * time) +
+          0.6 * Math.sin(2 * Math.PI * 2 * hz * time + 0.4) +
+          0.25 * Math.sin(2 * Math.PI * 3 * hz * time + 1.1) +
+          0.15 * Math.sin(2 * Math.PI * 4 * hz * time)) +
+      noise * random();
+  }
+  return samples;
+}
+
 describe('detectPitch', () => {
   for (const sampleRate of [44100, 48000]) {
     for (const string of TUNING) {
@@ -29,6 +49,30 @@ describe('detectPitch', () => {
       }
     }
   }
+
+  // A real pluck through a phone mic with no auto gain: quiet, decaying, noisy.
+  for (const [peak, noise] of [
+    [0.05, 0.003],
+    [0.02, 0.003],
+    [0.008, 0.0005],
+  ]) {
+    it(`quiet decaying pluck (peak ${peak}, noise ${noise}) on every string`, () => {
+      for (const string of TUNING) {
+        const target = midiToHz(string.midi);
+        const detected = detectPitch(pluck(target, 48000, peak, noise), 48000);
+        expect(detected).not.toBeNull();
+        expect(Math.abs(centsBetween(detected!, target))).toBeLessThan(6);
+      }
+    });
+  }
+
+  it('gives no reading rather than a wrong one when the note drowns in noise', () => {
+    for (const string of TUNING) {
+      const target = midiToHz(string.midi);
+      const detected = detectPitch(pluck(target, 48000, 0.008, 0.003), 48000);
+      if (detected !== null) expect(Math.abs(centsBetween(detected, target))).toBeLessThan(6);
+    }
+  });
 
   it('returns null for silence', () => {
     expect(detectPitch(new Float32Array(4096), 48000)).toBeNull();

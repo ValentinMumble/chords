@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {ensureAudio} from '../audio';
-import {detectPitch} from '../pitch';
+import {detectPitch, signalLevel} from '../pitch';
 
 // Window of samples per reading: ~85 ms, enough for a few periods of low E.
 const WINDOW = 4096;
@@ -12,20 +12,25 @@ const HOLD_MS = 700;
 export type MicState = 'idle' | 'listening' | 'denied' | 'unsupported';
 
 // Listens to the microphone and reports the detected frequency (Hz, or null
-// when nothing clear is playing). `start` must run inside a tap: iOS only
+// when nothing clear is playing) and the input level (RMS, for a level meter). `start` must run inside a tap: iOS only
 // grants the mic and resumes audio from a user gesture. The mic is released on
 // `stop` and when the component using it unmounts (leaving the Tuner tab).
 export function usePitchDetector() {
   const [state, setState] = useState<MicState>('idle');
   const [frequency, setFrequency] = useState<number | null>(null);
+  const [level, setLevel] = useState(0);
   const streamRef = useRef<MediaStream | null>(null);
+  const nodesRef = useRef<AudioNode[]>([]);
   const frameRef = useRef(0);
 
   const stop = useCallback(() => {
     cancelAnimationFrame(frameRef.current);
     streamRef.current?.getTracks().forEach(track => track.stop());
     streamRef.current = null;
+    nodesRef.current.forEach(node => node.disconnect());
+    nodesRef.current = [];
     setFrequency(null);
+    setLevel(0);
     setState(current => (current === 'listening' ? 'idle' : current));
   }, []);
 
@@ -47,9 +52,19 @@ export function usePitchDetector() {
       return;
     }
     streamRef.current = stream;
+    // Opening the mic switches iOS's audio session, which can suspend the context.
+    void context.resume();
+    const source = context.createMediaStreamSource(stream);
     const analyser = context.createAnalyser();
     analyser.fftSize = WINDOW;
-    context.createMediaStreamSource(stream).connect(analyser); // not to the speakers
+    // Safari only processes nodes that lead to the output, so route the
+    // analyser into the speakers through a muted gain (nothing is heard).
+    const mute = context.createGain();
+    mute.gain.value = 0;
+    source.connect(analyser);
+    analyser.connect(mute);
+    mute.connect(context.destination);
+    nodesRef.current = [source, analyser, mute];
     const samples = new Float32Array(WINDOW);
     const recent: number[] = [];
     let lastHeard = 0;
@@ -60,7 +75,9 @@ export function usePitchDetector() {
       frameRef.current = requestAnimationFrame(tick);
       skip = !skip; // ~30 readings a second is plenty
       if (skip) return;
+      if (context.state === 'suspended') void context.resume();
       analyser.getFloatTimeDomainData(samples);
+      setLevel(signalLevel(samples));
       const hz = detectPitch(samples, context.sampleRate);
       const now = performance.now();
       if (hz === null) {
@@ -81,5 +98,5 @@ export function usePitchDetector() {
 
   useEffect(() => stop, [stop]);
 
-  return {state, frequency, start, stop};
+  return {state, frequency, level, start, stop};
 }

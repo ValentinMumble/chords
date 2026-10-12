@@ -10,11 +10,18 @@ const IN_TUNE = 5;
 // The needle's range either side of the target note.
 const RANGE = 50;
 const STRING_ORDINALS = ['6th', '5th', '4th', '3rd', '2nd', '1st'];
+// Mic level meter range, in dB of the input's RMS.
+const LEVEL_FLOOR_DB = -60;
+const LEVEL_TOP_DB = -10;
+// Below this the mic hears next to nothing.
+const QUIET_DB = -50;
 
 // A guitar tuner: listens to the mic, picks the nearest open string (or the one
 // you locked by tapping it), and shows how many cents sharp or flat you are.
 export function Tuner() {
-  const {state, frequency, start, stop} = usePitchDetector();
+  const {state, frequency, level, start, stop} = usePitchDetector();
+  const levelDb = level > 0 ? 20 * Math.log10(level) : LEVEL_FLOOR_DB;
+  const levelPercent = Math.max(0, Math.min(100, ((levelDb - LEVEL_FLOOR_DB) / (LEVEL_TOP_DB - LEVEL_FLOOR_DB)) * 100));
   // A string tapped to tune against; null = follow the nearest string.
   const [locked, setLocked] = useState<number | null>(null);
 
@@ -34,7 +41,8 @@ export function Tuner() {
   if (state === 'denied') status = 'Microphone blocked. Allow it for this site in Settings, then try again.';
   else if (state === 'unsupported') status = "This browser can't use the microphone.";
   else if (state === 'idle') status = 'Tap Start, then play a single open string.';
-  else if (cents === null) status = 'Listening… play a single open string.';
+  else if (cents === null && levelDb < QUIET_DB) status = "Can't hear much yet: play a string closer to the mic.";
+  else if (cents === null) status = 'Listening… play a single open string and let it ring.';
   else if (inTune) status = 'In tune';
   else if (cents < 0) status = `Too low by ${Math.round(-cents)} cents · tighten ↑`;
   else status = `Too high by ${Math.round(cents)} cents · loosen ↓`;
@@ -103,10 +111,20 @@ export function Tuner() {
 
       <div className={styles.controls}>
         {state === 'listening' ? (
-          <button className="tab-play playing" onClick={stop}>
-            <span aria-hidden="true">◼</span>
-            Stop
-          </button>
+          <>
+            <button className="tab-play playing" onClick={stop}>
+              <span aria-hidden="true">◼</span>
+              Stop
+            </button>
+            <span
+              className={styles.level}
+              role="meter"
+              aria-label="Microphone level"
+              aria-valuenow={Math.round(levelPercent)}
+            >
+              <span className={styles.levelFill} style={{width: `${levelPercent}%`}} />
+            </span>
+          </>
         ) : (
           <button className="tab-play" onClick={() => void start()}>
             <span aria-hidden="true">●</span>
