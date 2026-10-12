@@ -4,6 +4,26 @@ A guitar chord visualizer and practice tool. Live at [chords.vumble.dev](https:/
 
 Built with Vite, React, and TypeScript.
 
+## Screenshots
+
+**Songs:** play along with a chord progression, with the strum pattern, tempo and a next-up chord.
+
+![Songs tab on desktop](docs/screenshots/songs-desktop.png)
+
+**Practice:** tabs for riffs and exercises, with finger colours, a rhythm lane and a play button with adjustable tempo.
+
+![Practice tab on desktop, dark mode](docs/screenshots/practice-desktop.png)
+
+**Scales and Tuner on a phone:** scale boxes with French note names, and a microphone tuner with a cents meter.
+
+|                                        Scales                                         |                                                         Tuner                                                          |
+| :-----------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------: |
+| <img src="docs/screenshots/scales-phone.png" alt="Scales tab on a phone" width="300"> | <img src="docs/screenshots/tuner-phone.png" alt="Tuner tab on a phone, showing an A string 24 cents flat" width="300"> |
+
+**Landscape on a phone:** the Practice index on the left jumps straight to a card.
+
+![Practice tab in phone landscape with the jump index](docs/screenshots/practice-landscape.png)
+
 ## Features
 
 - 28 common chords: open majors and minors, barre shapes, dominant/minor/major 7ths, sus and add chords
