@@ -80,9 +80,10 @@
     display: none;
   }
 }
-/* Phone landscape: label above a tighter grid, so even a two-bar (16-slot)
-   pattern fits the narrow transport column. */
-@media (max-height: 500px) {
+/* Phones (portrait and landscape): label above a tighter grid whose slots share
+   the width, so even a two-bar (16-slot) pattern fits instead of widening the
+   page (which on phones makes pinned bars drift). */
+@media (max-width: 600px), (max-height: 500px) {
   .strum {
     flex-direction: column;
     gap: 2px;

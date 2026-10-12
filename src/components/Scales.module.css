@@ -133,3 +133,16 @@
     min-width: 30px;
   }
 }
+/* Portrait phone: the 12 root notes in two rows of six, so they fit. */
+@media (max-width: 600px) {
+  .field {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .rootGrid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .rootBtn {
+    min-width: 0;
+  }
+}
