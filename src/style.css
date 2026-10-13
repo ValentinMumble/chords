@@ -220,6 +220,11 @@ h2 {
     background: var(--fill);
     color: var(--ink);
   }
+  /* The card being read (scroll spy), in the tint colour. */
+  .practice-index button[aria-current='true'] {
+    color: var(--accent);
+    font-weight: 600;
+  }
   /* Back to top: an action, so tinted, with a hairline above it, pinned to the
      bottom of the screen in the index column (which follows the centred
      1100px column on wide screens) so it is always visible. */
