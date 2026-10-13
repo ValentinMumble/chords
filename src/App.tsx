@@ -132,16 +132,21 @@ export default function App() {
   }, [activeSound.id]);
 
   // iOS only unlocks the AudioContext when it's resumed inside a user gesture.
-  // Practice playback schedules its first note in a timer (not in the click), so
-  // on iPhone the context would stay suspended and nothing sounds. Resume it on
-  // the first tap/key anywhere, which counts as an in-gesture unlock.
+  // iOS only starts or resumes audio inside a real tap (touchend/click, not a
+  // finger's pointerdown), and a home-screen app's audio is interrupted each
+  // time it goes to the background. So resume on every tap or key (a no-op once
+  // running) and when the app comes back to the foreground.
   useEffect(() => {
     const unlock = () => ensureAudio();
-    window.addEventListener('pointerdown', unlock, {once: true});
-    window.addEventListener('keydown', unlock, {once: true});
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') ensureAudio();
+    };
+    const events = ['touchend', 'click', 'keydown'] as const;
+    events.forEach(name => window.addEventListener(name, unlock, {passive: true}));
+    document.addEventListener('visibilitychange', onVisible);
     return () => {
-      window.removeEventListener('pointerdown', unlock);
-      window.removeEventListener('keydown', unlock);
+      events.forEach(name => window.removeEventListener(name, unlock));
+      document.removeEventListener('visibilitychange', onVisible);
     };
   }, []);
 

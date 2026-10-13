@@ -39,8 +39,17 @@ function roomImpulse(context: AudioContext): AudioBuffer {
   return buffer;
 }
 
+// iOS: ask for the "playback" audio session, like a music app, so sound isn't
+// muted by the ring/silent switch. The tuner switches to "play-and-record"
+// while it listens. (navigator.audioSession: Safari 16.4+; ignored elsewhere.)
+export function setAudioSession(type: 'playback' | 'play-and-record'): void {
+  const session = (navigator as Navigator & {audioSession?: {type: string}}).audioSession;
+  if (session) session.type = type;
+}
+
 export function ensureAudio(): AudioContext {
   if (!ctx) {
+    setAudioSession('playback');
     ctx = new AudioContext();
     // Everything plays into busInput, which splits to a dry path and a wet
     // (reverb) path before the output.
@@ -54,7 +63,9 @@ export function ensureAudio(): AudioContext {
     busInput.connect(dry).connect(ctx.destination);
     busInput.connect(reverb).connect(wet).connect(ctx.destination);
   }
-  if (ctx.state === 'suspended') void ctx.resume();
+  // Resume whenever it isn't running: iOS leaves a home-screen app's audio
+  // "interrupted" (not just "suspended") after it was backgrounded or locked.
+  if (ctx.state !== 'running') ctx.resume().catch(() => {});
   return ctx;
 }
 

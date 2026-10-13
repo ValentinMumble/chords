@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
-import {ensureAudio} from '../audio';
+import {ensureAudio, setAudioSession} from '../audio';
 import {detectPitch, signalLevel} from '../pitch';
 
 // Window of samples per reading: ~85 ms, enough for a few periods of low E.
@@ -29,6 +29,7 @@ export function usePitchDetector() {
     streamRef.current = null;
     nodesRef.current.forEach(node => node.disconnect());
     nodesRef.current = [];
+    setAudioSession('playback'); // back to speaker playback, not the earpiece
     setFrequency(null);
     setLevel(0);
     setState(current => (current === 'listening' ? 'idle' : current));
@@ -40,7 +41,7 @@ export function usePitchDetector() {
       return;
     }
     const context = ensureAudio();
-    void context.resume();
+    setAudioSession('play-and-record');
     let stream: MediaStream;
     try {
       // Raw signal: the phone's voice processing would distort the pitch.
@@ -48,6 +49,7 @@ export function usePitchDetector() {
         audio: {echoCancellation: false, noiseSuppression: false, autoGainControl: false},
       });
     } catch {
+      setAudioSession('playback');
       setState('denied');
       return;
     }
