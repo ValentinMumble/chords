@@ -233,7 +233,12 @@ export default function App() {
   return (
     <main>
       <div className={styles.topbar}>
-        <h1>🎸 Chords</h1>
+        <h1>
+          {/* The logo takes you back to the top, like tapping an iOS title bar. */}
+          <button className={styles.logo} onClick={() => window.scrollTo(0, 0)}>
+            🎸 Chords
+          </button>
+        </h1>
         <div className={styles.legends}>
           <div className={styles.fingerLegend}>
             <span className={styles.legendLabel}>Fingers</span>

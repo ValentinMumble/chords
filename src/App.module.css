@@ -29,6 +29,16 @@
   backdrop-filter: blur(20px) saturate(180%);
   border-bottom: 0.5px solid var(--line);
 }
+/* The title is a plain-looking button that scrolls back to the top. */
+.logo {
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
 .legends {
   display: flex;
   align-items: center;
