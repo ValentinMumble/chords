@@ -1,4 +1,4 @@
-import type {ReactNode} from 'react';
+import type {CSSProperties, ReactNode} from 'react';
 import {useEffect, useRef, useState} from 'react';
 import {
   CHORDS,
@@ -319,7 +319,18 @@ export default function App() {
       )}
       {/* Phone portrait: the sections move to a floating glass tab bar, like an
           iOS app. Hidden (CSS) wherever the top switcher is shown. */}
-      <nav className={styles.tabBar} aria-label="Sections">
+      <nav
+        className={styles.tabBar}
+        aria-label="Sections"
+        style={
+          {
+            '--count': MODES.length,
+            '--index': MODES.findIndex(item => item.key === mode),
+          } as CSSProperties
+        }
+      >
+        {/* The glass lens under the current tab: it slides from one tab to the next. */}
+        <span className={styles.tabGlow} aria-hidden="true" />
         {MODES.map(item => (
           <button
             key={item.key}
