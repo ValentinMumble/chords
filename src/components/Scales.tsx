@@ -233,7 +233,7 @@ export function Scales() {
                     textAnchor="middle"
                     fontSize={10}
                     fontWeight={600}
-                    fill={isRoot ? '#fff' : 'var(--accent)'}
+                    fill={isRoot ? 'var(--on-accent)' : 'var(--accent)'}
                   >
                     {FRENCH[pc]}
                   </text>

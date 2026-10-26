@@ -76,7 +76,9 @@ h2 {
 }
 .exercise {
   background: var(--surface);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
+  box-shadow: var(--glass-shadow);
   padding: 1.25rem 1.5rem;
   /* Skip rendering exercises that are off-screen until scrolled near — the tab
      SVGs are heavy, so this keeps the Practice tab fast to open (esp. on mobile).
@@ -154,7 +156,7 @@ h2 {
 }
 .tab-play.playing {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 /* Short viewport (phone landscape): tighten the practice/gear cards + headings. */

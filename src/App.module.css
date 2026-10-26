@@ -89,7 +89,9 @@
 .stage {
   margin-top: 1rem;
   background: var(--surface);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
+  box-shadow: var(--glass-shadow);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;

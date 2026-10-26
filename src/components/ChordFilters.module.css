@@ -16,7 +16,7 @@
 }
 .filters button.active {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 .divider {
   width: 1px;

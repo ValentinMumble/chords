@@ -1,6 +1,8 @@
 .transport {
   background: var(--surface);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
+  box-shadow: var(--glass-shadow);
   padding: 1.25rem 1.5rem;
 }
 .row {
@@ -20,9 +22,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--accent);
+  background: #ffffff;
   border: none;
-  color: #fff;
+  color: var(--on-accent);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   transition: scale 0.15s ease;
 }

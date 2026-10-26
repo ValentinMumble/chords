@@ -1,19 +1,24 @@
-/* Design tokens + base resets, modelled on the iOS system palette (grouped
-   background, secondary grouped cards, label/separator colours, system blue as
-   the tint). Imported before style.css so the variables reach every rule. */
+/* Design tokens + base resets: Liquid Glass. Frosted, translucent cards over a
+   blurred desert-sunset backdrop (body::before), white text, a warm amber tint.
+   One look in light and dark mode. Imported before style.css so the variables
+   reach every rule. */
 :root {
-  --bg: #f2f2f7; /* systemGroupedBackground: the page */
-  --surface: #ffffff; /* secondarySystemGroupedBackground: cards */
-  --panel: #f2f2f7; /* inset panels inside a card (tab staff, scale board) */
-  --fill: rgba(118, 118, 128, 0.12); /* tertiarySystemFill: buttons, chips, menus */
-  --bar: rgba(242, 242, 247, 0.72); /* frosted bars */
-  --ink: #000000;
-  --muted: rgba(60, 60, 67, 0.6); /* secondaryLabel */
-  --faint: rgba(60, 60, 67, 0.3); /* tertiaryLabel */
-  --line: rgba(60, 60, 67, 0.29); /* separator */
-  --accent: #007aff; /* systemBlue tint */
-  --accent-soft: #e5f1ff; /* opaque, so SVG masks behind digits still hide lines */
-  --radius: 16px;
+  color-scheme: dark;
+  --bg: #141a2b; /* deep dusk, under the sunset glow */
+  --surface: rgba(255, 255, 255, 0.12); /* glass cards */
+  --panel: #1c2336; /* opaque inset panels (tab staff, scale board), so SVG masks hide lines */
+  --fill: rgba(255, 255, 255, 0.14); /* buttons, chips, menus */
+  --bar: rgba(20, 26, 43, 0.5); /* frosted bars */
+  --ink: #ffffff;
+  --muted: rgba(255, 255, 255, 0.72);
+  --faint: rgba(255, 255, 255, 0.45);
+  --line: rgba(255, 255, 255, 0.22);
+  --accent: #ffb340; /* sunset amber tint */
+  --accent-soft: #3d3221; /* opaque, so SVG masks behind digits still hide lines */
+  --on-accent: #1a1f2e; /* text on the tint */
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 10px 30px rgba(0, 0, 0, 0.22);
+  --radius: 22px;
   /* Side safe areas. In landscape only the island side keeps its inset (main.tsx
      sets data-notch), so the other side doesn't waste ~50px. */
   --safe-left: env(safe-area-inset-left);
@@ -29,21 +34,6 @@
 :root[data-notch='right'] {
   --safe-left: 0px;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #000000;
-    --surface: #1c1c1e;
-    --panel: #2c2c2e;
-    --fill: rgba(118, 118, 128, 0.24);
-    --bar: rgba(22, 22, 24, 0.7);
-    --ink: #ffffff;
-    --muted: rgba(235, 235, 245, 0.6);
-    --faint: rgba(235, 235, 245, 0.3);
-    --line: rgba(84, 84, 88, 0.65);
-    --accent: #0a84ff;
-    --accent-soft: #0b2a4d;
-  }
-}
 * {
   box-sizing: border-box;
 }
@@ -52,6 +42,20 @@ html {
      positioning keeps working. */
   overflow-x: clip;
   -webkit-text-size-adjust: 100%;
+}
+/* The backdrop: soft glows of sunset orange, sand and dusk blue, fixed behind
+   everything (a pseudo-element, since iOS ignores background-attachment). */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(8, 10, 20, 0.3), rgba(8, 10, 20, 0.3)),
+    radial-gradient(60% 45% at 92% 0%, rgba(224, 115, 58, 0.95), transparent 70%),
+    radial-gradient(55% 40% at 0% 45%, rgba(217, 164, 91, 0.7), transparent 70%),
+    radial-gradient(70% 50% at 95% 100%, rgba(47, 93, 154, 0.9), transparent 70%), var(--bg);
 }
 body {
   margin: 0;

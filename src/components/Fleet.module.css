@@ -13,7 +13,9 @@
   flex-direction: column;
   gap: 2px;
   background: var(--surface);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
+  box-shadow: var(--glass-shadow);
   padding: 1rem 1.25rem;
 }
 .statValue {
@@ -28,7 +30,9 @@
 }
 .card {
   background: var(--surface);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
+  box-shadow: var(--glass-shadow);
   padding: 1.25rem 1.5rem;
 }
 .head {
@@ -117,18 +121,18 @@
   border-radius: 999px;
   border: 1px solid transparent;
 }
-/* iOS system green / orange / red. */
+/* iOS system green / orange / red (dark-mode shades, readable on glass). */
 .fresh {
-  color: #248a3d;
-  background: rgba(52, 199, 89, 0.15);
+  color: #30d158;
+  background: rgba(48, 209, 88, 0.16);
 }
 .aging {
-  color: #c93400;
-  background: rgba(255, 149, 0, 0.16);
+  color: #ff9f0a;
+  background: rgba(255, 159, 10, 0.16);
 }
 .overdue {
-  color: #ff3b30;
-  background: rgba(255, 59, 48, 0.12);
+  color: #ff453a;
+  background: rgba(255, 69, 58, 0.16);
 }
 .stringsDate {
   font-size: 13px;

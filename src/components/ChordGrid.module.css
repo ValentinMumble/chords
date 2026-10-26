@@ -45,9 +45,10 @@
 }
 .grid button.active {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   font-weight: 600;
 }
 .grid button.active .fr {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--on-accent);
+  opacity: 0.75;
 }

@@ -2,7 +2,9 @@
   max-width: 640px;
   margin: 0 auto;
   background: var(--surface);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
+  box-shadow: var(--glass-shadow);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -154,7 +156,7 @@
 }
 .string.locked {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 .stringEn {
   font-size: 18px;
