@@ -20,6 +20,11 @@ import {
   SOMEDAY_CHORDS,
   SOMEDAY_CHORUS,
   SOMEDAY_CHORUS_CHORDS,
+  SOMEDAY_RHYTHM_PART,
+  SOMEDAY_RHYTHM_CHORDS,
+  SHES_LOST_CONTROL_BASS,
+  SHES_LOST_CONTROL_RIFF,
+  SHES_LOST_CONTROL_RIFF_CHORDS,
 } from '../data/exercises';
 
 // An exercise card whose open/closed state is remembered per card in localStorage,
@@ -45,6 +50,7 @@ function CollapsibleExercise({id, title, children}: {id: string; title: string; 
 
 // Short names for the landscape jump index, in card order (ids match the cards).
 const INDEX: {id: string; label: string}[] = [
+  {id: 'shes-lost-control', label: "She's Lost Control"},
   {id: 'someday', label: 'Someday'},
   {id: 'polly', label: 'Polly'},
   {id: 'miss-you', label: 'Miss You'},
@@ -141,6 +147,37 @@ export function Exercises({
         </button>
       </nav>
       <div className="exercises">
+        <CollapsibleExercise id="shes-lost-control" title="She's Lost Control — Joy Division">
+          <p className="exercise-note">
+            The bass line played on guitar, high on the A string (frets 10 to 17): index on 13 and 10, ring on 15, pinky
+            on 17. Pick it as written, starting with two downstrokes. Then the guitar riff as power chords on the three
+            low strings: G · A · A# · C, landing on D, then again landing on A. Keep the rests on beats 2 and 4 crisp.
+          </p>
+          <PlayableTab
+            bars={SHES_LOST_CONTROL_BASS}
+            storageKey="slc-bass"
+            defaultTempo={140}
+            subdiv={2}
+            showRhythm
+            barsPerRow={2}
+            firstBar={1}
+            caption="Bass line on the A string — hold the note on beat 3 in bars 2 and 4"
+            {...shared}
+          />
+          <PlayableTab
+            bars={SHES_LOST_CONTROL_RIFF}
+            storageKey="slc-riff"
+            defaultTempo={140}
+            subdiv={2}
+            showRhythm
+            barsPerRow={2}
+            chords={SHES_LOST_CONTROL_RIFF_CHORDS}
+            firstBar={1}
+            caption="Guitar riff — power chords on the three low strings, rests on beats 2 and 4"
+            {...shared}
+          />
+        </CollapsibleExercise>
+
         <CollapsibleExercise id="someday" title="Someday — The Strokes">
           <p className="exercise-note">
             Albert Hammond Jr's intro lead: three-note shapes on the top three strings, moving between A and D around
@@ -169,6 +206,18 @@ export function Exercises({
             chords={SOMEDAY_CHORUS_CHORDS}
             firstBar={1}
             caption="Chorus lead — double-stop on 3, high note on 4, then the double-stop again on the next downbeat"
+            {...shared}
+          />
+          <PlayableTab
+            bars={SOMEDAY_RHYTHM_PART}
+            storageKey="someday-rhythm"
+            defaultTempo={106}
+            subdiv={4}
+            showRhythm
+            barsPerRow={1}
+            chords={SOMEDAY_RHYTHM_CHORDS}
+            firstBar={1}
+            caption="Rhythm part (Nick Valensi) — A/E then D, constant down-up sixteenths; let the held chords ring"
             {...shared}
           />
         </CollapsibleExercise>

@@ -418,3 +418,99 @@ export const SOMEDAY_CHORUS: Col[][] = SOMEDAY_CHORUS_BARS.map(placements => {
   return bar;
 });
 export const SOMEDAY_CHORUS_CHORDS = ['A', 'C#m', 'F#m', 'D', 'A'];
+
+// Someday, Nick Valensi's rhythm part: A/E and D strummed in constant down-up
+// sixteenths (106 bpm). Verse bars: A/E, then D twice; the first D bar lets the
+// chord ring through the first sixteenth of beats 2 and 4. In each pattern 'x'
+// is a strum and '-' holds the previous chord. Notes are [row, fret, finger].
+const SOMEDAY_A_E: [number, number, number][] = [
+  [0, 5, 1],
+  [1, 5, 1],
+  [2, 6, 2],
+  [3, 7, 3],
+  [4, 7, 4],
+];
+const SOMEDAY_D_SHAPE: [number, number, number][] = [
+  [1, 7, 3],
+  [2, 7, 3],
+  [3, 7, 3],
+  [4, 5, 1],
+];
+const strummedBar = (shape: [number, number, number][], pattern: string): Col[] =>
+  [...pattern].map((stroke, index) => {
+    const column: Col = [null, null, null, null, null, null];
+    if (stroke !== 'x') return column;
+    const beats = pattern[index + 1] === '-' ? 0.5 : 0.25;
+    shape.forEach(([row, fret, finger]) => {
+      column[row] = {fret, finger, beats};
+    });
+    return column;
+  });
+export const SOMEDAY_RHYTHM_PART: Col[][] = [
+  strummedBar(SOMEDAY_A_E, 'xxxxxxxxxxxxxxxx'),
+  strummedBar(SOMEDAY_D_SHAPE, 'xxxx-xxxxxxx-xxx'),
+  strummedBar(SOMEDAY_D_SHAPE, 'xxxxxxxxxxxxxxxx'),
+];
+export const SOMEDAY_RHYTHM_CHORDS = ['A/E', 'D', 'D'];
+
+// She's Lost Control (Joy Division), from a printed guitar arrangement.
+// The bass line played on guitar, high on the A string: a quarter then six
+// eighths on D (17) and C (15), and the D-C-B♭-G runs with a held note on beat 3.
+// Fingers: index on 13 and 10, ring on 15, pinky on 17.
+const SLC_FINGER: Record<number, number> = {10: 1, 13: 1, 15: 3, 17: 4};
+const singleNotes = (row: number, frets: number[]): Col[] =>
+  frets.map(fret => {
+    const column: Col = [null, null, null, null, null, null];
+    column[row] = {fret, finger: SLC_FINGER[fret]};
+    return column;
+  });
+const SLC_STEADY = [1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5];
+const SLC_RUN = [0.5, 0.5, 0.5, 1, 0.5, 0.5, 0.5];
+export const SHES_LOST_CONTROL_BASS = applyRhythm(
+  [
+    singleNotes(4, [17, 17, 17, 17, 17, 17, 17]),
+    singleNotes(4, [15, 17, 15, 13, 13, 13, 13]),
+    singleNotes(4, [15, 15, 15, 15, 15, 15, 15]),
+    singleNotes(4, [13, 15, 13, 10, 10, 10, 10]),
+  ],
+  barIndex => (barIndex % 2 === 0 ? SLC_STEADY : SLC_RUN),
+  2,
+);
+
+// The guitar riff, as power chords on the three low strings (the top three
+// strings of the printed voicings are crossed out on the sheet). Eighth-note
+// strums with an eighth rest on beats 2 and 4: G G · A A A · A#, A# A# · C C C · D,
+// two bars of D, then the same with A in place of D. Root on the low E (index),
+// fifth and octave on A and D (ring and pinky). '-' is a rest.
+const SLC_ROOT_FRET: Record<string, number> = {G: 3, A: 5, 'A#': 6, C: 8, D: 10};
+const powerChordBar = (strums: string[]): Col[] =>
+  strums.map(name => {
+    const column: Col = [null, null, null, null, null, null];
+    const root = SLC_ROOT_FRET[name];
+    if (root === undefined) return column;
+    column[5] = {fret: root, finger: 1, beats: 0.5};
+    column[4] = {fret: root + 2, finger: 3, beats: 0.5};
+    column[3] = {fret: root + 2, finger: 4, beats: 0.5};
+    return column;
+  });
+const slcHold = (name: string): string[] => Array.from({length: 8}, () => name);
+export const SHES_LOST_CONTROL_RIFF: Col[][] = [
+  powerChordBar(['G', 'G', '-', 'A', 'A', 'A', '-', 'A#']),
+  powerChordBar(['A#', 'A#', '-', 'C', 'C', 'C', '-', 'D']),
+  powerChordBar(slcHold('D')),
+  powerChordBar(slcHold('D')),
+  powerChordBar(['G', 'G', '-', 'A', 'A', 'A', '-', 'A#']),
+  powerChordBar(['A#', 'A#', '-', 'C', 'C', 'C', '-', 'A']),
+  powerChordBar(slcHold('A')),
+  powerChordBar(slcHold('A')),
+];
+export const SHES_LOST_CONTROL_RIFF_CHORDS = [
+  'G · A · A#',
+  'A# · C · D',
+  'D',
+  'D',
+  'G · A · A#',
+  'A# · C · A',
+  'A',
+  'A',
+];
