@@ -38,7 +38,7 @@ Built with Vite, React, and TypeScript.
 
 - Tabs for riffs and exercises: Someday, Polly, Miss You, Dust in the Wind, Stairway to Heaven, A Forest, Peter Gunn, plus chromatic, staircase and dexterity drills
 - Finger colours on every note, a rhythm lane with beamed note values, and play/stop with an adjustable tempo per tab
-- Cards fold away and remember it; in phone landscape, an index on the side jumps straight to a card
+- Cards fold away and remember it; an index on the side (desktop and phone landscape) follows the card being read and jumps straight to one
 
 **Scales**
 
@@ -57,7 +57,7 @@ Built with Vite, React, and TypeScript.
 **Everywhere**
 
 - Real guitar sound via [soundfont-player](https://github.com/danigb/soundfont-player) with 8 sounds (steel and nylon acoustic, clean, jazz, muted, overdriven and distorted electric, harmonics) and a Web Audio fallback while samples load
-- iOS look in light and dark mode (follows the system), built for iPhone in portrait and landscape, with a home screen icon
+- Liquid Glass look in light and dark mode (follows the system): frosted cards over a sunset backdrop, a tab bar with a lens under the current tab; built for iPhone in portrait and landscape, with a home screen icon
 - Keyboard shortcuts: `←` / `→` to change chord (or jump bars while a song plays), `space` to play or pause, `s` to strum, `a` for an arpeggio
 - Choices are saved in the browser (chord, song, tempo, sound, folded cards, scale), so they survive a reload
 
