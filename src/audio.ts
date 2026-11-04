@@ -259,6 +259,21 @@ export function pluckMidi(midi: number, when: number, gain: number): void {
   }
 }
 
+// A metronome click for count-ins: a short blip, higher on the bar's first beat.
+export function click(when: number, accent: boolean): void {
+  const context = ensureAudio();
+  const osc = context.createOscillator();
+  const gain = context.createGain();
+  osc.frequency.value = accent ? 1600 : 1100;
+  gain.gain.setValueAtTime(0.0001, when);
+  gain.gain.exponentialRampToValueAtTime(0.35, when + 0.002);
+  gain.gain.exponentialRampToValueAtTime(0.0001, when + 0.06);
+  osc.connect(gain);
+  gain.connect(context.destination);
+  osc.start(when);
+  osc.stop(when + 0.07);
+}
+
 export function arpeggio(chord: Chord): void {
   playChord(chord, ARPEGGIO_STAGGER);
 }

@@ -2,11 +2,39 @@ import {Fragment, useEffect, useRef, useState, type ReactNode} from 'react';
 import {PlayableTab} from './PlayableTab';
 import {usePersistedState} from '../hooks/usePersistedState';
 import {PRACTICE} from '../data/practice';
+import {formatDuration, mergeDays, stats, usePracticeLog, type PracticeStats} from '../practiceLog';
+
+// "Today 12 min · 3-day streak · 2 h 05 in all", leaving out what's empty.
+function describe({today, total, streak}: PracticeStats): string {
+  return [
+    today > 0 && `Today ${formatDuration(today)}`,
+    streak > 1 && `${streak}-day streak`,
+    total > 0 && `${formatDuration(total)} in all`,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+}
 
 // An exercise card whose open/closed state is remembered per card in localStorage,
-// so long tabs can be folded away and stay that way across visits.
-function CollapsibleExercise({id, title, children}: {id: string; title: string; children: ReactNode}) {
+// so long tabs can be folded away and stay that way across visits. A card opened
+// through a link (`linked`) opens even if it was folded.
+function CollapsibleExercise({
+  id,
+  title,
+  practice,
+  linked,
+  children,
+}: {
+  id: string;
+  title: string;
+  practice: string;
+  linked: boolean;
+  children: ReactNode;
+}) {
   const [open, setOpen] = usePersistedState(`exercise:${id}:open`, true);
+  useEffect(() => {
+    if (linked) setOpen(true);
+  }, [linked, setOpen]);
   return (
     <section className="exercise" id={`exercise-${id}`}>
       <button
@@ -18,6 +46,7 @@ function CollapsibleExercise({id, title, children}: {id: string; title: string; 
           {open ? '▾' : '▸'}
         </span>
         <h2>{title}</h2>
+        {practice && <span className="exercise-log">{practice}</span>}
       </button>
       {open && children}
     </section>
@@ -36,6 +65,19 @@ function jumpTo(id: string): void {
   if (!card) return;
   card.scrollIntoView({block: 'start'});
   requestAnimationFrame(() => requestAnimationFrame(() => card.scrollIntoView({block: 'start'})));
+}
+
+// The card named in the URL (/practice#someday), if there is one.
+function cardFromHash(): string | null {
+  const id = decodeURIComponent(window.location.hash.slice(1));
+  return INDEX.some(entry => entry.id === id) ? id : null;
+}
+
+// Keep the URL on the card last jumped to, so it can be shared or bookmarked.
+// replaceState: the back button still leaves Practice, not each card.
+function setCardHash(id: string | null): void {
+  const {pathname, search} = window.location;
+  window.history.replaceState(null, '', `${pathname}${search}${id ? `#${id}` : ''}`);
 }
 
 // How long a tapped index entry stays highlighted regardless of scroll position.
@@ -92,6 +134,22 @@ export function Exercises({
   // enough to bring it to the reading line (cards near the end of the page).
   const highlighted = jumpedTo && performance.now() - jumpedTo.at < JUMP_HOLD_MS ? jumpedTo.id : currentId;
 
+  // A link to one card: open it and jump there, on load and when the hash changes.
+  const [linked, setLinked] = useState(cardFromHash);
+  useEffect(() => {
+    const onHashChange = () => setLinked(cardFromHash());
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+  useEffect(() => {
+    if (!linked) return;
+    // After the card has opened (its effect runs first, the render follows).
+    const frame = requestAnimationFrame(() => jumpTo(linked));
+    return () => cancelAnimationFrame(frame);
+  }, [linked]);
+
+  const log = usePracticeLog();
+  const overall = describe(stats(mergeDays(log)));
   return (
     <div className="practice">
       {/* Phone landscape only (CSS): a pinned index to jump straight to a card. */}
@@ -102,23 +160,37 @@ export function Exercises({
             aria-current={highlighted === id ? 'true' : undefined}
             onClick={() => {
               setJumpedTo({id, at: performance.now()});
+              setCardHash(id);
               jumpTo(id);
             }}
           >
             {label}
           </button>
         ))}
-        <button className="practice-index-top" onClick={() => window.scrollTo(0, 0)}>
+        <button
+          className="practice-index-top"
+          onClick={() => {
+            setCardHash(null);
+            window.scrollTo(0, 0);
+          }}
+        >
           ↑ Top
         </button>
       </nav>
       <div className="exercises">
+        {overall && <p className="practice-summary">{overall}</p>}
         {PRACTICE.map(card => (
-          <CollapsibleExercise key={card.id} id={card.id} title={card.title}>
+          <CollapsibleExercise
+            key={card.id}
+            id={card.id}
+            title={card.title}
+            practice={describe(stats(log[card.id] ?? {}))}
+            linked={linked === card.id}
+          >
             {card.tabs.map(({note, ...tab}) => (
               <Fragment key={tab.storageKey}>
                 {note && <p className="exercise-note">{note}</p>}
-                <PlayableTab {...tab} {...shared} />
+                <PlayableTab {...tab} {...shared} logId={card.id} />
               </Fragment>
             ))}
           </CollapsibleExercise>

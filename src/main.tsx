@@ -15,3 +15,9 @@ window.addEventListener('orientationchange', markNotchSide);
 window.addEventListener('resize', markNotchSide);
 
 createRoot(document.getElementById('root')!).render(<App />);
+
+// Works offline once visited (public/sw.js). Not in development, where a cached
+// app would hide the changes being made.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+}

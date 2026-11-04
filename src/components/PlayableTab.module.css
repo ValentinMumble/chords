@@ -21,3 +21,37 @@
   color: var(--muted);
   min-width: 56px;
 }
+/* Practice tools under the transport: toggles and the bars to loop. */
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.chip {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 999px;
+  background: var(--fill);
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+}
+.chip[aria-pressed='true'] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.loop {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.loop select {
+  font-size: 13px;
+  padding: 4px 26px 4px 10px;
+  background-position: right 8px center;
+}

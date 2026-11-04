@@ -112,6 +112,19 @@ h2 {
 .exercise-toggle h2 {
   margin: 0;
 }
+/* Time practised on this card, at the right of its header. */
+.exercise-log {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--faint);
+  text-align: right;
+}
+/* Overall practice time and streak, above the cards. */
+.practice-summary {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
 .exercise-caret {
   flex-shrink: 0;
   width: 12px;
