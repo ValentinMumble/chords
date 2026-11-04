@@ -12,7 +12,7 @@ export type Cell = {fret: number; finger?: number; slur?: boolean; beats?: numbe
 // low E (index 5); null means that string isn't played on that slot.
 export type Col = Cell[];
 
-const emptyColumn = (): Col => [null, null, null, null, null, null];
+export const emptyColumn = (): Col => [null, null, null, null, null, null];
 
 // Parse aligned ASCII tab (six lines, high-E first) into bars of columns. Tol-
 // erates an optional string label and leading "|"/"||"; "|" separates bars. One
@@ -119,4 +119,58 @@ export function applyRhythm(bars: Col[][], rhythmFor: (barIndex: number) => numb
       return [first, ...rests];
     });
   });
+}
+
+// --- Builders: write tab data as notes and patterns instead of filling columns
+// by hand. Every exercise uses these, so a new song is a few short lines.
+
+// A note to place in a column: [string row (0 = high e … 5 = low E), fret,
+// finger?]. Leave the finger out for open strings.
+export type Note = readonly [number, number, number?];
+
+// One column sounding the given notes, each tagged with `beats` when given.
+export function column(notes: readonly Note[], beats?: number): Col {
+  const result = emptyColumn();
+  notes.forEach(([row, fret, finger]) => {
+    result[row] = beats === undefined ? {fret, finger} : {fret, finger, beats};
+  });
+  return result;
+}
+
+const STRING_ROWS: Record<string, number> = {e: 0, B: 1, G: 2, D: 3, A: 4, E: 5};
+
+// Notes written like tab: 'B14/1 G14/1' = B string fret 14 with finger 1 and G
+// string fret 14 with finger 1. The finger is optional ('E0' = open low E).
+export function notes(text: string): Note[] {
+  return text
+    .trim()
+    .split(/\s+/)
+    .map(token => {
+      const match = /^([eBGDAE])(\d+)(?:\/(\d))?$/.exec(token);
+      if (!match) throw new Error(`Bad note "${token}" (expected like "B14/1")`);
+      const [, string, fret, finger] = match;
+      return [STRING_ROWS[string], Number(fret), finger === undefined ? undefined : Number(finger)] as const;
+    });
+}
+
+// A bar laid out slot by slot on a fixed grid: notes to sound, '-' to let the
+// previous notes ring on, '.' for silence. Each attack lasts slotBeats times
+// (1 + the number of '-' right after it), so the rhythm lane draws it right.
+export type Slot = readonly Note[] | '-' | '.';
+export function slots(entries: readonly Slot[], slotBeats: number): Col[] {
+  return entries.map((entry, index) => {
+    if (entry === '-' || entry === '.') return emptyColumn();
+    let held = 0;
+    while (entries[index + 1 + held] === '-') held += 1;
+    return column(entry, slotBeats * (1 + held));
+  });
+}
+
+// Strum one chord shape on a pattern: 'x' strums, '-' rings on, '.' is silent.
+// strum(notes('A5/1 D7/3 G7/3 B7/3'), 'xxxx-xxx', 0.25) is a bar of sixteenths.
+export function strum(shape: readonly Note[], pattern: string, slotBeats: number): Col[] {
+  return slots(
+    [...pattern].map(char => (char === 'x' ? shape : char === '-' ? '-' : '.')),
+    slotBeats,
+  );
 }

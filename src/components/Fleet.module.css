@@ -121,18 +121,18 @@
   border-radius: 999px;
   border: 1px solid transparent;
 }
-/* iOS system green / orange / red (dark-mode shades, readable on glass). */
+/* The theme status colours, with a faint wash of the same colour behind. */
 .fresh {
-  color: #30d158;
-  background: rgba(48, 209, 88, 0.16);
+  color: var(--good);
+  background: color-mix(in srgb, var(--good) 16%, transparent);
 }
 .aging {
-  color: #ff9f0a;
-  background: rgba(255, 159, 10, 0.16);
+  color: var(--close);
+  background: color-mix(in srgb, var(--close) 16%, transparent);
 }
 .overdue {
-  color: #ff453a;
-  background: rgba(255, 69, 58, 0.16);
+  color: var(--off);
+  background: color-mix(in srgb, var(--off) 16%, transparent);
 }
 .stringsDate {
   font-size: 13px;

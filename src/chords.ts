@@ -64,13 +64,13 @@ export const SHAPE_FILTERS: {key: Exclude<ShapeFilter, 'any'>; label: string}[] 
   {key: 'barre', label: 'Barre'},
 ];
 
-// Per-finger color code (1 index, 2 middle, 3 ring, 4 pinky). Coral-led palette
-// harmonious with the accent; all read with white numerals in both modes.
+// Per-finger color code (1 index, 2 middle, 3 ring, 4 pinky). The colours are
+// theme tokens (--finger-n in theme.css), so they work as SVG fills and CSS.
 export const FINGER_COLORS: Record<number, string> = {
-  1: '#d85a30',
-  2: '#ba7517',
-  3: '#0f6e56',
-  4: '#534ab7',
+  1: 'var(--finger-1)',
+  2: 'var(--finger-2)',
+  3: 'var(--finger-3)',
+  4: 'var(--finger-4)',
 };
 
 export interface Barre {

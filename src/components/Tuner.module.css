@@ -104,7 +104,7 @@
   font-weight: 600;
 }
 
-/* Colour by how close the string is (iOS green / orange / red). */
+/* Colour by how close the string is (theme status colours). */
 .idle {
   color: var(--muted);
 }
@@ -112,22 +112,22 @@
   background: var(--faint);
 }
 .good {
-  color: #34c759;
+  color: var(--good);
 }
 .needle.good {
-  background: #34c759;
+  background: var(--good);
 }
 .close {
-  color: #ff9500;
+  color: var(--close);
 }
 .needle.close {
-  background: #ff9500;
+  background: var(--close);
 }
 .off {
-  color: #ff3b30;
+  color: var(--off);
 }
 .needle.off {
-  background: #ff3b30;
+  background: var(--off);
 }
 
 /* The six strings: tap to lock one and hear its reference note. */
@@ -190,7 +190,7 @@
   display: block;
   height: 100%;
   border-radius: 3px;
-  background: #34c759;
+  background: var(--good);
   transition: width 0.08s linear;
 }
 
