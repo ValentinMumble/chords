@@ -36,9 +36,11 @@ Built with Vite, React, and TypeScript.
 
 **Practice**
 
-- Tabs for riffs and exercises: Someday, Polly, Miss You, Dust in the Wind, Stairway to Heaven, A Forest, Peter Gunn, plus chromatic, staircase and dexterity drills
-- Finger colours on every note, a rhythm lane with beamed note values, and play/stop with an adjustable tempo per tab
-- Cards fold away and remember it; an index on the side (desktop and phone landscape) follows the card being read and jumps straight to one
+- Tabs for riffs and exercises: She's Lost Control, Someday, Polly, Miss You, Dust in the Wind, Stairway to Heaven, A Forest, Peter Gunn, plus hammer-on and pull-off routines and chromatic, staircase, dexterity and spider drills
+- Finger colours on every note, slurs for hammer-ons and pull-offs, a rhythm lane with beamed note values, and play/stop with an adjustable tempo per tab
+- Practice tools on every tab: a count-in, a loop over chosen bars, and a speed trainer (+5 bpm each loop)
+- A practice log on the device: time today, total and streak per card and overall
+- Cards fold away and remember it; an index on the side (desktop and phone landscape) follows the card being read and jumps straight to one; `/practice#<card>` links to a single card
 
 **Scales**
 
@@ -60,6 +62,8 @@ Built with Vite, React, and TypeScript.
 - Liquid Glass look in light and dark mode (follows the system): frosted cards over a sunset backdrop, a tab bar with a lens under the current tab; built for iPhone in portrait and landscape, with a home screen icon
 - Keyboard shortcuts: `←` / `→` to change chord (or jump bars while a song plays), `space` to play or pause, `s` to strum, `a` for an arpeggio
 - Choices are saved in the browser (chord, song, tempo, sound, folded cards, scale), so they survive a reload
+- Works offline once visited: the app and every guitar sound played once are kept by a service worker
+- Each tab has its own address (`/practice`, `/scales`, `/tuner`, `/gear`)
 
 ## Development
 
@@ -67,7 +71,7 @@ Built with Vite, React, and TypeScript.
 npm install
 npm run dev     # dev server on :5180
 npm run build   # type-check + production build to dist/
-npm test        # vitest (pure logic: chord names, barres, note math)
+npm test        # vitest (pure logic: chord names, note math, tab helpers, practice log, checks on every tab)
 ```
 
 ## Deployment

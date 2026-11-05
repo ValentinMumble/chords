@@ -4,6 +4,7 @@ export * from './drills';
 export * from './stairway';
 export * from './aForest';
 export * from './dust';
+export * from './legato';
 export * from './missYou';
 export * from './polly';
 export * from './someday';

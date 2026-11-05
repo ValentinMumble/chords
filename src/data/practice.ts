@@ -1,6 +1,7 @@
 import {aForest} from './exercises/aForest';
 import {chromatic, dexterity, peterGunn} from './exercises/drills';
 import {dust} from './exercises/dust';
+import {legato} from './exercises/legato';
 import {missYou} from './exercises/missYou';
 import {polly} from './exercises/polly';
 import {shesLostControl} from './exercises/shesLostControl';
@@ -20,6 +21,7 @@ export const PRACTICE: PracticeCard[] = [
   dust,
   stairway,
   aForest,
+  legato,
   dexterity,
   chromatic,
   peterGunn,

@@ -30,6 +30,16 @@ export interface TabPlaybackOptions {
   onLoop?: () => void;
 }
 
+// Whether the note on `row` at column `index` is hammered or pulled from the one
+// before it on that string (that note carries the slur).
+function isSlurredInto(columns: readonly Col[], index: number, row: number): boolean {
+  for (let back = index - 1; back >= 0; back--) {
+    const cell = columns[back][row];
+    if (cell) return !!cell.slur;
+  }
+  return false;
+}
+
 // Plays a tab and loops it, on the shared audio-clock scheduler (drift-free).
 // Each column's notes are struck together (a chord slot).
 export function useTabPlayback(
@@ -65,8 +75,10 @@ export function useTabPlayback(
         return 60 / bpm;
       }
       if (steps.length > 0) {
-        columns[steps[(current - runCountIn) % steps.length]].forEach((cell, row) => {
-          if (cell) pluckTab(row, cell.fret, at, 0.8);
+        const index = steps[(current - runCountIn) % steps.length];
+        columns[index].forEach((cell, row) => {
+          // A hammer-on or pull-off sounds softer than a picked note.
+          if (cell) pluckTab(row, cell.fret, at, isSlurredInto(columns, index, row) ? 0.5 : 0.8);
         });
       }
       return 60 / bpm / subdiv;

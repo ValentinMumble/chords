@@ -61,12 +61,20 @@ function dexterityBars(positions: number): Col[][] {
   });
 }
 
+// The spider: frets 1-2-3-4 with fingers 1-2-3-4 on every string, from the high
+// e down to the low E, one string per bar. Each finger stays down until it's
+// needed on the next string.
+function spiderBars(): Col[][] {
+  return [0, 1, 2, 3, 4, 5].map(row => [1, 2, 3, 4].map(fret => column([[row, fret, fret]])));
+}
+
 // Computed once at module load (stable references), so switching to Practice and
 // re-renders don't rebuild these arrays or the tabs derived from them.
 export const PETER_GUNN = evenEighths(peterGunnBars());
 export const CHROMATIC = evenEighths([...chromaticBars(false), ...chromaticBars(true)]);
 export const STAIRCASE = evenEighths([...staircaseBars(false), ...staircaseBars(true)]);
 export const DEXTERITY = evenEighths(dexterityBars(4));
+export const SPIDER = evenEighths(spiderBars());
 
 export const dexterity: PracticeCard = {
   id: 'dexterity',
@@ -88,6 +96,21 @@ export const dexterity: PracticeCard = {
       showRhythm: true,
       barsPerRow: 2,
       caption: 'Climbs one fret per bar — keep every note the same length',
+    },
+    {
+      note: (
+        <>
+          The spider: frets 1·2·3·4 with fingers 1·2·3·4 on each string, from the high e down to the low E.{' '}
+          <strong>Keep each finger down as long as you can</strong>, lifting it only when it moves to the next string.
+        </>
+      ),
+      bars: SPIDER,
+      storageKey: 'spider',
+      defaultTempo: 50,
+      subdiv: 2,
+      showRhythm: true,
+      barsPerRow: 6,
+      caption: 'One string per bar, fingers stay down',
     },
   ],
 };
